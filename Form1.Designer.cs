@@ -1,0 +1,152 @@
+﻿namespace BrunnianLink
+{
+    partial class Form1
+    {
+        /// <summary>
+        ///  Required designer variable.
+        /// </summary>
+        private System.ComponentModel.IContainer components = null;
+
+        /// <summary>
+        ///  Clean up any resources being used.
+        /// </summary>
+        /// <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing && (components != null))
+            {
+                components.Dispose();
+            }
+            base.Dispose(disposing);
+        }
+
+        #region Windows Form Designer generated code
+
+        /// <summary>
+        ///  Required method for Designer support - do not modify
+        ///  the contents of this method with the code editor.
+        /// </summary>
+        private void InitializeComponent()
+        {
+            tbPath = new TextBox();
+            btGenerate = new Button();
+            btOpen = new Button();
+            cbModelChoice = new ComboBox();
+            label1 = new Label();
+            label2 = new Label();
+            nudLevel = new NumericUpDown();
+            btViewText = new Button();
+            ((System.ComponentModel.ISupportInitialize)nudLevel).BeginInit();
+            SuspendLayout();
+            // 
+            // tbPath
+            // 
+            tbPath.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            tbPath.AutoCompleteMode = AutoCompleteMode.SuggestAppend;
+            tbPath.AutoCompleteSource = AutoCompleteSource.FileSystem;
+            tbPath.Location = new Point(12, 12);
+            tbPath.Name = "tbPath";
+            tbPath.Size = new Size(468, 23);
+            tbPath.TabIndex = 0;
+            tbPath.Text = "D:\\klad\\lego\\BrunnianLink\\out\\meh.ldr";
+            // 
+            // btGenerate
+            // 
+            btGenerate.Location = new Point(12, 164);
+            btGenerate.Name = "btGenerate";
+            btGenerate.Size = new Size(75, 23);
+            btGenerate.TabIndex = 1;
+            btGenerate.Text = "Generate";
+            btGenerate.UseVisualStyleBackColor = true;
+            btGenerate.Click += BtGenerate_Click;
+            // 
+            // btOpen
+            // 
+            btOpen.Location = new Point(93, 164);
+            btOpen.Name = "btOpen";
+            btOpen.Size = new Size(75, 23);
+            btOpen.TabIndex = 1;
+            btOpen.Text = "Open";
+            btOpen.UseVisualStyleBackColor = true;
+            btOpen.Click += BtOpen_Click;
+            // 
+            // cbModelChoice
+            // 
+            cbModelChoice.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            cbModelChoice.FormattingEnabled = true;
+            cbModelChoice.Items.AddRange(new object[] { "Brunnian links", "Gosper tiling", "Hat Polykite", "Hilbert 3D", "Cross tiling", "Conway Radin pinwheel tiling", "Chair tiling", "Tennis tiling", "Wanderer (reflections) tiling", "Wanderer (rotations) tiling","Ammann-Beenker tiling" });
+            cbModelChoice.Location = new Point(93, 70);
+            cbModelChoice.Name = "cbModelChoice";
+            cbModelChoice.Size = new Size(387, 23);
+            cbModelChoice.TabIndex = 2;
+            // 
+            // label1
+            // 
+            label1.AutoSize = true;
+            label1.Location = new Point(12, 73);
+            label1.Name = "label1";
+            label1.Size = new Size(44, 15);
+            label1.TabIndex = 3;
+            label1.Text = "Model:";
+            // 
+            // label2
+            // 
+            label2.AutoSize = true;
+            label2.Location = new Point(12, 123);
+            label2.Name = "label2";
+            label2.Size = new Size(37, 15);
+            label2.TabIndex = 4;
+            label2.Text = "Level:";
+            // 
+            // nudLevel
+            // 
+            nudLevel.Location = new Point(93, 121);
+            nudLevel.Maximum = new decimal(new int[] { 20, 0, 0, 0 });
+            nudLevel.Minimum = new decimal(new int[] { 1, 0, 0, 0 });
+            nudLevel.Name = "nudLevel";
+            nudLevel.Size = new Size(120, 23);
+            nudLevel.TabIndex = 5;
+            nudLevel.Value = new decimal(new int[] { 4, 0, 0, 0 });
+            // 
+            // btViewText
+            // 
+            btViewText.Location = new Point(174, 164);
+            btViewText.Name = "btViewText";
+            btViewText.Size = new Size(116, 23);
+            btViewText.TabIndex = 6;
+            btViewText.Text = "View .ldr as text";
+            btViewText.UseVisualStyleBackColor = true;
+            btViewText.Click += BtViewText_Click;
+            // 
+            // Form1
+            // 
+            AutoScaleDimensions = new SizeF(7F, 15F);
+            AutoScaleMode = AutoScaleMode.Font;
+            ClientSize = new Size(492, 199);
+            Controls.Add(btViewText);
+            Controls.Add(nudLevel);
+            Controls.Add(label2);
+            Controls.Add(label1);
+            Controls.Add(cbModelChoice);
+            Controls.Add(btOpen);
+            Controls.Add(btGenerate);
+            Controls.Add(tbPath);
+            Name = "Form1";
+            Text = "Form1";
+            ((System.ComponentModel.ISupportInitialize)nudLevel).EndInit();
+            ResumeLayout(false);
+            PerformLayout();
+        }
+
+        #endregion
+
+        private TextBox tbPath;
+        private Button btGenerate;
+        private Button btOpen;
+        private ComboBox cbModelChoice;
+        private Label label1;
+        private Label label2;
+        private NumericUpDown nudLevel;
+        private Button btViewText;
+    }
+}
