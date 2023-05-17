@@ -52,7 +52,7 @@ namespace BrunnianLink
             new() { Rule = new TennisRule() },
             new() { Rule = new WandererReflectionsRule() },
             new() { Rule = new WandererRotationsRule() },
-            new() { Rule = new AmmannBeenker()}
+            new() { Rule = new AmmannBeenkerRule()}
         };
         private void BtGenerate_Click(object sender, EventArgs e)
         {
@@ -71,6 +71,9 @@ namespace BrunnianLink
             int level = (int)nudLevel.Value;
             int modelChoice = cbModelChoice.SelectedIndex;
             string file = tbPath.Text;
+            string parentDir = Directory.GetParent(file)?.FullName!;
+            if (!Directory.Exists(parentDir))
+                Directory.CreateDirectory(parentDir);
             Properties.Settings.Default.SelectedLevel = level;
             Properties.Settings.Default.SelectedModel = modelChoice;
             Properties.Settings.Default.OutputPath = file;
