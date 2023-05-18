@@ -21,7 +21,7 @@ namespace BrunnianLink
 
         public override string MainName => "Ammann_Beenker";
 
-        private static int[] m_startStates = new int[] { 2 };
+        private static int[] m_startStates = new int[] { 0,1 };
         public override int[] StartStates { get => m_startStates; }
 
         public override string BasePart(int state) => state switch
