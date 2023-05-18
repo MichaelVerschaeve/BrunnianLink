@@ -9,6 +9,7 @@ using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 using System.Windows.Forms;
 using System.Linq;
 using System.Drawing.Imaging;
+using Microsoft.VisualBasic.Devices;
 
 namespace BrunnianLink
 {
@@ -29,7 +30,8 @@ namespace BrunnianLink
             BtGenerate_Click(sender, e);
             using Process fileopener = new();
 
-            fileopener.StartInfo.FileName = "explorer";
+            //fileopener.StartInfo.FileName = "explorer";
+            fileopener.StartInfo.FileName = @"C:\Program Files\Studio 2.0\Studio.exe";
             fileopener.StartInfo.Arguments = "\"" + tbPath.Text + "\"";
             fileopener.Start();
         }
@@ -52,7 +54,8 @@ namespace BrunnianLink
             new() { Rule = new TennisRule() },
             new() { Rule = new WandererReflectionsRule() },
             new() { Rule = new WandererRotationsRule() },
-            new() { Rule = new AmmannBeenkerRule()}
+            new() { Rule = new AmmannBeenkerRule()},
+            new() { Rule = new PenroseRhombRule()}
         };
         private void BtGenerate_Click(object sender, EventArgs e)
         {
