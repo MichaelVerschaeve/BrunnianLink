@@ -28,146 +28,114 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.tbPath = new System.Windows.Forms.TextBox();
-            this.btGenerate = new System.Windows.Forms.Button();
-            this.btOpen = new System.Windows.Forms.Button();
-            this.cbModelChoice = new System.Windows.Forms.ComboBox();
-            this.label1 = new System.Windows.Forms.Label();
-            this.label2 = new System.Windows.Forms.Label();
-            this.nudLevel = new System.Windows.Forms.NumericUpDown();
-            this.btViewText = new System.Windows.Forms.Button();
-            ((System.ComponentModel.ISupportInitialize)(this.nudLevel)).BeginInit();
-            this.SuspendLayout();
+            tbPath = new TextBox();
+            btGenerate = new Button();
+            btOpen = new Button();
+            cbModelChoice = new ComboBox();
+            label1 = new Label();
+            label2 = new Label();
+            nudLevel = new NumericUpDown();
+            btViewText = new Button();
+            ((System.ComponentModel.ISupportInitialize)nudLevel).BeginInit();
+            SuspendLayout();
             // 
             // tbPath
             // 
-            this.tbPath.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.tbPath.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.SuggestAppend;
-            this.tbPath.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.FileSystem;
-            this.tbPath.Location = new System.Drawing.Point(14, 16);
-            this.tbPath.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
-            this.tbPath.Name = "tbPath";
-            this.tbPath.Size = new System.Drawing.Size(534, 27);
-            this.tbPath.TabIndex = 0;
-            this.tbPath.Text = "D:\\klad\\lego\\BrunnianLink\\out\\meh.ldr";
+            tbPath.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            tbPath.AutoCompleteMode = AutoCompleteMode.SuggestAppend;
+            tbPath.AutoCompleteSource = AutoCompleteSource.FileSystem;
+            tbPath.Location = new Point(12, 12);
+            tbPath.Name = "tbPath";
+            tbPath.Size = new Size(468, 23);
+            tbPath.TabIndex = 0;
+            tbPath.Text = "D:\\klad\\lego\\BrunnianLink\\out\\meh.ldr";
             // 
             // btGenerate
             // 
-            this.btGenerate.Location = new System.Drawing.Point(14, 219);
-            this.btGenerate.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
-            this.btGenerate.Name = "btGenerate";
-            this.btGenerate.Size = new System.Drawing.Size(86, 31);
-            this.btGenerate.TabIndex = 1;
-            this.btGenerate.Text = "Generate";
-            this.btGenerate.UseVisualStyleBackColor = true;
+            btGenerate.Location = new Point(12, 164);
+            btGenerate.Name = "btGenerate";
+            btGenerate.Size = new Size(75, 23);
+            btGenerate.TabIndex = 1;
+            btGenerate.Text = "Generate";
+            btGenerate.UseVisualStyleBackColor = true;
+            btGenerate.Click += BtGenerate_Click;
             // 
             // btOpen
             // 
-            this.btOpen.Location = new System.Drawing.Point(106, 219);
-            this.btOpen.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
-            this.btOpen.Name = "btOpen";
-            this.btOpen.Size = new System.Drawing.Size(86, 31);
-            this.btOpen.TabIndex = 1;
-            this.btOpen.Text = "Open";
-            this.btOpen.UseVisualStyleBackColor = true;
-            this.btOpen.Click += new System.EventHandler(this.BtOpen_Click);
+            btOpen.Location = new Point(93, 164);
+            btOpen.Name = "btOpen";
+            btOpen.Size = new Size(75, 23);
+            btOpen.TabIndex = 1;
+            btOpen.Text = "Open";
+            btOpen.UseVisualStyleBackColor = true;
+            btOpen.Click += BtOpen_Click;
             // 
             // cbModelChoice
             // 
-            this.cbModelChoice.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.cbModelChoice.FormattingEnabled = true;
-            this.cbModelChoice.Items.AddRange(new object[] {
-            "Brunnian links",
-            "Gosper tiling",
-            "Hat Polykite",
-            "Hilbert 3D",
-            "Cross tiling",
-            "Conway Radin pinwheel tiling",
-            "Chair tiling",
-            "Tennis tiling",
-            "Wanderer (reflections) tiling",
-            "Wanderer (rotations) tiling",
-            "Ammann-Beenker tiling",
-            "Penrose rhombus tiling"});
-            this.cbModelChoice.Location = new System.Drawing.Point(106, 93);
-            this.cbModelChoice.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
-            this.cbModelChoice.Name = "cbModelChoice";
-            this.cbModelChoice.Size = new System.Drawing.Size(442, 28);
-            this.cbModelChoice.TabIndex = 2;
+            cbModelChoice.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            cbModelChoice.FormattingEnabled = true;
+            cbModelChoice.Items.AddRange(new object[] { "Brunnian links", "Gosper tiling", "Hat Polykite", "Hilbert 3D", "Cross tiling", "Penrose rhombus tiling", "Conway Radin pinwheel tiling", "Chair tiling", "Tennis tiling", "Wanderer (reflections) tiling", "Wanderer (rotations) tiling", "Ammann-Beenker tiling" });
+            cbModelChoice.Location = new Point(93, 70);
+            cbModelChoice.Name = "cbModelChoice";
+            cbModelChoice.Size = new Size(387, 23);
+            cbModelChoice.TabIndex = 2;
             // 
             // label1
             // 
-            this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(14, 97);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(55, 20);
-            this.label1.TabIndex = 3;
-            this.label1.Text = "Model:";
+            label1.AutoSize = true;
+            label1.Location = new Point(12, 73);
+            label1.Name = "label1";
+            label1.Size = new Size(44, 15);
+            label1.TabIndex = 3;
+            label1.Text = "Model:";
             // 
             // label2
             // 
-            this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(14, 164);
-            this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(46, 20);
-            this.label2.TabIndex = 4;
-            this.label2.Text = "Level:";
+            label2.AutoSize = true;
+            label2.Location = new Point(12, 123);
+            label2.Name = "label2";
+            label2.Size = new Size(37, 15);
+            label2.TabIndex = 4;
+            label2.Text = "Level:";
             // 
             // nudLevel
             // 
-            this.nudLevel.Location = new System.Drawing.Point(106, 161);
-            this.nudLevel.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
-            this.nudLevel.Maximum = new decimal(new int[] {
-            20,
-            0,
-            0,
-            0});
-            this.nudLevel.Minimum = new decimal(new int[] {
-            1,
-            0,
-            0,
-            0});
-            this.nudLevel.Name = "nudLevel";
-            this.nudLevel.Size = new System.Drawing.Size(137, 27);
-            this.nudLevel.TabIndex = 5;
-            this.nudLevel.Value = new decimal(new int[] {
-            4,
-            0,
-            0,
-            0});
+            nudLevel.Location = new Point(93, 121);
+            nudLevel.Maximum = new decimal(new int[] { 20, 0, 0, 0 });
+            nudLevel.Minimum = new decimal(new int[] { 1, 0, 0, 0 });
+            nudLevel.Name = "nudLevel";
+            nudLevel.Size = new Size(120, 23);
+            nudLevel.TabIndex = 5;
+            nudLevel.Value = new decimal(new int[] { 4, 0, 0, 0 });
             // 
             // btViewText
             // 
-            this.btViewText.Location = new System.Drawing.Point(199, 219);
-            this.btViewText.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
-            this.btViewText.Name = "btViewText";
-            this.btViewText.Size = new System.Drawing.Size(133, 31);
-            this.btViewText.TabIndex = 6;
-            this.btViewText.Text = "View .ldr as text";
-            this.btViewText.UseVisualStyleBackColor = true;
+            btViewText.Location = new Point(174, 164);
+            btViewText.Name = "btViewText";
+            btViewText.Size = new Size(116, 23);
+            btViewText.TabIndex = 6;
+            btViewText.Text = "View .ldr as text";
+            btViewText.UseVisualStyleBackColor = true;
+            btViewText.Click += BtViewText_Click;
             // 
             // Form1
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 20F);
-            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(562, 265);
-            this.Controls.Add(this.btViewText);
-            this.Controls.Add(this.nudLevel);
-            this.Controls.Add(this.label2);
-            this.Controls.Add(this.label1);
-            this.Controls.Add(this.cbModelChoice);
-            this.Controls.Add(this.btOpen);
-            this.Controls.Add(this.btGenerate);
-            this.Controls.Add(this.tbPath);
-            this.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
-            this.Name = "Form1";
-            this.Text = "Form1";
-            ((System.ComponentModel.ISupportInitialize)(this.nudLevel)).EndInit();
-            this.ResumeLayout(false);
-            this.PerformLayout();
-
+            AutoScaleDimensions = new SizeF(7F, 15F);
+            AutoScaleMode = AutoScaleMode.Font;
+            ClientSize = new Size(492, 199);
+            Controls.Add(btViewText);
+            Controls.Add(nudLevel);
+            Controls.Add(label2);
+            Controls.Add(label1);
+            Controls.Add(cbModelChoice);
+            Controls.Add(btOpen);
+            Controls.Add(btGenerate);
+            Controls.Add(tbPath);
+            Name = "Form1";
+            Text = "Form1";
+            ((System.ComponentModel.ISupportInitialize)nudLevel).EndInit();
+            ResumeLayout(false);
+            PerformLayout();
         }
 
         #endregion

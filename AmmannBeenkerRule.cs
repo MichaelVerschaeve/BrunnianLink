@@ -103,7 +103,6 @@ namespace BrunnianLink
 
         public override void DefineCompositeBasePart(StringBuilder sb, int state)
         {
-            MetaData.StartSubModel(sb, BasePart(state));
             int color = StudIOColor16BugFixed ? 16 : ColorMap.Get(m_colors[state==1?0:state]).id;
             switch (state)
             {

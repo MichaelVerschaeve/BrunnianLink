@@ -36,18 +36,6 @@ namespace BrunnianLink
             fileopener.Start();
         }
 
-
-        private void BtViewText_Click(object sender, EventArgs e)
-        {
-            BtGenerate_Click(sender, e);
-            using Process fileopener = new();
-
-            fileopener.StartInfo.FileName = "notepad";
-            fileopener.StartInfo.Arguments = "\"" + tbPath.Text + "\"";
-            fileopener.Start();
-        }
-
-
         private static readonly TilingGenerator[] tileGens = {
             new() { Rule = new PinWheelRules() },
             new() { Rule = new ChairRule() },
@@ -55,7 +43,6 @@ namespace BrunnianLink
             new() { Rule = new WandererReflectionsRule() },
             new() { Rule = new WandererRotationsRule() },
             new() { Rule = new AmmannBeenkerRule()},
-            new() { Rule = new PenroseRhombRule()}
         };
         private void BtGenerate_Click(object sender, EventArgs e)
         {
@@ -116,13 +103,25 @@ namespace BrunnianLink
 
                         }
                     break;
+                case 5:
+                    PenroseRhomb.Generate(sb, level);
+                    break;
                 default:
-                    tileGens[cbModelChoice.SelectedIndex - 5].Generate(sb, level);
+                    tileGens[cbModelChoice.SelectedIndex - 6].Generate(sb, level);
                     break;
             }
             var utf8WithoutBom = new System.Text.UTF8Encoding(false);
             File.WriteAllText(file, sb.ToString(), utf8WithoutBom);
         }
 
+        private void BtViewText_Click(object sender, EventArgs e)
+        {
+            BtGenerate_Click(sender, e);
+            using Process fileopener = new();
+
+            fileopener.StartInfo.FileName = "notepad";
+            fileopener.StartInfo.Arguments = "\"" + tbPath.Text + "\"";
+            fileopener.Start();
+        }
     }
 }

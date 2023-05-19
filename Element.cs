@@ -59,7 +59,7 @@ namespace BrunnianLink
         public int Depth { get => sz / 20; set => sz = 20 * value; }
         public string PartID { get => partID; set => partID = value; }
 
-
+        public bool SwitchXY { get; set; }
         public bool SubModel { get; set; }
 
         protected double rotationAngleDegrees=0.0;
@@ -68,6 +68,10 @@ namespace BrunnianLink
         {
             double c = Math.Cos(rotationAngleDegrees*Math.PI/180.0);
             double s = Math.Sin(rotationAngleDegrees * Math.PI / 180.0);
+            if (SwitchXY) //switch cols
+            {
+                return $"0 {c} {-s} 1 0 0 0 {s} {c}";
+            }
             return $"{c} 0 {-s} 0 1 0 {s} 0 {c}";
         }
 

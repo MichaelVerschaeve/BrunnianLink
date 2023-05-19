@@ -58,26 +58,29 @@ namespace BrunnianLink
             {
                 MetaData.StartSubModel(sb, Rule.MainName);
                 //test mode: just composite base part...
-                foreach (int state in Rule.StartStates)
+                for (int state = 0; state < Rule.StateCount; state++)
                 {
                     Shape s = new() { PartID = Rule.BasePart(state), SubModel = true };
                     sb.AppendLine(s.Print(0, 0, 0, ColorMap.Get(Rule.Colors[state]).id));
                 }
-                for (int i = 0; i < Rule.StateCount; i++)
-                    Rule.DefineCompositeBasePart(sb, i);
+                for (int state = 0; state < Rule.StateCount; state++)
+                {
+                    MetaData.StartSubModel(sb, Rule.BasePart(state));
+                    Rule.DefineCompositeBasePart(sb, state);
+                }
                 return;
             }
             SortedSet<(int level, int state, int color)> requiredParts =
                 DetermineRequiredParts(level);
 
-            if (Rule.StartStates.Length>1)
+            if (Rule.StartStates.Length > 1)
             {
                 MetaData.StartSubModel(sb, Rule.MainName);
                 int count = 0;
                 foreach (int state in Rule.StartStates)
                 {
                     int color = (Rule.ColorByState ? state : (count++)) % Rule.Colors.Length;
-                    Shape s = new() { PartID = PartName(level,state,color), SubModel = true };
+                    Shape s = new() { PartID = PartName(level, state, color), SubModel = true };
                     sb.AppendLine(s.Print(0, 0, 0, ColorMap.Get(Rule.Colors[state]).id));
                 }
             }
@@ -85,10 +88,13 @@ namespace BrunnianLink
                 DoSubPart(sb, t.level, t.level == level, t.state, t.color);
 
             if (Rule.Level0IsComposite)
-                for (int i =0; i < Rule.StateCount; i++)
-                    Rule.DefineCompositeBasePart(sb, i);
-        }
+                for (int state = 0; state < Rule.StateCount; state++)
+                {
+                    MetaData.StartSubModel(sb, Rule.BasePart(state));
 
+                    Rule.DefineCompositeBasePart(sb, state);
+                }
+        }
         private SortedSet<(int level, int state, int color)> DetermineRequiredParts(int level)
         {
             SortedSet<(int level, int state, int color)> res = new();
