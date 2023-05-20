@@ -21,7 +21,7 @@ namespace BrunnianLink
 
         public override string MainName => "Ammann_Beenker";
 
-        private static int[] m_startStates = new int[] { 0,1 };
+        private static readonly int[] m_startStates = new int[] { 0,1 };
         public override int[] StartStates { get => m_startStates; }
 
         public override string BasePart(int state) => state switch
@@ -67,9 +67,9 @@ namespace BrunnianLink
 
         override public List<(double x, double y, double rotation, int state)> Rule(int state) => m_rules[state];
 
-        static bool StudIOColor16BugFixed = false;
+        static readonly bool StudIOColor16BugFixed = false;
 
-        private void DefineQuarter(StringBuilder sb, bool right)
+        private static void DefineQuarter(StringBuilder sb, bool right)
         {
             int color = StudIOColor16BugFixed ? 16 : ColorMap.Get(m_colors[0]).id;
             MetaData.StartSubModel(sb, right ? "QuarterRight" : "QuarterLeft");
@@ -82,7 +82,7 @@ namespace BrunnianLink
             sb.AppendLine(p.Print(-s * 2, -0.5, 0, color));
         }
 
-        private void DefineHalfRhomb(StringBuilder sb)
+        private static void DefineHalfRhomb(StringBuilder sb)
         {
             int color = StudIOColor16BugFixed ? 16 : ColorMap.Get(m_colors[2]).id;
             MetaData.StartSubModel(sb, "HalfRhumb");

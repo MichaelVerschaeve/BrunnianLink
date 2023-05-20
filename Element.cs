@@ -48,8 +48,9 @@ namespace BrunnianLink
                 az = (double)az,
                 partID = partID,
                 rotationAngleDegrees = rotationAngleDegrees,
-                SubModel = SubModel
-
+                SubModel = SubModel,
+                SwitchXZ = SwitchXZ,
+                SwitchYZ = SwitchYZ
             };
             return clone;
         }
@@ -59,7 +60,8 @@ namespace BrunnianLink
         public int Depth { get => sz / 20; set => sz = 20 * value; }
         public string PartID { get => partID; set => partID = value; }
 
-        public bool SwitchXY { get; set; }
+        public bool SwitchXZ { get; set; }
+        public bool SwitchYZ { get; set; }
         public bool SubModel { get; set; }
 
         protected double rotationAngleDegrees=0.0;
@@ -68,9 +70,12 @@ namespace BrunnianLink
         {
             double c = Math.Cos(rotationAngleDegrees*Math.PI/180.0);
             double s = Math.Sin(rotationAngleDegrees * Math.PI / 180.0);
-            if (SwitchXY) //switch cols
+            if (SwitchYZ) //x,yswitch cols, other axle minus to not go chiral
             {
-                return $"0 {c} {-s} 1 0 0 0 {s} {c}";
+                return $"{c} {-s} 0 0 0 -1 {s} {c} 0";
+            }
+            else if (SwitchXZ) {
+                return $"0 {c} {-s} -1 0 0 0 {s} {c}";
             }
             return $"{c} 0 {-s} 0 1 0 {s} 0 {c}";
         }

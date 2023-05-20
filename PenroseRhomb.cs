@@ -1,6 +1,7 @@
 ﻿using Microsoft.VisualBasic.ApplicationServices;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Security.Cryptography.Xml;
 using System.Text;
@@ -31,14 +32,15 @@ namespace BrunnianLink
 
     }
 
-    public struct VertexData : IComparable<VertexData>
+    public class VertexData : IComparable<VertexData>
     {
         public double x;
         public double y;
         public int flags;
 
-        public int CompareTo(VertexData other)
+        public int CompareTo(VertexData? other)
         {
+            if (other == null) return -1;
             if (Math.Abs(x - other.x) > 1.0e-8)
                 return x.CompareTo(other.x);
             if (Math.Abs(y - other.y) > 1.0e-8)
@@ -142,7 +144,7 @@ namespace BrunnianLink
             for (int i = 5; i < 10; i++)
             {
                 if ((flag & mask) == mask)
-                    yield return 360 - (18 + i * 36);
+                    yield return  (18 + i * 36)-360;
                 mask <<= 1;
             }
         }
@@ -162,10 +164,10 @@ namespace BrunnianLink
             if (sangle > 180) sangle -= 360;
             double dx2 = c[sangle] * InitialScale;
             double dy2 = s[sangle] * InitialScale;
-            yield return new VertexData() { x = data.x, y = data.y, flags = EncodeFlag(data.rotation + angle) | EncodeFlag(data.rotation + 180 - angle) };
-            yield return new VertexData() { x = data.x + dx1, y = data.y + dy1, flags = EncodeFlag(data.rotation + 180 - angle) | EncodeFlag(data.rotation + 180 + angle) };
-            yield return new VertexData() { x = data.x + dx2, y = data.y + dy2, flags = EncodeFlag(data.rotation + angle) | EncodeFlag(data.rotation - angle) };
-            yield return new VertexData() { x = data.x +dx1+dx2, y = data.y +dy1+ dy2, flags = EncodeFlag(data.rotation - angle) | EncodeFlag(data.rotation + 180 + angle) };
+            yield return new VertexData() { x = data.x, y = data.y, flags = (EncodeFlag(data.rotation + angle) | EncodeFlag(data.rotation + 180 - angle)) };
+            yield return new VertexData() { x = data.x + dx1, y = data.y + dy1, flags = (EncodeFlag(data.rotation + 180 - angle) | EncodeFlag(data.rotation + 180 + angle))};
+            yield return new VertexData() { x = data.x + dx2, y = data.y + dy2, flags =(EncodeFlag(data.rotation + angle) | EncodeFlag(data.rotation - angle) )};
+            yield return new VertexData() { x = data.x +dx1+dx2, y = data.y +dy1+ dy2, flags =( EncodeFlag(data.rotation - angle) | EncodeFlag(data.rotation + 180 + angle))};
         }
 
 
@@ -237,9 +239,9 @@ namespace BrunnianLink
             sb.AppendLine(liftarm.Rotate(-cangle).Print(-x, y + dy, 0, color));
             sb.AppendLine(liftarm.Rotate(-cangle).Print(x, -y + dy, 0, color));
             sb.AppendLine(liftarm.Rotate(cangle).Print(-x, -y + dy, 0, color));
-            double dpx = 2*c[angle];
-            double dpy = 2*s[angle];
-            Shape pin = new() { PartID = "2780", SwitchXY = true };
+            double dpx = 3*c[angle];
+            double dpy = 3*s[angle];
+            Shape pin = new() { PartID = "2780", SwitchXZ = true };
             sb.AppendLine(pin.Print(x - dpx, y + dpy + dy, -1.25, BlackId));
             sb.AppendLine(pin.Print(x + dpx, y - dpy + dy, -1.25, BlackId));
             sb.AppendLine(pin.Print(-x - dpx, y - dpy + dy, -1.25, BlackId));
@@ -253,14 +255,35 @@ namespace BrunnianLink
 
         static readonly int LBGid = ColorMap.Get("Light_Bluish_Grey").id;
         static readonly int BlackId = ColorMap.Get("Black").id;
+        static readonly int RedId = ColorMap.Get("Red").id;
 
-        public static void DefineVertex(StringBuilder sb, int flags )
+        public static void DefineVertex(StringBuilder sb, int flags)
         {
             Shape rotor = new() { PartID = "80273" };
             MetaData.StartSubModel(sb, $"Vertex_{flags}");
-            sb.AppendLine(rotor.Print(0, 0,0, LBGid));
-            sb.AppendLine(rotor.Rotate(180).Print(0, 0, -2.5, LBGid));
-            
+            sb.AppendLine(rotor.Print(0, 0, -2.5, LBGid));
+            sb.AppendLine(rotor.Rotate(180).Print(0, 0, -5, LBGid));
+            Shape pinAxleConnector3L = new() { PartID = "42003", SwitchYZ = true };
+            Shape pin = new() { PartID = "2780", SwitchXZ = true };
+            Shape pinDouble = new() { PartID = "65098", SwitchXZ = true };
+            Shape doubleSplit = new(){ PartID = "41678" };
+            Shape redAxle = new(){ PartID = "32062" };
+            foreach (int rotation in DecodeFlag(flags))
+            {
+                sb.AppendLine(pinAxleConnector3L.Rotate(rotation + 90).Print(3 * c[rotation], 3 * s[rotation], 0, LBGid));
+                sb.AppendLine(doubleSplit.Rotate(rotation + 90).Print(4 * c[rotation], 4 * s[rotation], 0, LBGid));
+                sb.AppendLine(redAxle.Rotate(rotation + 90).Print(4 * c[rotation], 4 * s[rotation], 0, RedId));
+                if ((rotation - 18 + 360) % 72 == 0) // downer
+                {
+                    sb.AppendLine(pinDouble.Rotate(rotation).Print(2.5 * c[rotation], 2.5 * s[rotation], -2.5, LBGid));
+                }
+                else
+                {
+                    sb.AppendLine(pin.Print(2 * c[rotation], 2 * s[rotation], -1.25, BlackId));
+                    sb.AppendLine(pin.Print(3 * c[rotation], 3 * s[rotation], -1.25, BlackId));
+                }
+            }
+
         }
     }
 }
