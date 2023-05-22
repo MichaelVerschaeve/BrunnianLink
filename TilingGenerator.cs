@@ -33,7 +33,7 @@ namespace BrunnianLink
 
         public virtual bool Level0IsComposite { get => false; }
 
-        private static int[] m_startStates = new int[] {0 };
+        private static readonly int[] m_startStates = new int[] { 0 };
 
         public virtual int[] StartStates { get => m_startStates; }
 
@@ -57,15 +57,21 @@ namespace BrunnianLink
             if ((Control.ModifierKeys & Keys.Control) == Keys.Control)
             {
                 MetaData.StartSubModel(sb, Rule.MainName);
+                int state = level - 1;
                 //test mode: just composite base part...
-                for (int state = 0; state < Rule.StateCount; state++)
-                {
+               // for (int state = 0; state < Rule.StateCount; state++)
+                //{
                     Shape s = new() { PartID = Rule.BasePart(state), SubModel = true };
                     sb.AppendLine(s.Print(0, 0, 0, ColorMap.Get(Rule.Colors[state]).id));
-                }
-                for (int state = 0; state < Rule.StateCount; state++)
+               // }
+                HashSet<string> definedParts = new();
+                for (state = 0; state < Rule.StateCount; state++)
                 {
-                    MetaData.StartSubModel(sb, Rule.BasePart(state));
+                    string id = Rule.BasePart(state);
+                    if (definedParts.Contains(id))
+                        continue;
+                    definedParts.Add(id);
+                    MetaData.StartSubModel(sb, id);
                     Rule.DefineCompositeBasePart(sb, state);
                 }
                 return;
@@ -88,12 +94,18 @@ namespace BrunnianLink
                 DoSubPart(sb, t.level, t.level == level, t.state, t.color);
 
             if (Rule.Level0IsComposite)
+            {
+                HashSet<string> definedParts = new();
                 for (int state = 0; state < Rule.StateCount; state++)
                 {
-                    MetaData.StartSubModel(sb, Rule.BasePart(state));
-
+                    string id = Rule.BasePart(state);
+                    if (definedParts.Contains(id))
+                        continue;
+                    definedParts.Add(id);
+                    MetaData.StartSubModel(sb, id);
                     Rule.DefineCompositeBasePart(sb, state);
                 }
+            }
         }
         private SortedSet<(int level, int state, int color)> DetermineRequiredParts(int level)
         {

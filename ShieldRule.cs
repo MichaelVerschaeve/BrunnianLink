@@ -8,7 +8,7 @@ namespace BrunnianLink
 {
     public class ShieldRule : SubstitutionRule
     {
-        private static readonly string[] m_colors = new[] { "Yellow", "Yellow", "Orange", "DarkBlue"};
+        private static readonly string[] m_colors = new[] { "Yellow", "Yellow", "Orange", "Dark_Blue"};
         public override string[] Colors => m_colors.Concat(m_colors.Reverse()).ToArray();
 
         public override int StateCount => 8;
@@ -20,10 +20,10 @@ namespace BrunnianLink
 
         public override string MainName => "ShieldTiling";
 
-        private static readonly string[] m_baseParts = new[] { "Triangle1", "Triangle2", "Square", "Shield" };
+        private static readonly string[] m_baseParts = new[] { "Triangle", "Triangle", "Square", "Shield", "Shield_mirror" };
         public override string BasePart(int state)
         {
-            return (state >= 4) ? (m_baseParts[7-state] + "_mirror") : m_baseParts[state];
+            return m_baseParts[state>4?(7-state):state];
         }
 
         //state 0: triangle type one, center at top
@@ -85,14 +85,43 @@ namespace BrunnianLink
 
         public override void DefineCompositeBasePart(StringBuilder sb, int state)
         {
+            int mainColor = ColorMap.Get(Colors[state]).id;
+
             switch (state)
             {
-                case 0: case 1: case 6: case 7: //triangle...
+                case 0:
+                case 1:
+                case 6:
+                case 7: //triangle...
                     break;
-                case 2: case 5: //square
-                    sb.AppendLine(new Plate(6, 6).Print(0, 0, 0, ColorMap.Get(Colors[state]).id));
+                case 2:
+                case 5: //square
+                    sb.AppendLine(new Plate(6, 6).Print(3, 3, 0, mainColor));
                     break;
-                default: //shield
+                case 3:
+                case 4: //shield
+                    int s = state == 4 ? -1 : 1;
+                    string thirdID = BasePart(state) + "_third";
+                    Shape shieldThird = new() { PartID = thirdID, SubModel = true };
+                    sb.AppendLine(shieldThird.Print(0, 0, s * 45, mainColor));
+                    double x = InitialScale * (0.5 * Math.Sqrt(2.0) + Math.Sin(Math.PI / 12));
+                    double y = InitialScale * (0.5 * Math.Sqrt(2.0) + Math.Sin(Math.PI / 12));
+                    sb.AppendLine(shieldThird.Print(-s * x, y, -s * 75, mainColor));
+                    sb.AppendLine(shieldThird.Print(s * x, y, s * 165, mainColor));
+                    int swivelColor = ColorMap.Get("Green").id;
+                    int baseColor = ColorMap.Get("White").id;
+                    MetaData.StartSubModel(sb, thirdID);
+                    sb.AppendLine(new Plate(4, 4).Print(2, 2, 0, mainColor));
+                    sb.AppendLine(new Shape() { PartID = "43723" }.Rotate(s * 90).Print(s * 1.5, 5, 0, mainColor));
+                    sb.AppendLine(new Shape() { PartID = "43722" }.Rotate(180).Print(s * 5, 1.55, 0, mainColor));
+                    sb.AppendLine(new Shape() { PartID = "29120" }.Rotate(180).Print(s * 3.5, 4.5, -2, mainColor));
+                    sb.AppendLine(new Plate(5).Print(s * 2.5, 0.5, -1, mainColor));
+                    sb.AppendLine(new Plate(1, 4).Print(s * 0.5, 3, -1, mainColor));
+                    sb.AppendLine(new Shape() { PartID = "2429" }.Rotate(-s * 90).Print(s * 3, 3, -1, swivelColor));
+                    sb.AppendLine(new Shape() { PartID = "2430" }.Rotate(s * 120).Print(s * 3, 3, -1, swivelColor));
+                    sb.AppendLine(new Shape() { PartID = "2430" }.Rotate(s * 120).Print(s * 3, 3, -2, swivelColor));
+                    sb.AppendLine(new Shape() { PartID = "2429" }.Rotate(s * 150).Print(s * 3, 3, -2, swivelColor));
+                    sb.AppendLine(new Shape() { PartID = "30503" }.Rotate(s * 30).Print(s * (2 + 0.5 * Math.Sqrt(3.0)), 3.5 + Math.Sqrt(3), -3, baseColor));
                     break;
             }
         }
