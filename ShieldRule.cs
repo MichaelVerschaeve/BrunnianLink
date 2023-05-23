@@ -20,10 +20,10 @@ namespace BrunnianLink
 
         public override string MainName => "ShieldTiling";
 
-        private static readonly string[] m_baseParts = new[] { "Triangle", "Triangle", "Square", "Shield", "Shield_mirror", "Square_mirror" };
+        private static readonly string[] m_baseParts = new[] { "Triangle1", "Triangle2", "Square", "Shield", "Shield_mirror", "Square_mirror", "Triangle2_mirror", "Triangle1_mirror" };
         public override string BasePart(int state)
         {
-            return m_baseParts[state>5?(7-state):state];
+            return m_baseParts[state];
         }
 
         //state 0: triangle type one, center at top
@@ -57,16 +57,15 @@ namespace BrunnianLink
                 (-0.5,1.0+Math.Sqrt(3.0)*0.5,-30,5), //left top square
                 (0.5,1.0+Math.Sqrt(3.0)*0.5,30,2), //right top square
                 (0.5,1.0+Math.Sqrt(3.0)*0.5,90,5), //bottom square
-               /* (-0.5,Math.Sqrt(3.0)*0.5,60,0), //bottom outer triangle
-                (-Math.Sqrt(3.0),1.5+Math.Sqrt(3.0),-60,0), //left outer triangle
-                (Math.Sqrt(3.0),1.5+Math.Sqrt(3.0),60,7), //right outer triangle
-                (-0.5*Math.Sqrt(3.0),2+Math.Sqrt(3.0),90,7), //duo on top, left triangle
-                (0.5*Math.Sqrt(3.0),2+Math.Sqrt(3.0),-90,1), //duo on top, right,triangle
+                (-0.5,Math.Sqrt(3.0)*0.5,60,0), //bottom outer triangle
+                (-Math.Sqrt(3.0)*0.5,1.5+Math.Sqrt(3.0),-60,0), //left outer triangle
+                (Math.Sqrt(3.0)*0.5,1.5+Math.Sqrt(3.0),60,7), //right outer triangle
+                (-0.5*Math.Sqrt(3.0),1.5+Math.Sqrt(3.0),90,7), //duo on top, left triangle
+                (0.5*Math.Sqrt(3.0),1.5+Math.Sqrt(3.0),-90,1), //duo on top, right,triangle
                 (-0.5*(1+Math.Sqrt(3.0)),1.5+0.5*Math.Sqrt(3.0),30,0), //duo on left, top triangle
                 (-0.5,0.5*Math.Sqrt(3.0),-150,6), //duo on left, bottom triangle
                 (0.5*(1+Math.Sqrt(3.0)),1.5+0.5*Math.Sqrt(3.0),-30,7), //duo on right, top triangle
-                (0.5,0.5*Math.Sqrt(3.0),150,1), //duo on right, bottom triangle
-               */
+                (0.5,0.5*Math.Sqrt(3.0),150,1) //duo on right, bottom triangle
             }
         };
 
@@ -82,7 +81,7 @@ namespace BrunnianLink
 
         public override bool Level0IsComposite => true;
 
-        public override int[] StartStates => new int[] {2};
+        public override int[] StartStates => new int[] {3};
 
         public override void DefineCompositeBasePart(StringBuilder sb, int state)
         {
