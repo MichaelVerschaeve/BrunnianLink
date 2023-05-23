@@ -20,10 +20,10 @@ namespace BrunnianLink
 
         public override string MainName => "ShieldTiling";
 
-        private static readonly string[] m_baseParts = new[] { "Triangle", "Triangle", "Square", "Shield", "Shield_mirror" };
+        private static readonly string[] m_baseParts = new[] { "Triangle", "Triangle", "Square", "Shield", "Shield_mirror", "Square_mirror" };
         public override string BasePart(int state)
         {
-            return m_baseParts[state>4?(7-state):state];
+            return m_baseParts[state>5?(7-state):state];
         }
 
         //state 0: triangle type one, center at top
@@ -35,17 +35,17 @@ namespace BrunnianLink
         {
             new List<(double x, double y, double rotation, int state)> 
             { 
-                (0,0,180,3)
+                (-m_scaleFactor*0.5,-m_scaleFactor*Math.Sqrt(3.0)*0.5, -60,3)
             },
             new List<(double x, double y, double rotation, int state)>
             {
                 (0,0,-135,2),
-                (0,-Math.Sqrt(2),135,1),
-                (0,-Math.Sqrt(2),-135,6),
+                (0,-Math.Sqrt(2),105,1),
+                (0,-Math.Sqrt(2),-105,6),
             },
             new List<(double x, double y, double rotation, int state)>
             {
-                ((m_scaleFactor+Math.Sqrt(2.0))*0.5,m_scaleFactor*0.5,45,4),
+                ((m_scaleFactor+Math.Sqrt(2.0))*0.5,m_scaleFactor*0.5,45,5),
                 ((m_scaleFactor-Math.Sqrt(2.0))*0.5,m_scaleFactor*0.5,15,0),
                 (m_scaleFactor*0.5,(m_scaleFactor-Math.Sqrt(2.0))*0.5,105,0),
                 ((m_scaleFactor-Math.Sqrt(2.0))*0.5,m_scaleFactor*0.5,165,7),
@@ -57,7 +57,7 @@ namespace BrunnianLink
                 (-0.5,1.0+Math.Sqrt(3.0)*0.5,-30,5), //left top square
                 (0.5,1.0+Math.Sqrt(3.0)*0.5,30,2), //right top square
                 (0.5,1.0+Math.Sqrt(3.0)*0.5,90,5), //bottom square
-                (-0.5,Math.Sqrt(3.0)*0.5,60,0), //bottom outer triangle
+               /* (-0.5,Math.Sqrt(3.0)*0.5,60,0), //bottom outer triangle
                 (-Math.Sqrt(3.0),1.5+Math.Sqrt(3.0),-60,0), //left outer triangle
                 (Math.Sqrt(3.0),1.5+Math.Sqrt(3.0),60,7), //right outer triangle
                 (-0.5*Math.Sqrt(3.0),2+Math.Sqrt(3.0),90,7), //duo on top, left triangle
@@ -66,6 +66,7 @@ namespace BrunnianLink
                 (-0.5,0.5*Math.Sqrt(3.0),-150,6), //duo on left, bottom triangle
                 (0.5*(1+Math.Sqrt(3.0)),1.5+0.5*Math.Sqrt(3.0),-30,7), //duo on right, top triangle
                 (0.5,0.5*Math.Sqrt(3.0),150,1), //duo on right, bottom triangle
+               */
             }
         };
 
@@ -81,7 +82,7 @@ namespace BrunnianLink
 
         public override bool Level0IsComposite => true;
 
-        public override int[] StartStates => new int[] {3};
+        public override int[] StartStates => new int[] {2};
 
         public override void DefineCompositeBasePart(StringBuilder sb, int state)
         {
@@ -89,6 +90,7 @@ namespace BrunnianLink
             string thirdID = BasePart(state) + "_third";
             int baseColor = ColorMap.Get("White").id;
             int grayColor = ColorMap.Get("Light_Bluish_Grey").id;
+            int s = state >= 4 ? -1 : 1;
 
             switch (state)
             {
@@ -96,17 +98,18 @@ namespace BrunnianLink
                 case 1:
                 case 6:
                 case 7: //triangle...
+                    double yoffset = -Math.Sqrt(3.0) * 3;
                     Shape triangleThird = new() { PartID = thirdID, SubModel = true };
-                    sb.AppendLine(triangleThird.Print(0, 0, 0, mainColor));
-                    sb.AppendLine(triangleThird.Rotate(120).Print(1.5, 1.5 * Math.Sqrt(3.0), 0, mainColor));
-                    sb.AppendLine(triangleThird.Rotate(-120).Print(-1.5, 1.5 * Math.Sqrt(3.0), 0, mainColor));
-                    sb.AppendLine(new Shape() { PartID = "3004" }.Print(0, 0.5, -1.5, mainColor));
-                    sb.AppendLine(new Shape() { PartID = "99781", SwitchYZ2 = true }.Rotate(60).Print(-1.5, 1.5 * Math.Sqrt(3.0), -3.25, mainColor));
-                    sb.AppendLine(new Shape() { PartID = "99781", SwitchYZ2 = true }.Rotate(-60).Print(1.5, 1.5 * Math.Sqrt(3.0), -3.25, mainColor));
+                    sb.AppendLine(triangleThird.Print(0, yoffset, 0, mainColor));
+                    sb.AppendLine(triangleThird.Rotate(120).Print(1.5, yoffset + 1.5 * Math.Sqrt(3.0), 0, mainColor));
+                    sb.AppendLine(triangleThird.Rotate(-120).Print(-1.5, yoffset +1.5 * Math.Sqrt(3.0), 0, mainColor));
+                    sb.AppendLine(new Shape() { PartID = "3004" }.Print(0, yoffset + 0.5, - 1.5, mainColor));
+                    sb.AppendLine(new Shape() { PartID = "99781", SwitchYZ2 = true }.Rotate(60).Print(-1.5, yoffset + 1.5 * Math.Sqrt(3.0), -3.25, mainColor));
+                    sb.AppendLine(new Shape() { PartID = "99781", SwitchYZ2 = true }.Rotate(-60).Print(1.5, yoffset + 1.5 * Math.Sqrt(3.0), -3.25, mainColor));
                     double halfplated = 0.2;
-                    sb.AppendLine(new Plate(2, 2) { SwitchYZ2 = true }.Rotate(60).Print(-1.5 - halfplated * Math.Sqrt(3.0), halfplated + 1.5 * Math.Sqrt(3.0), -4.5, grayColor));
-                    sb.AppendLine(new Plate(2, 2) { SwitchYZ2 = true }.Rotate(-60).Print(1.5 + halfplated * Math.Sqrt(3.0), halfplated + 1.5 * Math.Sqrt(3.0), -4.5, grayColor));
-                    sb.AppendLine(new Shape() { PartID = "30022", SwitchYZ2 = true }.Rotate(180).Print(0, 0, -5.75, mainColor));
+                    sb.AppendLine(new Plate(2, 2) { SwitchYZ2 = true }.Rotate(60).Print(-1.5 - halfplated * Math.Sqrt(3.0), yoffset + halfplated + 1.5 * Math.Sqrt(3.0), -4.5, grayColor));
+                    sb.AppendLine(new Plate(2, 2) { SwitchYZ2 = true }.Rotate(-60).Print(1.5 + halfplated * Math.Sqrt(3.0), yoffset + halfplated + 1.5 * Math.Sqrt(3.0), -4.5, grayColor));
+                    sb.AppendLine(new Shape() { PartID = "30022", SwitchYZ2 = true }.Rotate(180).Print(0, yoffset, -5.75, mainColor));
 
                     MetaData.StartSubModel(sb, thirdID);
                     sb.AppendLine(new Shape() { PartID = "29120" }.Rotate(90).Print(1, 0.5, -1.5, baseColor));
@@ -116,11 +119,10 @@ namespace BrunnianLink
                     break;
                 case 2:
                 case 5: //square
-                    sb.AppendLine(new Plate(6, 6).Print(3, 3, 0, mainColor));
+                    sb.AppendLine(new Plate(6, 6).Print(s*3, 3, 0, mainColor));
                     break;
                 case 3:
                 case 4: //shield
-                    int s = state == 4 ? -1 : 1;
                     Shape shieldThird = new() { PartID = thirdID, SubModel = true };
                     sb.AppendLine(shieldThird.Rotate(s * 45).Print(0, 0, 0, mainColor));
                     double x = InitialScale * (0.5 * Math.Sqrt(2.0) + Math.Sin(Math.PI / 12));

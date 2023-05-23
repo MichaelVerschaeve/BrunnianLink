@@ -105,10 +105,13 @@ namespace BrunnianLink
                         }
                     break;
                 case 5:
+                    OctaFlake.Generate(sb, level);
+                    break;
+                case 6:
                     PenroseRhomb.Generate(sb, level);
                     break;
                 default:
-                    tileGens[cbModelChoice.SelectedIndex - 6].Generate(sb, level);
+                    tileGens[cbModelChoice.SelectedIndex - 7].Generate(sb, level);
                     break;
             }
             var utf8WithoutBom = new System.Text.UTF8Encoding(false);
