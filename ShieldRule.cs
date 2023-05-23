@@ -72,7 +72,7 @@ namespace BrunnianLink
         public override List<(double x, double y, double rotation, int state)> Rule(int state)
         {
             if (state >= 4)
-                return m_rules[7-state].Select(((double x, double y, double rotation, int state) t) => (-t.x, t.y, -t.rotation, 7 - state)).ToList();
+                return m_rules[7-state].Select(((double x, double y, double rotation, int state) t) => (-t.x, t.y, -t.rotation, 7 - t.state)).ToList();
             else
                 return m_rules[state];
         }
@@ -89,7 +89,8 @@ namespace BrunnianLink
             string thirdID = BasePart(state) + "_third";
             int baseColor = ColorMap.Get("White").id;
             int grayColor = ColorMap.Get("Light_Bluish_Grey").id;
-            int s = state >= 4 ? -1 : 1;
+            bool mirrored = state >= 4;
+            int s = mirrored ? -1 : 1;
 
             switch (state)
             {
@@ -131,18 +132,18 @@ namespace BrunnianLink
                     int swivelColor = ColorMap.Get("Green").id;
 
                     MetaData.StartSubModel(sb, thirdID);
-                    sb.AppendLine(new Plate(4, 4).Print(2, 2, 0, mainColor));
-                    sb.AppendLine(new Shape() { PartID = "43723" }.Rotate(s * 90).Print(s * 1.5, 5, 0, mainColor));
-                    sb.AppendLine(new Shape() { PartID = "43722" }.Rotate(180).Print(s * 5, 1.55, 0, mainColor));
-                    sb.AppendLine(new Shape() { PartID = "29120" }.Rotate(180).Print(s * 3.5, 5, -2, mainColor));
+                    sb.AppendLine(new Plate(4, 4).Print(s*2, 2, 0, mainColor));
+                    sb.AppendLine(new Shape() { PartID = mirrored? "43722":"43723" }.Rotate(s * 90).Print(s * 1.5, 5, 0, mainColor));
+                    sb.AppendLine(new Shape() { PartID = mirrored? "43723":"43722" }.Rotate(180).Print(s * 5, 1.55, 0, mainColor));
+                    sb.AppendLine(new Shape() { PartID = mirrored?"29119":"29120" }.Rotate(180).Print(s * 3.5, 5, -2, mainColor));
                     sb.AppendLine(new Plate(5).Print(s * 2.5, 0.5, -1, mainColor));
                     sb.AppendLine(new Plate(1, 4).Print(s * 0.5, 3, -1, mainColor));
                     sb.AppendLine(new Plate(1, 4).Print(s * 3.5, 3, -1, mainColor));
-                    sb.AppendLine(new Shape() { PartID = "2429" }.Rotate(-s * 90).Print(s * 3, 3, -2, swivelColor));
-                    sb.AppendLine(new Shape() { PartID = "2430" }.Rotate(s * 120).Print(s * 3, 3, -2, swivelColor));
-                    sb.AppendLine(new Shape() { PartID = "2430" }.Rotate(s * 120).Print(s * 3, 3, -3, swivelColor));
-                    sb.AppendLine(new Shape() { PartID = "2429" }.Rotate(s * 150).Print(s * 3, 3, -3, swivelColor));
-                    sb.AppendLine(new Shape() { PartID = "30503" }.Rotate(s * 30).Print(s * (2 + 0.5 * Math.Sqrt(3.0)), 3.5 + Math.Sqrt(3), -4, baseColor));
+                    sb.AppendLine(new Shape() { PartID = mirrored?"2430":"2429" }.Rotate(-s * 90).Print(s * 3, 3, -2, swivelColor));
+                    sb.AppendLine(new Shape() { PartID = mirrored ? "2429" : "2430" }.Rotate(s * 120).Print(s * 3, 3, -2, swivelColor));
+                    sb.AppendLine(new Shape() { PartID = mirrored ? "2429" : "2430" }.Rotate(s * 120).Print(s * 3, 3, -3, swivelColor));
+                    sb.AppendLine(new Shape() { PartID = mirrored ? "2430" : "2429" }.Rotate(s * 150).Print(s * 3, 3, -3, swivelColor));
+                    sb.AppendLine(new Shape() { PartID = "30503" }.Rotate(mirrored?-120:30).Print(s * (2 + 0.5 * Math.Sqrt(3.0)), 3.5 + Math.Sqrt(3), -4, baseColor));
                     break;
             }
         }
