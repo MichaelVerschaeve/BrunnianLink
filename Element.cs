@@ -50,7 +50,8 @@ namespace BrunnianLink
                 rotationAngleDegrees = rotationAngleDegrees,
                 SubModel = SubModel,
                 SwitchXZ = SwitchXZ,
-                SwitchYZ = SwitchYZ
+                SwitchYZ = SwitchYZ,
+                SwitchYZ2 = SwitchYZ2
             };
             return clone;
         }
@@ -62,6 +63,7 @@ namespace BrunnianLink
 
         public bool SwitchXZ { get; set; }
         public bool SwitchYZ { get; set; }
+        public bool SwitchYZ2 { get; set; }
         public bool SubModel { get; set; }
 
         protected double rotationAngleDegrees=0.0;
@@ -73,6 +75,10 @@ namespace BrunnianLink
             if (SwitchYZ) //x,yswitch cols, other axle minus to not go chiral
             {
                 return $"{c} {-s} 0 0 0 -1 {s} {c} 0";
+            }
+            else if (SwitchYZ2) //x,yswitch cols, other axle minus to not go chiral
+            {
+                return $"{c} {s} 0 0 0 1 {s} {-c} 0";
             }
             else if (SwitchXZ) {
                 return $"0 {c} {-s} -1 0 0 0 {s} {c}";

@@ -86,6 +86,9 @@ namespace BrunnianLink
         public override void DefineCompositeBasePart(StringBuilder sb, int state)
         {
             int mainColor = ColorMap.Get(Colors[state]).id;
+            string thirdID = BasePart(state) + "_third";
+            int baseColor = ColorMap.Get("White").id;
+            int grayColor = ColorMap.Get("Light_Bluish_Grey").id;
 
             switch (state)
             {
@@ -93,6 +96,23 @@ namespace BrunnianLink
                 case 1:
                 case 6:
                 case 7: //triangle...
+                    Shape triangleThird = new() { PartID = thirdID, SubModel = true };
+                    sb.AppendLine(triangleThird.Print(0, 0, 0, mainColor));
+                    sb.AppendLine(triangleThird.Rotate(120).Print(1.5, 1.5 * Math.Sqrt(3.0), 0, mainColor));
+                    sb.AppendLine(triangleThird.Rotate(-120).Print(-1.5, 1.5 * Math.Sqrt(3.0), 0, mainColor));
+                    sb.AppendLine(new Shape() { PartID = "3004" }.Print(0, 0.5, -1.5, mainColor));
+                    sb.AppendLine(new Shape() { PartID = "99781", SwitchYZ2 = true }.Rotate(60).Print(-1.5, 1.5 * Math.Sqrt(3.0), -3.25, mainColor));
+                    sb.AppendLine(new Shape() { PartID = "99781", SwitchYZ2 = true }.Rotate(-60).Print(1.5, 1.5 * Math.Sqrt(3.0), -3.25, mainColor));
+                    double halfplated = 0.2;
+                    sb.AppendLine(new Plate(2, 2) { SwitchYZ2 = true }.Rotate(60).Print(-1.5 - halfplated * Math.Sqrt(3.0), halfplated + 1.5 * Math.Sqrt(3.0), -4.5, grayColor));
+                    sb.AppendLine(new Plate(2, 2) { SwitchYZ2 = true }.Rotate(-60).Print(1.5 + halfplated * Math.Sqrt(3.0), halfplated + 1.5 * Math.Sqrt(3.0), -4.5, grayColor));
+                    sb.AppendLine(new Shape() { PartID = "30022", SwitchYZ2 = true }.Rotate(180).Print(0, 0, -5.75, mainColor));
+
+                    MetaData.StartSubModel(sb, thirdID);
+                    sb.AppendLine(new Shape() { PartID = "29120" }.Rotate(90).Print(1, 0.5, -1.5, baseColor));
+                    sb.AppendLine(new Shape() { PartID = "29119" }.Rotate(-90).Print(-1, 0.5, -1.5, baseColor));
+                    sb.AppendLine(new Plate(2).Print(0, 0.5, -0.5, baseColor));
+
                     break;
                 case 2:
                 case 5: //square
@@ -101,27 +121,27 @@ namespace BrunnianLink
                 case 3:
                 case 4: //shield
                     int s = state == 4 ? -1 : 1;
-                    string thirdID = BasePart(state) + "_third";
                     Shape shieldThird = new() { PartID = thirdID, SubModel = true };
-                    sb.AppendLine(shieldThird.Print(0, 0, s * 45, mainColor));
+                    sb.AppendLine(shieldThird.Rotate(s * 45).Print(0, 0, 0, mainColor));
                     double x = InitialScale * (0.5 * Math.Sqrt(2.0) + Math.Sin(Math.PI / 12));
-                    double y = InitialScale * (0.5 * Math.Sqrt(2.0) + Math.Sin(Math.PI / 12));
-                    sb.AppendLine(shieldThird.Print(-s * x, y, -s * 75, mainColor));
-                    sb.AppendLine(shieldThird.Print(s * x, y, s * 165, mainColor));
+                    double y = InitialScale * (0.5 * Math.Sqrt(2.0) + Math.Cos(Math.PI / 12));
+                    sb.AppendLine(shieldThird.Rotate(-s * 75).Print(-s * x, y, 0, mainColor));
+                    sb.AppendLine(shieldThird.Rotate(s * 165).Print(s * x, y, 0, mainColor));
                     int swivelColor = ColorMap.Get("Green").id;
-                    int baseColor = ColorMap.Get("White").id;
+
                     MetaData.StartSubModel(sb, thirdID);
                     sb.AppendLine(new Plate(4, 4).Print(2, 2, 0, mainColor));
                     sb.AppendLine(new Shape() { PartID = "43723" }.Rotate(s * 90).Print(s * 1.5, 5, 0, mainColor));
                     sb.AppendLine(new Shape() { PartID = "43722" }.Rotate(180).Print(s * 5, 1.55, 0, mainColor));
-                    sb.AppendLine(new Shape() { PartID = "29120" }.Rotate(180).Print(s * 3.5, 4.5, -2, mainColor));
+                    sb.AppendLine(new Shape() { PartID = "29120" }.Rotate(180).Print(s * 3.5, 5, -2, mainColor));
                     sb.AppendLine(new Plate(5).Print(s * 2.5, 0.5, -1, mainColor));
                     sb.AppendLine(new Plate(1, 4).Print(s * 0.5, 3, -1, mainColor));
-                    sb.AppendLine(new Shape() { PartID = "2429" }.Rotate(-s * 90).Print(s * 3, 3, -1, swivelColor));
-                    sb.AppendLine(new Shape() { PartID = "2430" }.Rotate(s * 120).Print(s * 3, 3, -1, swivelColor));
+                    sb.AppendLine(new Plate(1, 4).Print(s * 3.5, 3, -1, mainColor));
+                    sb.AppendLine(new Shape() { PartID = "2429" }.Rotate(-s * 90).Print(s * 3, 3, -2, swivelColor));
                     sb.AppendLine(new Shape() { PartID = "2430" }.Rotate(s * 120).Print(s * 3, 3, -2, swivelColor));
-                    sb.AppendLine(new Shape() { PartID = "2429" }.Rotate(s * 150).Print(s * 3, 3, -2, swivelColor));
-                    sb.AppendLine(new Shape() { PartID = "30503" }.Rotate(s * 30).Print(s * (2 + 0.5 * Math.Sqrt(3.0)), 3.5 + Math.Sqrt(3), -3, baseColor));
+                    sb.AppendLine(new Shape() { PartID = "2430" }.Rotate(s * 120).Print(s * 3, 3, -3, swivelColor));
+                    sb.AppendLine(new Shape() { PartID = "2429" }.Rotate(s * 150).Print(s * 3, 3, -3, swivelColor));
+                    sb.AppendLine(new Shape() { PartID = "30503" }.Rotate(s * 30).Print(s * (2 + 0.5 * Math.Sqrt(3.0)), 3.5 + Math.Sqrt(3), -4, baseColor));
                     break;
             }
         }
