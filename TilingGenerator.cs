@@ -12,6 +12,19 @@ using static System.Runtime.InteropServices.JavaScript.JSType;
 using static System.Windows.Forms.AxHost;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement.TaskbarClock;
 
+//tilings to still consider
+//MiniTangram
+//hoffstedter
+//Square Triangle Pinwheel Variant
+//Monnier (scale Y)
+//Pentomino
+//Rhomb Square Octagon
+//Socolar - C5 (reuse penrose)
+//Tangram
+//Tetris
+//Tromino 2
+//Watanabe Ito Soma 8-fold
+
 namespace BrunnianLink
 {
     public abstract class SubstitutionRule

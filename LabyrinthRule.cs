@@ -9,7 +9,7 @@ namespace BrunnianLink
 {
     public class LabyrinthRule : SubstitutionRule
     {
-        static private readonly string[] m_colors = new[] { "Lavender", "Dark_Pink", "Aqua" };
+        static private readonly string[] m_colors = new[] { "Dark_Pink", "Purple", "Aqua" };
         public override string[] Colors => m_colors;
 
         public override int StateCount => 3;
@@ -57,12 +57,12 @@ namespace BrunnianLink
                 (1,0,180,2),
                 (1,1,0,0)
             },
-            new List<(double x, double y, double rotation, int state)> //trapezium, bottom center
+            new List<(double x, double y, double rotation, int state)> //trapezium, top center, smallest base at top
             {
-                (0,1-trapHeight,0,0),
-                (-1,-trapHeight,0,1),
-                (1,-trapHeight,90,1),
-                (0,-trapHeight,180,2)
+                (0,-0.5*squareHeight,0,0),
+                (-1,-squareHeight-trapHeight,0,1),
+                (1,-squareHeight-trapHeight,90,1),
+                (0,-squareHeight-trapHeight,180,2)
             }
         };
 
@@ -72,7 +72,7 @@ namespace BrunnianLink
 
         public override bool Level0IsComposite => true;
 
-
+        public override int[] StartStates => new int[] { 0 };
 
         private static string QuarterId(bool right) => "Quarter" + (right ? "Right" : "Left");
 
@@ -92,7 +92,7 @@ namespace BrunnianLink
 
         public override void DefineCompositeBasePart(StringBuilder sb, int state)
         {
-            int color = MetaData.StudIOColor16BugFixed ? 16 : ColorMap.Get(m_colors[state == 1 ? 0 : state]).id;
+            int color = MetaData.StudIOColor16BugFixed ? 16 : ColorMap.Get(m_colors[state]).id;
             //int swivelColor = ColorMap.Get("Green").id;
             Shape wedge = new() { PartID = "15706" };   //from 135 to 180 degree wedge
             Shape swivelTop = new() { PartID = "2430" };
@@ -130,21 +130,22 @@ namespace BrunnianLink
                     sb.AppendLine(new Plate(8).Print(offset + 4, 0.5, 1, color));
                     sb.AppendLine(new Plate(4).Rotate(45).Print(offset + 5.5 * c, offset + 4.5 * c, 0, color));
                     sb.AppendLine(new Plate(6).Rotate(45).Print(offset + 2.5 * c, offset + 1.5 * c, 1, color));
-                    sb.AppendLine(swivelBottom.Rotate(45).Print(offset + 8*c, offset + 6*c, 1, color));
+                    sb.AppendLine(swivelBottom.Rotate(45).Print(offset + 8 * c, offset + 6 * c, 1, color));
                     break;
                 case 2: //trapezium
-                    sb.AppendLine(wedge.Rotate(-135).Print(-3, 1, 0, color));
-                    sb.AppendLine(wedge.Print(3, 1, 1, color));
-                    sb.AppendLine(new Plate(4).Print(-3, 0.5, 1, color));
-                    sb.AppendLine(new Plate(4).Print(3, 0.5, 0, color));
-                    sb.AppendLine(swivelTop.Rotate(180).Print(5, 1, 1, color));
-                    sb.AppendLine(swivelBottom.Rotate(180).Print(-5,1, 0, color));
-                    sb.AppendLine(new Plate(8).Rotate(45).Print(-3 + 3.5 * c, 1 + 4.5 * c, 1, color));
-                    sb.AppendLine(new Plate(3).Rotate(-45).Print(3 - c, 1 + 2 * c, 0, color));
-                    sb.AppendLine(new Shape() { PartID="92593"}.Rotate(-45).Print(3-4.5*c, 1 + 5.5 * c, 0, color));
-                    sb.AppendLine(new Plate(1).Rotate(-45).Print(3 - 7*c, 1 + 8 * c, 0, color));
-                    sb.AppendLine(swivelTop.Rotate(-45).Print(3 - 8 * c, 1 + 8 * c, 1, color));
-                    sb.AppendLine(swivelBottom.Rotate(45).Print(-3 + 8 * c, 1 + 8 * c, 0, color));
+                    double yoffset = -trapHeight * InitialScale;
+                    sb.AppendLine(wedge.Rotate(-135).Print(-3, yoffset + 1, 0, color));
+                    sb.AppendLine(wedge.Print(3, yoffset + 1, 1, color));
+                    sb.AppendLine(new Plate(4).Print(-3, yoffset + 0.5, 1, color));
+                    sb.AppendLine(new Plate(4).Print(3, yoffset + 0.5, 0, color));
+                    sb.AppendLine(swivelTop.Rotate(180).Print(5, yoffset + 1, 1, color));
+                    sb.AppendLine(swivelBottom.Rotate(180).Print(-5, yoffset + 1, 0, color));
+                    sb.AppendLine(new Plate(8).Rotate(45).Print(-3 + 3.5 * c, yoffset + 1 + 4.5 * c, 1, color));
+                    sb.AppendLine(new Plate(3).Rotate(-45).Print(3 - c, yoffset + 1 + 2 * c, 0, color));
+                    sb.AppendLine(new Shape() { PartID = "92593" }.Rotate(-45).Print(3 - 4.5 * c, yoffset + 1 + 5.5 * c, 0, color));
+                    sb.AppendLine(new Plate(1).Rotate(-45).Print(3 - 7 * c, yoffset + 1 + 8 * c, 0, color));
+                    sb.AppendLine(swivelTop.Rotate(-45).Print(3 - 8 * c, yoffset + 1 + 8 * c, 1, color));
+                    sb.AppendLine(swivelBottom.Rotate(45).Print(-3 + 8 * c, yoffset + 1 + 8 * c, 0, color));
                     break;
             }
 
