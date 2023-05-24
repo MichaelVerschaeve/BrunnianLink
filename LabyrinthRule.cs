@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Forms.VisualStyles;
 
 namespace BrunnianLink
 {
@@ -13,15 +14,25 @@ namespace BrunnianLink
 
         public override int StateCount => 3;
 
-        public override double ScaleFactor => 1+Math.Sqrt(2.0);
+        static readonly double m_sqrt2p1 = 1 + Math.Sqrt(2.0);
 
-        public override double InitialScale => 7;
+        public override double ScaleFactor => m_sqrt2p1;
+
 
         public override string MainName => "Labyrinth";
 
+        public override string BasePart(int state) => state switch
+        {
+            0 => "Square",
+            1 => "Corner",
+            2 => "Trapezium",
+            _ => ""
+        };
 
-        static private readonly string[] m_baseParts = new[] { "Square", "Corner", "Trapezium" };
-        public override string BasePart(int state) => m_baseParts[state];
+        static readonly double scale = 2.0 / (1+Math.Sqrt(2.0)); //total size maps to 2, so center is (0,0) and corners are (+/-1,+/-1)
+        static readonly double trapHeight = scale * 0.5 * Math.Sqrt(2.0);
+        static readonly double squareHeight = 2 - 2 * trapHeight;
+        public override double InitialScale => (8 + 2 * Math.Sqrt(2.0))/squareHeight;
 
         List<(double x, double y, double rotation, int state)>[] m_rules = new[]
         {
@@ -46,11 +57,12 @@ namespace BrunnianLink
                 (1,0,180,2),
                 (1,1,0,0)
             },
-            new List<(double x, double y, double rotation, int state)> //corner, bottom left
+            new List<(double x, double y, double rotation, int state)> //trapezium, bottom center
             {
-                (0,0,0,1)
-
-
+                (0,1-trapHeight,0,0),
+                (-1,-trapHeight,0,1),
+                (1,-trapHeight,90,1),
+                (0,-trapHeight,180,2)
             }
         };
 
@@ -60,10 +72,82 @@ namespace BrunnianLink
 
         public override bool Level0IsComposite => true;
 
-        public override void DefineCompositeBasePart(StringBuilder sb, int state)
+
+
+        private static string QuarterId(bool right) => "Quarter" + (right ? "Right" : "Left");
+
+        private static void DefineQuarter(StringBuilder sb, bool right)
         {
-            //base.DefineCompositeBasePart(sb, state);
+            int color = MetaData.StudIOColor16BugFixed ? 16 : ColorMap.Get(m_colors[0]).id;
+            MetaData.StartSubModel(sb, QuarterId(right));
+            Shape wedge = new() { PartID = "15706" };   //from 135 to 180 degree wedge
+            int s = right ? -1 : 1;
+            sb.AppendLine(wedge.Rotate(right ? -135 : 0).Print(s * 3, 0, 0, color));
+            sb.AppendLine(wedge.Rotate(right ? 0 : -135).Print(-s * 3, 0, 1, color));
+            Plate p = new(2);
+            sb.AppendLine(p.Print(s * 2, -0.5, 1, color));
+            sb.AppendLine(p.Print(-s * 2, -0.5, 0, color));
         }
 
+
+        public override void DefineCompositeBasePart(StringBuilder sb, int state)
+        {
+            int color = MetaData.StudIOColor16BugFixed ? 16 : ColorMap.Get(m_colors[state == 1 ? 0 : state]).id;
+            //int swivelColor = ColorMap.Get("Green").id;
+            Shape wedge = new() { PartID = "15706" };   //from 135 to 180 degree wedge
+            Shape swivelTop = new() { PartID = "2430" };
+            Shape swivelBottom = new() { PartID = "2429" };
+            double c = Math.Sqrt(2.0) * 0.5;
+            switch (state)
+            {
+                case 0: //square
+                    double t = 3 + Math.Sqrt(2.0);
+                    Shape quarter = new() { PartID = QuarterId(false), SubModel = true };
+                    sb.AppendLine(quarter.Print(0, -t, 0, color));
+                    sb.AppendLine(quarter.Rotate(180).Print(0, t, 0, color));
+                    quarter = new() { PartID = QuarterId(true), SubModel = true };
+                    sb.AppendLine(quarter.Rotate(-90).Print(-t, 0, 0, color));
+                    sb.AppendLine(quarter.Rotate(90).Print(t, 0, 0, color));
+                    t -= 1.5 * Math.Sqrt(2.0);
+                    Shape p = new Plate(4, 2).Rotate(45);
+                    sb.AppendLine(p.Print(-t, -t, 0, color));
+                    sb.AppendLine(p.Print(t, t, 0, color));
+                    p = new Plate(4, 2).Rotate(-45);
+                    sb.AppendLine(p.Print(-t, t, 1, color));
+                    sb.AppendLine(p.Print(t, -t, 1, color));
+                    DefineQuarter(sb, false);
+                    DefineQuarter(sb, true);
+                    break;
+                case 1: //corner
+                    Shape halfCorner = new() { PartID = "halfCorner", SubModel = true };
+                    sb.AppendLine(halfCorner.Print(0, 0, 0, color));
+                    sb.AppendLine(halfCorner.Rotate(45).Print(0, 0, 0, color));
+                    MetaData.StartSubModel(sb, "halfCorner");
+                    double offset = 1 + Math.Sqrt(2.0);
+                    sb.AppendLine(wedge.Rotate(-135).Print(offset, 1, 0, color));
+                    sb.AppendLine(new Plate(2).Print(offset + 5, 0.5, 0, color));
+                    sb.AppendLine(swivelTop.Rotate(180).Print(offset + 8, 1, 0, color));
+                    sb.AppendLine(new Plate(8).Print(offset + 4, 0.5, 1, color));
+                    sb.AppendLine(new Plate(4).Rotate(45).Print(offset + 5.5 * c, offset + 4.5 * c, 0, color));
+                    sb.AppendLine(new Plate(6).Rotate(45).Print(offset + 2.5 * c, offset + 1.5 * c, 1, color));
+                    sb.AppendLine(swivelBottom.Rotate(45).Print(offset + 8*c, offset + 6*c, 1, color));
+                    break;
+                case 2: //trapezium
+                    sb.AppendLine(wedge.Rotate(-135).Print(-3, 1, 0, color));
+                    sb.AppendLine(wedge.Print(3, 1, 1, color));
+                    sb.AppendLine(new Plate(4).Print(-3, 0.5, 1, color));
+                    sb.AppendLine(new Plate(4).Print(3, 0.5, 0, color));
+                    sb.AppendLine(swivelTop.Rotate(180).Print(5, 1, 1, color));
+                    sb.AppendLine(swivelBottom.Rotate(180).Print(-5,1, 0, color));
+                    sb.AppendLine(new Plate(8).Rotate(45).Print(-3 + 3.5 * c, 1 + 4.5 * c, 1, color));
+                    sb.AppendLine(new Plate(3).Rotate(-45).Print(3 - c, 1 + 2 * c, 0, color));
+                    sb.AppendLine(new Shape() { PartID="92593"}.Rotate(-45).Print(3-4.5*c, 1 + 5.5 * c, 0, color));
+                    sb.AppendLine(new Plate(1).Rotate(-45).Print(3 - 7*c, 1 + 8 * c, 0, color));
+                    sb.AppendLine(swivelTop.Rotate(-45).Print(3 - 8 * c, 1 + 8 * c, 1, color));
+                    sb.AppendLine(swivelBottom.Rotate(45).Print(-3 + 8 * c, 1 + 8 * c, 0, color));
+                    break;
+            }
+
+        }
     }
 }

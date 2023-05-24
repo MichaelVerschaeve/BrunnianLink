@@ -67,11 +67,10 @@ namespace BrunnianLink
 
         override public List<(double x, double y, double rotation, int state)> Rule(int state) => m_rules[state];
 
-        static readonly bool StudIOColor16BugFixed = false;
 
         private static void DefineQuarter(StringBuilder sb, bool right)
         {
-            int color = StudIOColor16BugFixed ? 16 : ColorMap.Get(m_colors[0]).id;
+            int color = MetaData.StudIOColor16BugFixed ? 16 : ColorMap.Get(m_colors[0]).id;
             MetaData.StartSubModel(sb, right ? "QuarterRight" : "QuarterLeft");
             Shape wedge = new() { PartID = "15706" };   //from 135 to 180 degree wedge
             int s = right ? -1 : 1;
@@ -84,7 +83,7 @@ namespace BrunnianLink
 
         private static void DefineHalfRhomb(StringBuilder sb)
         {
-            int color = StudIOColor16BugFixed ? 16 : ColorMap.Get(m_colors[2]).id;
+            int color = MetaData.StudIOColor16BugFixed ? 16 : ColorMap.Get(m_colors[2]).id;
             MetaData.StartSubModel(sb, "HalfRhumb");
             sb.AppendLine(new Shape() { PartID = "15706" }.Print(0, 0, 0, color));
             sb.AppendLine(new Shape() { PartID = "2429" }.Rotate(180).Print(-8, 0, 0, color));
@@ -103,7 +102,7 @@ namespace BrunnianLink
 
         public override void DefineCompositeBasePart(StringBuilder sb, int state)
         {
-            int color = StudIOColor16BugFixed ? 16 : ColorMap.Get(m_colors[state==1?0:state]).id;
+            int color = MetaData.StudIOColor16BugFixed ? 16 : ColorMap.Get(m_colors[state==1?0:state]).id;
             switch (state)
             {
                 case 0:

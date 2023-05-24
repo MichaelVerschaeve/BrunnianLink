@@ -19,7 +19,7 @@ namespace BrunnianLink
             sb.AppendLine($"0 STEP");
         }
 
-
+        public static readonly bool StudIOColor16BugFixed = false;
 
     }
 
