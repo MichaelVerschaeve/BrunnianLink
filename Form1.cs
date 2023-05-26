@@ -85,9 +85,14 @@ namespace BrunnianLink
                     EinsteinHat.Generate(sb, level);
                     break;
                 case 3:
-                    Hilbert3D.Generate(sb, level);
+                    //sb.AppendLine(new Plate(2,2).Print(0,1,0,ColorMap.Get("Red").id));
+                    //sb.AppendLine(new Plate(2,2).Print(0, -1, 0, ColorMap.Get("Blue").id));
+                    EinsteinHat2.Generate(sb, level);
                     break;
                 case 4:
+                    Hilbert3D.Generate(sb, level);
+                    break;
+                case 5:
 
                     for (int p1 = -5; p1 <= 5; p1++)
                         for (int p2 = -5; p2 <= 5; p2++)
@@ -105,14 +110,14 @@ namespace BrunnianLink
 
                         }
                     break;
-                case 5:
+                case 6:
                     OctaFlake.Generate(sb, level);
                     break;
-                case 6:
+                case 7:
                     PenroseRhomb.Generate(sb, level);
                     break;
                 default:
-                    tileGens[cbModelChoice.SelectedIndex - 7].Generate(sb, level);
+                    tileGens[cbModelChoice.SelectedIndex - 8].Generate(sb, level);
                     break;
             }
             var utf8WithoutBom = new System.Text.UTF8Encoding(false);
