@@ -44,7 +44,8 @@ namespace BrunnianLink
             new() { Rule = new WandererRotationsRule() },
             new() { Rule = new AmmannBeenkerRule()},
             new() { Rule = new ShieldRule() },
-            new() {Rule = new LabyrinthRule() }
+            new() {Rule = new LabyrinthRule() },
+            new() {Rule = new HofStetterArrowedRule() }
         };
         private void BtGenerate_Click(object sender, EventArgs e)
         {
