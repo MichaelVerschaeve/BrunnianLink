@@ -12,15 +12,25 @@ namespace BrunnianLink
     {//second version, with actual hats
 
 
+        //static readonly Dictionary<string, int> HatTypeColor = new()
+        //{
+        //    { "H1", ColorMap.Get("Red").id },
+        //    { "H", ColorMap.Get("Yellow").id },
+        //    { "T", ColorMap.Get("Black").id },
+        //    { "P", ColorMap.Get("White").id },
+        //    { "F", ColorMap.Get("Light_Bluish_Grey").id }
+        //};
+
         static readonly Dictionary<string, int> HatTypeColor = new()
         {
-            { "H1", ColorMap.Get("Red").id },
-            { "H", ColorMap.Get("Yellow").id },
-            { "T", ColorMap.Get("Black").id },
-            { "P", ColorMap.Get("White").id },
-            { "F", ColorMap.Get("Light_Bluish_Grey").id }
+            { "H1", ColorMap.Get("Dark_Blue").id },
+            { "H", ColorMap.Get("Medium_Azure").id },
+            { "T", ColorMap.Get("Red").id },
+            { "P", ColorMap.Get("Lime").id },
+            { "F", ColorMap.Get("White").id }
         };
 
+        static readonly bool smallerKite = true; //set to false for larger kites
 
         public static void Generate(StringBuilder sb, int level)
         {
@@ -41,7 +51,7 @@ namespace BrunnianLink
             double c = hatData[0].mat[4];
             double s = -hatData[0].mat[1];
             double scale = Math.Sqrt(c * c + s * s);
-            double unitLength = 7.0/Math.Sqrt(3.0) + 1.0;
+            double unitLength = (smallerKite?5.0:7.0)/Math.Sqrt(3.0) + 1.0;
             scale /= unitLength;
             List<(double angleRad, bool mirror, double x, double y, int color)> parameters = hatData.Select(((string hatType, double[] mat) hat) =>
             {
@@ -92,9 +102,9 @@ namespace BrunnianLink
             }
 
             //copy .ldr contents...
-            string[] templateFiles = new[] { "whiteHat.ldr", "redMirrorHat.ldr" };
+            string[] templateFiles = smallerKite? new[] { "whiteHat_smaller.ldr", "redMirrorHat_smaller.ldr" } : new[] { "whiteHat.ldr", "redMirrorHat.ldr" };
             string[] toReplace = new[] { "_white", "_red" };
-            string[] whiteParts = new[] { "2420.dat", "2429.dat", "2430.dat" };
+            string[] fixedColorParts = new[] { /*"2420.dat", */"2429.dat", "2430.dat" };
             for (int i = 0; i < 2; i++)
             {
 
@@ -103,13 +113,13 @@ namespace BrunnianLink
                 var parts = specialLine.Split(' ');
                 double ldux_offset = double.Parse(parts[2], NumberStyles.Float, CultureInfo.InvariantCulture)+((i==0)?-10:10);
                 double lduy_offset = double.Parse(parts[3], NumberStyles.Float, CultureInfo.InvariantCulture);
-                double lduz_offset = double.Parse(parts[4], NumberStyles.Float, CultureInfo.InvariantCulture) + 10 - 20.0 * (7 + Math.Sqrt(3.0));
+                double lduz_offset = double.Parse(parts[4], NumberStyles.Float, CultureInfo.InvariantCulture) + 10 - 20.0 * ((smallerKite?5:7) + Math.Sqrt(3.0));
                 var set = i == 0 ? usedColors : usedMirrorColors;
                 foreach (int color in set)
                 {
                     string suffix = SubModelNameSuffix(i==1, color);
                     MetaData.StartSubModel(sb, "Hat" + suffix);
-                    foreach (string line in fileLines.Skip(7).TakeWhile(line => !line.EndsWith("6141.dat")))
+                    foreach (string line in fileLines.SkipWhile(line => line.StartsWith('0')).TakeWhile(line => !line.EndsWith("6141.dat")))
                     {
                         parts = line.Split(' ');
                         double ldux = double.Parse(parts[2], NumberStyles.Float, CultureInfo.InvariantCulture);
@@ -125,7 +135,7 @@ namespace BrunnianLink
                         parts = line.Split(' ');
                         if (parts[1] == "16" || parts[0] == "0")
                             parts[parts.Length - 1] =  parts[parts.Length - 1].Replace(toReplace[i], suffix);
-                        else if (parts[0] == "1" && parts[1] != "0" && !whiteParts.Contains(parts[parts.Length - 1]))
+                        else if (parts[0] == "1" && parts[1] != "0" && !fixedColorParts.Contains(parts[parts.Length - 1]))
                             parts[1] = color.ToString();
                         sb.AppendLine(String.Join(' ',parts));
                     }
