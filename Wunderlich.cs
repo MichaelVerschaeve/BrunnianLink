@@ -55,15 +55,15 @@ namespace BrunnianLink
              new List<(double x, double y, double rotation, int state)>()
             { //R-shape combo
                 (1,1,0,2),
-                (1,0,180,7),
-                (1,-1,0,1),
-                (0,-1,0,5),
-                (0,0,180,3),
-                (0,1,0,6),
-                (-1,1,0,2),
-                (-1,0,180,7),
-                (-1,-1,0,1)
-            }
+                (1,0,90,7),
+                (0,0,90,4),
+                (0,1,180,0),
+                (1,1,0,3),
+                (0,1,0,2),
+                (-1,1,0,0),
+                (-1,0,-90,7),
+                (-1,-1,-90,4),
+             }
         };
 
 
@@ -89,6 +89,13 @@ namespace BrunnianLink
             Shape corner1 = new() { PartID = "corner_up_left", SubModel = true };  //corner 1, from up to left color 1 in inner macaroni
             Shape corner2 = new() { PartID = "corner_right_down", SubModel = true };  //corner 2, from right to down color 3 in inner macaroni
             Shape straight = new() { PartID = "straight", SubModel = true }; //horizontal, color 1 on top
+
+
+            if (CurveType == 2)
+            {
+                (corner1, corner2) = (corner2, corner1);
+            }
+            
             bool mirror = (state & 4)== 4;
 
             if (mirror)
@@ -99,16 +106,23 @@ namespace BrunnianLink
 
             int s = mirror?-1:1;
 
-            sb.AppendLine((((state & 1) == 0) ? straight : corner1).Print(s*5, 5, 0, 16));
-            sb.AppendLine(straight.Print(0, 5, 0, 16));
-            sb.AppendLine(corner2.Print(-s*5, 5, 0, 16));
-            sb.AppendLine(corner2.Rotate(s*90).Print(-s*5, 0, 0, 16));
-            sb.AppendLine(straight.Rotate(180).Print(0, 0, 0, 16));
-            sb.AppendLine(corner1.Rotate(s * 90).Print(s*5, 0, 0, 16));
-            sb.AppendLine(corner1.Print(s * 5, -5, 0, 16));
-            sb.AppendLine(straight.Print(0, -5, 0, 16));
-            sb.AppendLine((((state & 2) == 0) ? straight : corner2).Print(-s*5, -5, 0, 16));
 
+            if (CurveType == 2)
+            {
+
+            }
+            else
+            {
+                sb.AppendLine((((state & 1) == 0) ? straight : corner1).Print(s * 5, 5, 0, 16));
+                sb.AppendLine(straight.Print(0, 5, 0, 16));
+                sb.AppendLine(corner2.Print(-s * 5, 5, 0, 16));
+                sb.AppendLine(corner2.Rotate(s * 90).Print(-s * 5, 0, 0, 16));
+                sb.AppendLine(straight.Rotate(180).Print(0, 0, 0, 16));
+                sb.AppendLine(corner1.Rotate(s * 90).Print(s * 5, 0, 0, 16));
+                sb.AppendLine(corner1.Print(s * 5, -5, 0, 16));
+                sb.AppendLine(straight.Print(0, -5, 0, 16));
+                sb.AppendLine((((state & 2) == 0) ? straight : corner2).Print(-s * 5, -5, 0, 16));
+            }
 
             Plate bottom = new(6, 6);
             sb.AppendLine(bottom.Print(4.5, 4.5, -1, DBGID));
