@@ -34,7 +34,7 @@ namespace BrunnianLink
         static readonly double squareHeight = 2 - 2 * trapHeight;
         public override double InitialScale => (8 + 2 * Math.Sqrt(2.0))/squareHeight;
 
-        List<(double x, double y, double rotation, int state)>[] m_rules = new[]
+        readonly List<(double x, double y, double rotation, int state)>[] m_rules = new[]
         {
             new List<(double x, double y, double rotation, int state)> //square, centered
             {

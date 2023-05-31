@@ -16,6 +16,7 @@ using static System.Windows.Forms.VisualStyles.VisualStyleElement.TaskbarClock;
 //MiniTangram
 //hoffstedter
 //Square Triangle Pinwheel Variant
+//Square - triangle
 //Monnier (scale Y)
 //Pentomino
 //Rhomb Square Octagon

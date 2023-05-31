@@ -134,8 +134,8 @@ namespace BrunnianLink
                     {
                         parts = line.Split(' ');
                         if (parts[1] == "16" || parts[0] == "0")
-                            parts[parts.Length - 1] =  parts[parts.Length - 1].Replace(toReplace[i], suffix);
-                        else if (parts[0] == "1" && parts[1] != "0" && !fixedColorParts.Contains(parts[parts.Length - 1]))
+                            parts[^1] = parts[^1].Replace(toReplace[i], suffix);
+                        else if (parts[0] == "1" && parts[1] != "0" && !fixedColorParts.Contains(parts[^1]))
                             parts[1] = color.ToString();
                         sb.AppendLine(String.Join(' ',parts));
                     }

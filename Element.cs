@@ -139,6 +139,7 @@ namespace BrunnianLink
             ax = az = 0;
             partID = size switch
             {
+                16 => "3867",
                 32 => "3811",
                 48 => "4186",
                 _ => throw new ArgumentException("unsupported size"),
@@ -158,7 +159,7 @@ namespace BrunnianLink
 
     public class Bow : Shape
     {
-        public Bow(int size)
+        public Bow(int size, bool centerAtOrigin=false)
         {
             sx = sz = size * 20;
             sy = 8; //tile
@@ -175,6 +176,14 @@ namespace BrunnianLink
             }
             else
                 ax = az = 0;
+
+            if (centerAtOrigin)
+            {
+                ax += size * 10;
+                az -= size * 10;
+            }
+
+
             partID = size switch
             {
                 1 => "25269",

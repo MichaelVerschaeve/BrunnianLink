@@ -45,7 +45,10 @@ namespace BrunnianLink
             new() { Rule = new AmmannBeenkerRule()},
             new() { Rule = new ShieldRule() },
             new() {Rule = new LabyrinthRule() },
-            new() {Rule = new HofStetterArrowedRule() }
+            new() {Rule = new HofStetterArrowedRule() },
+            new() {Rule = new Wunderlich(){CurveType=0} },
+            new() {Rule = new Wunderlich(){CurveType=1} },
+            new() {Rule = new Wunderlich(){CurveType=2} }
         };
         private void BtGenerate_Click(object sender, EventArgs e)
         {
