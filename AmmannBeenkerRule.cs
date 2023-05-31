@@ -21,8 +21,19 @@ namespace BrunnianLink
 
         public override string MainName => "Ammann_Beenker";
 
-        private static readonly int[] m_startStates = new int[] { 0,1 };
-        public override int[] StartStates { get => m_startStates; }
+        //private static readonly int[] m_startStates = new int[] { (0,1 };
+        public override (double x, double y, double rotation, int state)[] StartStates
+        {
+            get
+            {
+                var a = base.StartStates!.Clone() as (double x, double y, double rotation, int state)[];
+                var b = base.StartStates!.Clone() as (double x, double y, double rotation, int state)[];
+                if (b != null) 
+                    b[0].state = 1;
+                return a?.Concat(b!)?.ToArray()!;
+
+            }
+        }
 
         public override string BasePart(int state) => state switch
         {

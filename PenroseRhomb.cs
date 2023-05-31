@@ -104,7 +104,7 @@ namespace BrunnianLink
                 sb.AppendLine(s.Rotate(data.rotation).Print(data.x, data.y, 0, ColorMap.Get(Colors[data.thin ? 1 : 0]).id));
                 foreach (VertexData vdata in VerticesFromRhomb(data))
                 {
-                    if (vSet.TryGetValue(vdata, out VertexData vold))
+                    if (vSet.TryGetValue(vdata, out VertexData? vold))
                     {
                         vold.flags |= vdata.flags;
                     }
