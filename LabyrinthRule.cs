@@ -71,9 +71,9 @@ namespace BrunnianLink
         public override bool ColorByState => true;
 
         public override bool Level0IsComposite => true;
+        private static readonly (double x, double y, double rotation, int state)[] m_startStates = new[] { (0.0, 0.0, 0.0, 0) };
 
-        public override int[] StartStates => new int[] { 0 };
-
+        public override (double x, double y, double rotation, int state)[] StartStates => m_startStates;
         private static string QuarterId(bool right) => "Quarter" + (right ? "Right" : "Left");
 
         private static void DefineQuarter(StringBuilder sb, bool right)

@@ -27,7 +27,9 @@ namespace BrunnianLink
 
         public override bool ColorByState => true;
 
-        public override int[] StartStates => new int[] { 2 };
+        private static readonly (double x, double y, double rotation, int state)[] m_startStates = new[] { (0.0, 0.0, 0.0, 2) };
+
+        public override (double x, double y, double rotation, int state)[] StartStates => m_startStates;
 
         private static readonly List<(double x, double y, double rotation, int state)>[] m_rules = new[]
 {

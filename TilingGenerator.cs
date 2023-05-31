@@ -47,9 +47,9 @@ namespace BrunnianLink
 
         public virtual bool Level0IsComposite { get => false; }
 
-        private static readonly int[] m_startStates = new int[] { 0 };
+        private static readonly (double x, double y, double rotation, int state)[] m_startStates = new [] { (0.0,0.0,0.0,0) };
 
-        public virtual int[] StartStates { get => m_startStates; }
+        public virtual (double x, double y, double rotation, int state)[] StartStates { get => m_startStates; }
 
         public virtual void Decorate(StringBuilder sb, int level, bool top, int state, int color)
         {            // add elements that cannot be defined by substitution alone, e.g. baseplates at top level
@@ -97,11 +97,12 @@ namespace BrunnianLink
             {
                 MetaData.StartSubModel(sb, Rule.MainName);
                 int count = 0;
-                foreach (int state in Rule.StartStates)
+                double scale = Math.Pow(Rule.ScaleFactor, level ) * Rule.InitialScale;
+                foreach (var (x, y, rotation, state) in Rule.StartStates)
                 {
                     int color = (Rule.ColorByState ? state : (count++)) % Rule.Colors.Length;
                     Shape s = new() { PartID = PartName(level, state, color), SubModel = true };
-                    sb.AppendLine(s.Print(0, 0, 0, ColorMap.Get(Rule.Colors[state]).id));
+                    sb.AppendLine(s.Print(scale*x, scale*y, rotation, ColorMap.Get(Rule.Colors[state]).id));
                 }
             }
             foreach (var t in requiredParts.Reverse())
@@ -125,7 +126,7 @@ namespace BrunnianLink
         {
             SortedSet<(int level, int state, int color)> res = new();
             int count = 0;
-            foreach (int state in Rule.StartStates)
+            foreach (var (x, y, rotation, state) in Rule.StartStates)
             {
                 int color = (Rule.ColorByState ? state: (count++))%Rule.Colors.Length;
                 res.UnionWith(RecurseDetermineRequiredParts(level, state, color));

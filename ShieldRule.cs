@@ -81,8 +81,9 @@ namespace BrunnianLink
 
         public override bool Level0IsComposite => true;
 
-        public override int[] StartStates => new int[] {3};
+        private static readonly (double x, double y, double rotation, int state)[] m_startStates = new[] { (0.0, 0.0, 0.0, 3) };
 
+        public override (double x, double y, double rotation, int state)[] StartStates => m_startStates;
         public override void DefineCompositeBasePart(StringBuilder sb, int state)
         {
             int mainColor = ColorMap.Get(Colors[state]).id;
