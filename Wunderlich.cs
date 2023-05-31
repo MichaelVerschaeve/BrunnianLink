@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.Eventing.Reader;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -22,7 +23,7 @@ namespace BrunnianLink
 
         public override bool ColorByState => true;
 
-        public override string BasePart(int state) => "SShape_" + ((state & 1) == 1 ? "c" : "s") + ((state & 2) == 2 ? "c" : "s")+ ((state & 4) == 4 ? "c" : "s");
+        public override string BasePart(int state) => "SShape_" + ((state & 1) == 1 ? "c" : "s") + ((state & 2) == 2 ? "c" : "s")+ ((state & 4) == 4 ? "m" : "");
 
 
 
@@ -54,15 +55,15 @@ namespace BrunnianLink
             },
              new List<(double x, double y, double rotation, int state)>()
             { //R-shape combo
-                (1,1,0,2),
-                (1,0,90,7),
+                (1,-1,0,2),
+                (0,-1,90,7),
                 (0,0,90,4),
-                (0,1,180,0),
+                (1,0,180,0),
                 (1,1,0,3),
                 (0,1,0,2),
                 (-1,1,0,0),
-                (-1,0,-90,7),
-                (-1,-1,-90,4),
+                (-1,0,-90,6),
+                (-1,-1,-90,6),
              }
         };
 
@@ -70,12 +71,11 @@ namespace BrunnianLink
         public override List<(double x, double y, double rotation, int state)> Rule(int state)
         {
             List<(double x, double y, double rotation, int state)> res = new(m_rule[CurveType]);
-            res[0] = (res[0].x, res[0].y, res[0].rotation, res[0].state + (state & 1));
-            res[8] = (res[8].x, res[8].y, res[8].rotation, res[8].state + (state & 2));
+            res[0] = (res[0].x, res[0].y, res[0].rotation, res[0].state ^ (state & 1));
+            res[8] = (res[8].x, res[8].y, res[8].rotation, res[8].state ^ (state & 2));
 
             if ((state & 4) == 4) //mirror
                 res = res.Select(t => (-t.x, t.y, -t.rotation, t.state ^ 4)).ToList();
-
             return res;
         }
 
@@ -90,26 +90,43 @@ namespace BrunnianLink
             Shape corner2 = new() { PartID = "corner_right_down", SubModel = true };  //corner 2, from right to down color 3 in inner macaroni
             Shape straight = new() { PartID = "straight", SubModel = true }; //horizontal, color 1 on top
 
+            bool mirror = (state & 4) == 4;
+            int s = mirror ? -1 : 1;
+
 
             if (CurveType == 2)
             {
-                (corner1, corner2) = (corner2, corner1);
-            }
-            
-            bool mirror = (state & 4)== 4;
+                if (mirror)
+                {
+                    //(corner1, corner2) = (corner1.Rotate(-90), corner2);
+                    corner1.RotateThis(-180);
+                    corner2.RotateThis(90);
+                    straight.RotateThis(180);
+                }
+                else
+                    (corner1, corner2) = (corner2.Rotate(-90), corner1);
 
-            if (mirror)
+            }
+            else if (mirror)
             {
                 corner1.RotateThis(-90);
                 corner2.RotateThis(-90);
             }
 
-            int s = mirror?-1:1;
-
-
             if (CurveType == 2)
             {
-
+                sb.AppendLine((((state & 1) == 0) ? straight : corner1).Print(s * 5, -5, 0, 16));
+                sb.AppendLine(corner2.Rotate(-s * 90).Print(0, -5, 0, 16));
+                sb.AppendLine(corner2.Rotate(180).Print(0, 0, 0, 16));
+                sb.AppendLine(corner1.Rotate(-s*90).Print(s * 5, 0, 0, 16));
+                sb.AppendLine(corner1.Print(s * 5, 5, 0, 16));
+                sb.AppendLine(straight.Print(0, 5, 0, 16));
+                sb.AppendLine(corner1.Rotate(s*90).Print(-s * 5, 5, 0, 16));
+                sb.AppendLine(straight.Rotate(s*90).Print(-s*5, 0, 0, 16));
+                if ((state & 2)==0)
+                    sb.AppendLine(straight.Rotate(s*90).Print(-s * 5, -5, 0, 16));
+                else
+                    sb.AppendLine(corner2.Print(-s * 5, -5, 0, 16));
             }
             else
             {
