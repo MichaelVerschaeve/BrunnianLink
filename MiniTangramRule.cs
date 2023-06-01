@@ -22,49 +22,61 @@ namespace BrunnianLink
         public override string MainName => "MiniTangram";
 
         public override string BasePart(int state) => state switch { 
-            0 => "square", 
-            1 => "tria1", 
-            2 => "tria2",
-            3 => "tria2_m",
-            4 => "tria1_m",
-            5 => "square_m",
+            0 => "T1", 
+            1 => "T2", 
+            2 => "T3",
+            3 => "T3_m",
+            4 => "T2_m",
+            5 => "T1_m",
             _ => "" };
 
-        static readonly List<(double x, double y, double rotation, int state)>[] m_rules = new[]
+        static private readonly List<(double x, double y, double rotation, int state)>[] m_rules = new[]
         {
             new List<(double x, double y, double rotation, int state)>()
             {
-                (-0.5,2.5,-90.0,0),
-                (0.5,0.5,0.0,0),
-                (-0.5,-0.5,0.0,0),
-                (2.5,-0.5,90.0,0)
+                (-1,1,0,0),
+                (-1,-1,-90,4),
+                (-1,-1,90,3),
+                (1,-1,-90,3),
+            },
+            new List<(double x, double y, double rotation, int state)>()
+            {
+                (-1,1,0,1),
+                (-1,-1,-90,0),
+                (-1,-1,0,5),
+                (1,-1,0,1),
+            },
+            new List<(double x, double y, double rotation, int state)>()
+            {
+                (-1,1,0,2),
+                (-1,-1,0,1),
+                (-1,-1,180,2),
+                (1,-1,0,1),
             }
         };
+
+
+        static private readonly (double x, double y, double rotation, int state)[] m_startStates = new[] {(0.0,0.0,0.0,0), (0.0,0.0,90.0,5)  };
+
+        public override (double x, double y, double rotation, int state)[] StartStates => m_startStates;
 
         public override List<(double x, double y, double rotation, int state)> Rule(int state) 
         {
             if (state > 2)
-                return m_rules[2].Select(t => (-t.x, t.y, -t.rotation, 5 - t.state)).ToList();
+                return m_rules[5-state].Select(t => (-t.x, t.y, -t.rotation, 5 - t.state)).ToList();
             else
-                return m_rules[i];
+                return m_rules[state];
         }
 
         public override bool Level0IsComposite => true; //because of mirror immages;
 
         public override void DefineCompositeBasePart(StringBuilder sb, int state)
         {
-            switch (state)
-            {
-                case 0: case 5:
-                    sb.AppendLine(new Tile(2, 2).Print(0, 0, 0, ColorMap.Get(m_colors[state]).id));
-                    break;
-                case 1: case 2:
+                if (state < 3)
                     sb.AppendLine(new Shape() { PartID = "35787"}.Print(0, 0, 0, ColorMap.Get(m_colors[state]).id));
-                    break;
-                case 3: case 4:
-                    sb.AppendLine(new Shape() { PartID = "35787" }.Rotate(90).Print(0, 0, 0, ColorMap.Get(m_colors[state]).id));
-                    break;
-            }
+                else 
+                sb.AppendLine(new Shape() { PartID = "35787" }.Rotate(90).Print(0, 0, 0, ColorMap.Get(Colors[state]).id));
+            
         }
 
     }

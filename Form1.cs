@@ -48,8 +48,8 @@ namespace BrunnianLink
             new() {Rule = new HofStetterArrowedRule() },
             new() {Rule = new Wunderlich(){CurveType=0} },
             new() {Rule = new Wunderlich(){CurveType=1} },
-            new() {Rule = new Wunderlich(){CurveType=2} }
-            new() {Rule = new Minitangram}
+            new() {Rule = new Wunderlich(){CurveType=2} },
+            new() {Rule = new MiniTangramRule()}
         };
         private void BtGenerate_Click(object sender, EventArgs e)
         {

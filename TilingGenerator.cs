@@ -102,7 +102,7 @@ namespace BrunnianLink
                 {
                     int color = (Rule.ColorByState ? state : (count++)) % Rule.Colors.Length;
                     Shape s = new() { PartID = PartName(level, state, color), SubModel = true };
-                    sb.AppendLine(s.Print(scale*x, scale*y, rotation, ColorMap.Get(Rule.Colors[state]).id));
+                    sb.AppendLine(s.Rotate(rotation).Print(scale*x, scale*y, 0, ColorMap.Get(Rule.Colors[state]).id));
                 }
             }
             foreach (var t in requiredParts.Reverse())
