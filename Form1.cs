@@ -121,8 +121,11 @@ namespace BrunnianLink
                 case 7:
                     PenroseRhomb.Generate(sb, level);
                     break;
+                case 8:
+                    new MazeGenerator(level).Generate(sb);
+                    break;
                 default:
-                    tileGens[cbModelChoice.SelectedIndex - 8].Generate(sb, level);
+                    tileGens[modelChoice - 9].Generate(sb, level);
                     break;
             }
             var utf8WithoutBom = new System.Text.UTF8Encoding(false);
