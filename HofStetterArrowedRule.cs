@@ -20,7 +20,7 @@ namespace BrunnianLink
 
         public override string MainName => "Hofstetter";
 
-        public override string BasePart(int state)
+        public override string BasePart(int state, int color)
         {
             return Tile.XYPartID(1, 1);
         }

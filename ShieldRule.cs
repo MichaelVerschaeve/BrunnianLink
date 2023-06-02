@@ -21,7 +21,7 @@ namespace BrunnianLink
         public override string MainName => "ShieldTiling";
 
         private static readonly string[] m_baseParts = new[] { "Triangle1", "Triangle2", "Square", "Shield", "Shield_mirror", "Square_mirror", "Triangle2_mirror", "Triangle1_mirror" };
-        public override string BasePart(int state)
+        public override string BasePart(int state, int color)
         {
             return m_baseParts[state];
         }
@@ -84,10 +84,10 @@ namespace BrunnianLink
         private static readonly (double x, double y, double rotation, int state)[] m_startStates = new[] { (0.0, 0.0, 0.0, 3) };
 
         public override (double x, double y, double rotation, int state)[] StartStates => m_startStates;
-        public override void DefineCompositeBasePart(StringBuilder sb, int state)
+        public override void DefineCompositeBasePart(StringBuilder sb, int state, int color)
         {
             int mainColor = ColorMap.Get(Colors[state]).id;
-            string thirdID = BasePart(state) + "_third";
+            string thirdID = BasePart(state,color) + "_third";
             int baseColor = ColorMap.Get("White").id;
             int grayColor = ColorMap.Get("Light_Bluish_Grey").id;
             bool mirrored = state >= 4;

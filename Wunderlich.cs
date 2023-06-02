@@ -23,7 +23,7 @@ namespace BrunnianLink
 
         public override bool ColorByState => true;
 
-        public override string BasePart(int state) => "SShape_" + ((state & 1) == 1 ? "c" : "s") + ((state & 2) == 2 ? "c" : "s")+ ((state & 4) == 4 ? "m" : "");
+        public override string BasePart(int state, int color) => "SShape_" + ((state & 1) == 1 ? "c" : "s") + ((state & 2) == 2 ? "c" : "s")+ ((state & 4) == 4 ? "m" : "");
 
 
 
@@ -83,7 +83,7 @@ namespace BrunnianLink
 
         static readonly int DBGID = ColorMap.Get("Dark_Bluish_Grey").id;
 
-        public override void DefineCompositeBasePart(StringBuilder sb, int state)
+        public override void DefineCompositeBasePart(StringBuilder sb, int state, int color)
         {
             //uses again other subparts (defined after state 3)
             Shape corner1 = new() { PartID = "corner_up_left", SubModel = true };  //corner 1, from up to left color 1 in inner macaroni

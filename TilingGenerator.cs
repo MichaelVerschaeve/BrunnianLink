@@ -43,7 +43,7 @@ namespace BrunnianLink
 
         public abstract List<(double x, double y, double rotation, int state)> Rule(int state);
 
-        public abstract string BasePart(int state); //names of the base parts
+        public abstract string BasePart(int state, int color); //names of the base parts
 
         public virtual bool Level0IsComposite { get => false; }
 
@@ -55,7 +55,7 @@ namespace BrunnianLink
         {            // add elements that cannot be defined by substitution alone, e.g. baseplates at top level
         }
 
-        public virtual void DefineCompositeBasePart(StringBuilder sb, int state)
+        public virtual void DefineCompositeBasePart(StringBuilder sb, int state, int color)
         { //if level 0 elements are not base parts... no need to specify the "0 FILE" line... do use color 16 if not fixed colors...
 
         }
@@ -75,18 +75,18 @@ namespace BrunnianLink
                 //test mode: just composite base part...
                // for (int state = 0; state < Rule.StateCount; state++)
                 //{
-                    Shape s = new() { PartID = Rule.BasePart(state), SubModel = true };
+                    Shape s = new() { PartID = Rule.BasePart(state,0), SubModel = true };
                     sb.AppendLine(s.Print(0, 0, 0, ColorMap.Get(Rule.Colors[state]).id));
                // }
                 HashSet<string> definedParts = new();
                 for (state = 0; state < Rule.StateCount; state++)
                 {
-                    string id = Rule.BasePart(state);
+                    string id = Rule.BasePart(state, 0);
                     if (definedParts.Contains(id))
                         continue;
                     definedParts.Add(id);
                     MetaData.StartSubModel(sb, id);
-                    Rule.DefineCompositeBasePart(sb, state);
+                    Rule.DefineCompositeBasePart(sb, state,0);
                 }
                 return;
             }
@@ -113,12 +113,15 @@ namespace BrunnianLink
                 HashSet<string> definedParts = new();
                 for (int state = 0; state < Rule.StateCount; state++)
                 {
-                    string id = Rule.BasePart(state);
-                    if (definedParts.Contains(id))
-                        continue;
-                    definedParts.Add(id);
-                    MetaData.StartSubModel(sb, id);
-                    Rule.DefineCompositeBasePart(sb, state);
+                    for (int color = 0; color < Rule.Colors.Length; color++)
+                    {
+                        string id = Rule.BasePart(state, color);
+                        if (definedParts.Contains(id))
+                            continue;
+                        definedParts.Add(id);
+                        MetaData.StartSubModel(sb, id);
+                        Rule.DefineCompositeBasePart(sb, state, color);
+                    }
                 }
             }
         }
@@ -162,7 +165,7 @@ namespace BrunnianLink
 
         private string PartName(int level, int state, int colorOffset)
         {
-            if (level == 0) return Rule.BasePart(state);
+            if (level == 0) return Rule.BasePart(state, colorOffset);
             else if (Rule.ColorByState) 
                 return $"SubPart_{level}_{state}";
             else

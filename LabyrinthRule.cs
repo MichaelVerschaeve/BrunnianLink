@@ -21,7 +21,7 @@ namespace BrunnianLink
 
         public override string MainName => "Labyrinth";
 
-        public override string BasePart(int state) => state switch
+        public override string BasePart(int state, int color) => state switch
         {
             0 => "Square",
             1 => "Corner",
@@ -90,7 +90,7 @@ namespace BrunnianLink
         }
 
 
-        public override void DefineCompositeBasePart(StringBuilder sb, int state)
+        public override void DefineCompositeBasePart(StringBuilder sb, int state,int _)
         {
             int color = MetaData.StudIOColor16BugFixed ? 16 : ColorMap.Get(m_colors[state]).id;
             int swivelColor = ColorMap.Get("Green").id;

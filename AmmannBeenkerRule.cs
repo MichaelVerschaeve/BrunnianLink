@@ -35,7 +35,7 @@ namespace BrunnianLink
             }
         }
 
-        public override string BasePart(int state) => state switch
+        public override string BasePart(int state, int color) => state switch
         {
             0 => "TriangleUp",
             1 => "TriangleDown",
@@ -111,13 +111,13 @@ namespace BrunnianLink
 
         public override bool Level0IsComposite => true;
 
-        public override void DefineCompositeBasePart(StringBuilder sb, int state)
+        public override void DefineCompositeBasePart(StringBuilder sb, int state,int _)
         {
             int color = MetaData.StudIOColor16BugFixed ? 16 : ColorMap.Get(m_colors[state==1?0:state]).id;
             switch (state)
             {
                 case 0:
-                    Shape downTriangle = new() { PartID = BasePart(1), SubModel = true };
+                    Shape downTriangle = new() { PartID = BasePart(1,0), SubModel = true };
                     sb.AppendLine(downTriangle.Rotate(180).Print(0, 0, 0, color));
                     break;
                 case 1:

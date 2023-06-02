@@ -21,7 +21,7 @@ namespace BrunnianLink
 
         public override string MainName => "MiniTangram";
 
-        public override string BasePart(int state) => state switch { 
+        public override string BasePart(int state, int color) => state switch { 
             0 => "T1", 
             1 => "T2", 
             2 => "T3",
@@ -70,7 +70,7 @@ namespace BrunnianLink
 
         public override bool Level0IsComposite => true; //because of mirror immages;
 
-        public override void DefineCompositeBasePart(StringBuilder sb, int state)
+        public override void DefineCompositeBasePart(StringBuilder sb, int state, int color)
         {
                 if (state < 3)
                     sb.AppendLine(new Shape() { PartID = "35787"}.Print(0, 0, 0, ColorMap.Get(m_colors[state]).id));
