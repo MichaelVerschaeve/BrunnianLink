@@ -14,11 +14,20 @@ namespace BrunnianLink
 
         public static Direction Opposite(Direction direction) => (Direction)(3 - direction);
 
-        public class Cell
+        public class Cell : IEquatable<Cell>
         {
             public Wall[] Walls = new Wall[4];
             public bool AssignedToMaze = false;
             public bool Visited = false;
+
+            private static int idCounter;
+            private readonly int id;
+            public Cell() { id = idCounter++; }
+            public bool Equals(Cell? other)
+            {
+               if (other== null) return false;
+               return other.id == id;
+            }
 
             internal Direction FindCell(Cell newCell)
             {
@@ -27,19 +36,26 @@ namespace BrunnianLink
                         return (Direction)(i);
                 return 0;
             }
+
+            public override bool Equals(object? obj) => Equals(obj as Cell);
+
+            public override int GetHashCode()
+            {
+                return id.GetHashCode();
+            }
         }
 
         public class Wall
         {
             public bool Open = false;
-            Cell[] Sides;
+            readonly Cell?[] Sides;
 
-            public Wall(Cell c1, Cell c2)
+            public Wall(Cell? c1, Cell? c2)
             {
-                Sides = new Cell[2] { c1, c2 };
+                Sides = new Cell?[2] { c1, c2 };
             }
 
-            public Cell OtherSide(Cell arg) => arg == Sides[0] ? Sides[1] : Sides[0];
+            public Cell? OtherSide(Cell arg) => arg == Sides[0] ? Sides[1] : Sides[0];
         }
 
         public Cell[,] maze;
@@ -50,45 +66,53 @@ namespace BrunnianLink
         {
             n = (1 << (level + 1)) - 2;
             maze = new Cell[n, n];
-            List<Cell> unassigned = new List<Cell>();
+            HashSet<Cell> unassigned = new();
 
             for (int i = 0; i < n; i++)
-                for (int j = 0; j < n; i++)
+                for (int j = 0; j < n; j++)
                 {
                     unassigned.Add(maze[i, j] = new Cell());
                 }
 
             //set up walls;
-            for (int i = 0; i < n - 1; i++)
+
+            for (int j = 0; j < n; j++)
             {
-                for (int j = 0; j < n; j++)
+                //inner walls...
+                for (int i = 0; i < n - 1; i++)
                 {
-                    Wall w = new Wall(maze[j, i], maze[j, i + 1]);
+                    Wall w = new(maze[j, i], maze[j, i + 1]);
                     maze[j, i].Walls[(int)Direction.Up] = w;
                     maze[j, i + 1].Walls[(int)Direction.Down] = w;
                     w = new Wall(maze[i, j], maze[i + 1, j]);
                     maze[i, j].Walls[(int)Direction.Right] = w;
                     maze[i + 1, j].Walls[(int)Direction.Left] = w;
                 }
+                //sides
+                maze[j, n - 1].Walls[(int)Direction.Up] = new Wall(maze[j, n - 1], null);
+                maze[j, 0].Walls[(int)Direction.Down] = new Wall(null, maze[j, 0]);
+                maze[n-1, j].Walls[(int)Direction.Right] = new Wall(maze[n-1, j],null);
+                maze[0,j].Walls[(int)Direction.Left] = new Wall(null, maze[0, j] );
             }
 
-            Random rand = new Random();
+            Random rand = new();
 
-            Cell firstPick = unassigned[rand.Next(unassigned.Count)];
+            Cell firstPick = unassigned.Skip(rand.Next(unassigned.Count)).First();
             firstPick.AssignedToMaze = true;
             unassigned.Remove(firstPick);
 
             while (unassigned.Count > 0)
             {
-                Cell lastVisited = unassigned[rand.Next(unassigned.Count)];
-                List<Cell> path = new List<Cell>() { lastVisited };
+                Cell lastVisited = unassigned.Skip(rand.Next(unassigned.Count)).First();
+                List<Cell> path = new() { lastVisited };
                 lastVisited.Visited = true;
                 Direction lastDirection = (Direction)rand.Next(4);
                 while (!lastVisited.AssignedToMaze)
                 {
-                    Direction newDirection = (Direction)((int)(lastDirection + rand.Next(3)) % 4);
+                    Direction newDirection = (Direction)((int)(lastDirection + 1 + rand.Next(3)) % 4);
                     if (newDirection == Opposite(lastDirection)) newDirection = lastDirection; //don't go back
-                    Cell newCell = lastVisited.Walls[(int)newDirection].OtherSide(lastVisited);
+                    Cell? newCell = lastVisited.Walls[(int)newDirection].OtherSide(lastVisited);
+                    if (newCell == null) continue;
                     if (newCell.Visited) //loopback
                     {
                         while (path.Last() != newCell)
@@ -99,7 +123,7 @@ namespace BrunnianLink
                         lastVisited = newCell;
                         if (path.Count > 1)
                         { //get last direction again from last two cells
-                            lastDirection = path[path.Count - 2].FindCell(newCell);
+                            lastDirection = path[^2].FindCell(newCell);
                         }
                         else //reset,
                             lastDirection = (Direction)rand.Next(4);
@@ -131,7 +155,7 @@ namespace BrunnianLink
         public void Generate(StringBuilder sb)
         {
             MetaData.StartSubModel(sb, $"Maze_{n}x{n}");
-            Shape borderTop = new Shape() { PartID = "4806b" };
+            Shape borderTop = new() { PartID = "4865b" };
             Shape borderLeft = borderTop.Rotate();
             Shape borderBottom = borderLeft.Rotate();
             Shape borderRight = borderBottom.Rotate();
@@ -152,7 +176,7 @@ namespace BrunnianLink
             sb.AppendLine(one.Print(2 * n + 0.5, -0.5, 0, tanID));
             sb.AppendLine(one.Print(2 * n + 0.5, 2 * n + 0.5, 0, tanID));
 
-            Shape borderTopRight = new Shape() { PartID = "4806b" }.Rotate(-90);
+            Shape borderTopRight = new Shape() { PartID = "91501" }.Rotate(-90);
 
             Tile two = new(2, 2);
 
