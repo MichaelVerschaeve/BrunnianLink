@@ -116,7 +116,7 @@ namespace BrunnianLink
                     for (int color = 0; color < Rule.Colors.Length; color++)
                     {
                         string id = Rule.BasePart(state, color);
-                        if (definedParts.Contains(id))
+                        if (string.IsNullOrEmpty(id) || definedParts.Contains(id)) //do nothing if no basepart is required
                             continue;
                         definedParts.Add(id);
                         MetaData.StartSubModel(sb, id);
@@ -163,7 +163,7 @@ namespace BrunnianLink
             return res;
         }
 
-        private string PartName(int level, int state, int colorOffset)
+        private string  (int level, int state, int colorOffset)
         {
             if (level == 0) return Rule.BasePart(state, colorOffset);
             else if (Rule.ColorByState) 
@@ -187,7 +187,10 @@ namespace BrunnianLink
                     color++;
                     if (color == Rule.Colors.Length) color = 0;
                 }
-                Shape subShape = new() { PartID = PartName(level-1, t.state, color), SubModel = level > 1 || Rule.Level0IsComposite };
+                string id = PartName(level - 1, t.state, color);
+                if (string.IsNullOrEmpty(id)) //no lego elements required
+                    continue;
+                Shape subShape = new() { PartID = id, SubModel = level > 1 || Rule.Level0IsComposite };
                 subShape.RotateThis(t.rotation);
                 sb.AppendLine(subShape.Print(scale*t.x,scale*t.y, 1, ColorMap.Get(Rule.Colors[color]).id));
             }
