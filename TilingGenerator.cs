@@ -163,7 +163,7 @@ namespace BrunnianLink
             return res;
         }
 
-        private string  (int level, int state, int colorOffset)
+        private string PartName(int level, int state, int colorOffset)
         {
             if (level == 0) return Rule.BasePart(state, colorOffset);
             else if (Rule.ColorByState) 

@@ -13,15 +13,6 @@ namespace BrunnianLink
     {
 
 
-        static readonly Dictionary<string, int> HatTypeColor = new()
-        {
-            { "H1", ColorMap.Get("Dark_Blue").id },
-            { "H", ColorMap.Get("Medium_Azure").id },
-            { "T", ColorMap.Get("Red").id },
-            { "P", ColorMap.Get("Lime").id },
-            { "F", ColorMap.Get("White").id }
-        };
-
         public static void Generate(StringBuilder sb, int level)
         {
             level = Math.Max(Math.Min(4, level), 1);
@@ -39,7 +30,7 @@ namespace BrunnianLink
             bool mirror = false;
             MetaData.StartSubModel(sb, $"Chiral_Spectre_tiling_{level}");
 
-            List<string> someColorNames = new List<string>() { "White", "Bright_Pink", "Dark_Blue", "Red", "Lime", "Medium_Azure", "Medium_Orange", "Tan", "Light_Aqua" };
+            List<string> someColorNames = new() { "White", "Bright_Pink", "Dark_Blue", "Red", "Lime", "Medium_Azure", "Medium_Orange", "Tan", "Light_Aqua" };
             
 
             Dictionary<Color, int> mappedColors = new();
@@ -68,8 +59,7 @@ namespace BrunnianLink
                 int i2 = parts[^2].IndexOf(")");
                 var colorParts = parts[^2][i1..i2].Split(",").Select(s => Byte.Parse(s)).ToArray();
                 Color svgColor = Color.FromArgb(colorParts[0], colorParts[1], colorParts[2]);
-                int colorId;
-                if (!mappedColors.TryGetValue(svgColor, out colorId))
+                if (!mappedColors.TryGetValue(svgColor, out int colorId))
                 {
                     colorId = ColorMap.Get(someColorNames[usedColors.Count]).id;
                     mappedColors.Add(svgColor, colorId);
