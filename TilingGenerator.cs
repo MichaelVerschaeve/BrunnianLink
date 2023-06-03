@@ -116,7 +116,7 @@ namespace BrunnianLink
                     for (int color = 0; color < Rule.Colors.Length; color++)
                     {
                         string id = Rule.BasePart(state, color);
-                        if (string.IsNullOrEmpty(id) || definedParts.Contains(id)) //do nothing if no basepart is required
+                        if (string.IsNullOrEmpty(id) || id.EndsWith(".dat") || definedParts.Contains(id)) //do nothing if no basepart is required, it's not composite or already defined
                             continue;
                         definedParts.Add(id);
                         MetaData.StartSubModel(sb, id);
