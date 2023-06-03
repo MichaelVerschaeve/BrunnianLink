@@ -199,7 +199,7 @@ namespace BrunnianLink
             //add interior manually...
             sb.AppendLine(new Plate(8, 8).Print(s * 4, 4, 0, 16));
             sb.AppendLine(new Plate(2, 2).Print(-s, -3, 0, 16));
-            Plate plate = new Plate(8, 4);
+            Plate plate = new(8, 4);
             sb.AppendLine(plate.Print(s * 4, -2, 0, 16));
             sb.AppendLine(plate.Print(s * 12, -2, 0, 16));
             sb.AppendLine(plate.Print(0, -6, 0, 16));

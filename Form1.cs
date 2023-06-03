@@ -95,9 +95,12 @@ namespace BrunnianLink
                     EinsteinHat2.Generate(sb, level);
                     break;
                 case 4:
-                    Hilbert3D.Generate(sb, level);
+                    ChiralSpectre.Generate(sb, level);
                     break;
                 case 5:
+                    Hilbert3D.Generate(sb, level);
+                    break;
+                case 6:
 
                     for (int p1 = -5; p1 <= 5; p1++)
                         for (int p2 = -5; p2 <= 5; p2++)
@@ -115,17 +118,17 @@ namespace BrunnianLink
 
                         }
                     break;
-                case 6:
+                case 7:
                     OctaFlake.Generate(sb, level);
                     break;
-                case 7:
+                case 8:
                     PenroseRhomb.Generate(sb, level);
                     break;
-                case 8:
+                case 9:
                     new MazeGenerator(level).Generate(sb);
                     break;
                 default:
-                    tileGens[modelChoice - 9].Generate(sb, level);
+                    tileGens[modelChoice - 10].Generate(sb, level);
                     break;
             }
             var utf8WithoutBom = new System.Text.UTF8Encoding(false);
