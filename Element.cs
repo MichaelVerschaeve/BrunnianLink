@@ -119,7 +119,7 @@ namespace BrunnianLink
             double dy = -topZPlates * 8;
             double dx = centerXStuds * 20 + ax;
             double dz = centerYStuds * 20 + az;
-            sb.Append($" {dx} {dy} {dz} ");
+            sb.Append($"{dx} {dy} {dz} ");
             sb.Append(RotMat());
             sb.Append(' ');
             sb.Append(partID);

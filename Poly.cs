@@ -17,7 +17,7 @@ namespace BrunnianLink
                 double s = Math.Sin(RotationRad);
                 foreach (var (x, y) in m_points)
                 {
-                    yield return (c*x-s*y, s*x + c*y);
+                    yield return (c*x-s*y +OffsetX, s*x + c*y+OffsetY);
                 }
             }
             set
@@ -67,7 +67,7 @@ namespace BrunnianLink
             RotationRad += Math.Atan2(pArg1.y - pArg2.y, pArg1.x - pArg2.x) - Math.Atan2(pThisArg2.y - pThisArg1.y, pThisArg2.x - pThisArg1.x);
             if (RotationRad > Math.PI) 
                 RotationRad -= 2* Math.PI;
-            if (RotationRad <= Math.PI)
+            if (RotationRad <= -Math.PI)
                 RotationRad += 2 * Math.PI;
 
             pThisArg1 = Points.Skip(thisSideIndex).First();
