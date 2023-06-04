@@ -74,7 +74,7 @@
             // 
             cbModelChoice.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
             cbModelChoice.FormattingEnabled = true;
-            cbModelChoice.Items.AddRange(new object[] { "Brunnian links", "Gosper tiling", "Hat Polykite Plates Y-scale trick", "Hat Polykite Technic", "Chiral Spectre", "Hilbert 3D", "Cross tiling", "Octagonal snowflake", "Penrose rhombus tiling", "Random Maze generator", "Conway Radin pinwheel tiling", "Chair tiling", "Tennis tiling", "Wanderer (reflections) tiling", "Wanderer (rotations) tiling", "Ammann-Beenker tiling", "Shield tiling", "Labyrinth tiling", "Hofstetter arrowed tiling", "Wunderlich I", "Wunderlich II", "Wunderlich III", "Mini Tangram" });
+            cbModelChoice.Items.AddRange(new object[] { "Brunnian links", "Gosper tiling", "Hat Polykite Plates Y-scale trick", "Hat Polykite Technic", "Chiral Spectre", "Hilbert 3D", "Cross tiling", "Octagonal snowflake", "Penrose rhombus tiling", "Random Maze generator", "Conway Radin pinwheel tiling", "Chair tiling", "Tennis tiling", "Wanderer (reflections) tiling", "Wanderer (rotations) tiling", "Ammann-Beenker tiling", "Shield tiling", "Labyrinth tiling", "Hofstetter arrowed tiling", "Wunderlich I", "Wunderlich II", "Wunderlich III", "Mini Tangram", "Socolar tiling", "Wheel tiling" });
             cbModelChoice.Location = new Point(93, 70);
             cbModelChoice.Name = "cbModelChoice";
             cbModelChoice.Size = new Size(387, 23);

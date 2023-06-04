@@ -1,5 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.Eventing.Reader;
+using System.Drawing;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -9,23 +12,36 @@ namespace BrunnianLink
     //used for both wheel tiling and socolar itself
     public class SocolarRule : SubstitutionRule
     {
-        private readonly bool m_isWheeling;
+        private readonly bool m_isWheelTiling;
 
         private static readonly string[] m_colors = new[] { "Dark Turquoise", "Magenta", "Orange", "Orange" };
         public override string[] Colors => m_colors;
 
         public override bool ColorByState => true;
 
-        public override string MainName => m_isWheeling ? "Wheel_Tiling" : "Socolar";
+        public override string MainName => m_isWheelTiling ? "Wheel_Tiling" : "Socolar";
 
-        public SocolarRule(bool isWheeling = false) { m_isWheeling = isWheeling; }
+        private readonly string folder;
+        public SocolarRule(bool isWheeling = false) 
+        {
+            m_isWheelTiling = isWheeling;
+            string dir = Directory.GetParent(AppDomain.CurrentDomain.BaseDirectory)?.FullName!;
+            dir = Directory.GetParent(dir)?.FullName!;
+            dir = Directory.GetParent(dir)?.FullName!;
+            dir = Directory.GetParent(dir)?.FullName!;
+            if (isWheeling)
+                dir = Path.Combine(dir, "Socolar");
+            else 
+                dir = Path.Combine(dir, "SpectrePolies");
+            folder = dir;
+        }
 
         public override int StateCount => 4;
 
         private static readonly double m_scaleFactor = (1.0 + Math.Sqrt(3.0)) / Math.Sqrt(2.0);
         public override double ScaleFactor => m_scaleFactor;
 
-        public override double InitialScale => m_isWheeling ? 6 : 4;
+        public override double InitialScale => m_isWheelTiling ? 6 : 4;
 
         private static (double x, double y, double rotation, int state) MirrorX((double x, double y, double rotation, int state) t)
         {
@@ -111,16 +127,50 @@ namespace BrunnianLink
             return res;
         }
 
-        private readonly string[] WheelingBaseParts = new[] {"Bow","","Flower" };
-        private readonly string[]  SocolarBaseParts= new[] {"",Plate.XYPartID(4,4)+".dat","Hexagon" };
-        public override string BasePart(int state, int color) => m_isWheeling ? WheelingBaseParts[state] : SocolarBaseParts[state];
+        private readonly string[]  WheelingBaseParts = new[] {"Bow","","Flower" };
+        private readonly string[]  SocolarBaseParts= new[] {"",Plate.XYPartID(4,4)+".dat","Hexagon","HexagonMirror"};
+        public override string BasePart(int state, int color) => m_isWheelTiling ? WheelingBaseParts[state] : SocolarBaseParts[state];
 
         public override bool Level0IsComposite => true;
         public override void DefineCompositeBasePart(StringBuilder sb, int state, int color)
         {
-            base.DefineCompositeBasePart(sb, state, color);
+            if (m_isWheelTiling)
+                DefineCompositeBasePartSocolar(sb,state, color);
+            else
+                DefineCompositeBasePartWheelTiling(sb, state, color);
         }
 
+        public void DefineCompositeBasePartSocolar(StringBuilder sb, int state, int color)
+        {
+            if (state < 2) return; //empty and simple plate
+            if (state == 2)
+            {
+                sb.AppendLine(new Shape() {PartID="hexBase",SubModel=true}.Rotate(120).Print(0,0,-2.5,16));
+                return;
+            }
+            sb.AppendLine(new Shape() { PartID = "hexBase", SubModel = true }.Print(0, 0, -2.5, 16));
+            MetaData.StartSubModel(sb,"hexBase");
+            string file = Path.Combine(folder, "hexagon.ldr");
+            string[] fileLines = File.ReadAllLines(file);
+            string specialLine = fileLines.First(line => line.EndsWith("3003.dat"));
+            var parts = specialLine.Split(' ');
+            double ldux_offset = double.Parse(parts[2], NumberStyles.Float, CultureInfo.InvariantCulture);
+            double lduy_offset = double.Parse(parts[3], NumberStyles.Float, CultureInfo.InvariantCulture);
+            double lduz_offset = double.Parse(parts[4], NumberStyles.Float, CultureInfo.InvariantCulture);
+            foreach (string line in fileLines.SkipWhile(line => line.StartsWith('0')))
+            {
+                parts = line.Split(' ');
+                double ldux = double.Parse(parts[2], NumberStyles.Float, CultureInfo.InvariantCulture);
+                double lduy = double.Parse(parts[3], NumberStyles.Float, CultureInfo.InvariantCulture);
+                double lduz = double.Parse(parts[4], NumberStyles.Float, CultureInfo.InvariantCulture);
+                sb.Append($"1 {parts[1]} {ldux - ldux_offset} {lduy - lduy_offset} {lduz - lduz_offset} ");
+                sb.AppendLine(string.Join(" ", parts.Skip(5)));
+            }
+        }
 
+        public void DefineCompositeBasePartWheelTiling(StringBuilder sb, int state, int color)
+        {
+            if (state < 2) return; //empty and simple plate
+        }
     }
 }

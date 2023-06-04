@@ -49,7 +49,9 @@ namespace BrunnianLink
             new() {Rule = new Wunderlich(){CurveType=0} },
             new() {Rule = new Wunderlich(){CurveType=1} },
             new() {Rule = new Wunderlich(){CurveType=2} },
-            new() {Rule = new MiniTangramRule()}
+            new() {Rule = new MiniTangramRule()},
+            new() {Rule = new SocolarRule(false)},
+            new() {Rule = new SocolarRule(true)},
         };
         private void BtGenerate_Click(object sender, EventArgs e)
         {
