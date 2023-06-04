@@ -14,10 +14,11 @@ namespace BrunnianLink
     {
         private readonly bool m_isWheelTiling;
 
-        private static readonly string[] m_colors = new[] { "Dark_Turquoise", "Magenta", "Orange", "Orange" };
-        public override string[] Colors => m_colors;
+        private static readonly string[] m_colorsSocolar = new[] { "Magenta", "Dark_Turquoise", "Orange", "Orange" };
+        private static readonly string[] m_colorsWheel = new[] { "Violet", "Tan", "Sand_Green", "Bright_Light_Orange" };
+        public override string[] Colors => m_isWheelTiling?m_colorsWheel: m_colorsSocolar;
 
-        public override bool ColorByState => true;
+        public override bool ColorByState => !m_isWheelTiling;
 
         public override string MainName => m_isWheelTiling ? "Wheel_Tiling" : "Socolar";
 
@@ -41,7 +42,7 @@ namespace BrunnianLink
         private static readonly double m_scaleFactor = 2.0 + Math.Sqrt(3.0);
         public override double ScaleFactor => m_scaleFactor;
 
-        public override double InitialScale => m_isWheelTiling ? 6 : 4;
+        public override double InitialScale => m_isWheelTiling ? 6*Math.Sqrt(2.0) : 4;
 
         private static (double x, double y, double rotation, int state) MirrorX((double x, double y, double rotation, int state) t)
         {
@@ -130,20 +131,20 @@ namespace BrunnianLink
             return res;
         }
 
-        private readonly string[] WheelingBaseParts = new[] { "Bow", "", "Flower" };
+        private readonly string[] WheelingBaseParts = new[] { "Bow", "", "Flower", "Flower" };
         private readonly string[] SocolarBaseParts = new[] { "", Plate.XYPartID(4, 4) + ".dat", "Hexagon", "HexagonMirror" };
-        public override string BasePart(int state, int color) => m_isWheelTiling ? WheelingBaseParts[state] : SocolarBaseParts[state];
+        public override string BasePart(int state, int color) => m_isWheelTiling ? WheelingBaseParts[state] : (SocolarBaseParts[state]+"_" +color.ToString());
 
         public override bool Level0IsComposite => true;
         public override void DefineCompositeBasePart(StringBuilder sb, int state, int color)
         {
             if (!m_isWheelTiling)
-                DefineCompositeBasePartSocolar(sb, state, color);
+                DefineCompositeBasePartSocolar(sb, state);
             else
                 DefineCompositeBasePartWheelTiling(sb, state, color);
         }
 
-        public void DefineCompositeBasePartSocolar(StringBuilder sb, int state, int color)
+        private void DefineCompositeBasePartSocolar(StringBuilder sb, int state)
         {
             if (state < 2) return; //empty and simple plate
             if (state == 2)
@@ -171,9 +172,49 @@ namespace BrunnianLink
             }
         }
 
-        public void DefineCompositeBasePartWheelTiling(StringBuilder sb, int state, int color)
+        private void DefineCompositeBasePartWheelTiling(StringBuilder sb, int state, int colorId)
         {
-            if (state < 2) return; //empty and simple plate
+            if (state == 1) return; //squares dissappear
+            MetaData.StartSubModel(sb,BasePart(state, colorId));
+            string[] partNames = { "Bow_base_", "Flower_base_" };
+            int i = state == 0 ? 0 : 1;
+            string baseName = partNames[i] + colorId.ToString();
+            Shape shape = new() { PartID = baseName, SubModel = true };
+            if (state == 0)
+            {
+                sb.AppendLine(shape.Rotate(60).Print(3 * Math.Sqrt(3.0), -3 * Math.Sqrt(3.0), 0, 16));
+            }
+            else
+            {
+                Shape bow = new() { PartID = baseName, SubModel = true };
+                sb.AppendLine(shape.Rotate(45).Print(0, -3  * Math.Sqrt(2.0) * (Math.Sqrt(3.0) + 1), 0, 16));
+            }
+
+            //copy .ldr contents...
+            string[] templateFiles = { "bow.ldr", "flower.ldr" };
+
+            string[] fileLines = File.ReadAllLines(Path.Combine(folder, templateFiles[i]));
+            string specialLine = fileLines.First(line => line.EndsWith("6141.dat"));
+            var parts = specialLine.Split(' ');
+            double ldux_offset = double.Parse(parts[2], NumberStyles.Float, CultureInfo.InvariantCulture) - 10;
+            double lduy_offset = double.Parse(parts[3], NumberStyles.Float, CultureInfo.InvariantCulture);
+            double lduz_offset = double.Parse(parts[4], NumberStyles.Float, CultureInfo.InvariantCulture) - 10;
+
+            MetaData.StartSubModel(sb, baseName);
+            foreach (string line in fileLines.SkipWhile(line => line.StartsWith('0')))
+            {
+                parts = line.Split(' ');
+                int pcolor = int.Parse(parts[1]);
+                if (pcolor == 4) //the red dot,
+                    continue;
+                else if (pcolor == 15)
+                    pcolor = colorId;
+                double ldux = double.Parse(parts[2], NumberStyles.Float, CultureInfo.InvariantCulture);
+                double lduy = double.Parse(parts[3], NumberStyles.Float, CultureInfo.InvariantCulture);
+                double lduz = double.Parse(parts[4], NumberStyles.Float, CultureInfo.InvariantCulture);
+                sb.Append($"1 {pcolor} {ldux - ldux_offset} {lduy - lduy_offset} {lduz - lduz_offset} ");
+                sb.AppendLine(string.Join(" ", parts.Skip(5)));
+            }
         }
 
         public override (double x, double y, double rotation, int state)[] StartStates => new[]{(0.0,0.0,0.0,1)};
