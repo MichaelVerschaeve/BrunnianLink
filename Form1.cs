@@ -40,6 +40,7 @@ namespace BrunnianLink
             new() { Rule = new PinWheelRules() },
             new() { Rule = new ChairRule() },
             new() { Rule = new TennisRule() },
+            new() { Rule = new Domino9Rule() },
             new() { Rule = new WandererReflectionsRule() },
             new() { Rule = new WandererRotationsRule() },
             new() { Rule = new AmmannBeenkerRule()},
