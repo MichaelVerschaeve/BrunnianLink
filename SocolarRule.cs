@@ -15,7 +15,7 @@ namespace BrunnianLink
         private readonly bool m_isWheelTiling;
 
         private static readonly string[] m_colorsSocolar = new[] { "Magenta", "Dark_Turquoise", "Orange", "Orange" };
-        private static readonly string[] m_colorsWheel = new[] { "Violet", "Tan", "Sand_Green", "Bright_Light_Orange" };
+        private static readonly string[] m_colorsWheel = new[] { "Violet", "Aqua", "Bright_Light_Orange", "Sand_Green", "Tan", "White", "Lime", "Medium_Azure"};
         public override string[] Colors => m_isWheelTiling?m_colorsWheel: m_colorsSocolar;
 
         public override bool ColorByState => !m_isWheelTiling;
@@ -133,7 +133,7 @@ namespace BrunnianLink
 
         private readonly string[] WheelingBaseParts = new[] { "Bow", "", "Flower", "Flower" };
         private readonly string[] SocolarBaseParts = new[] { "", Plate.XYPartID(4, 4) + ".dat", "Hexagon", "HexagonMirror" };
-        public override string BasePart(int state, int color) => m_isWheelTiling ? WheelingBaseParts[state] : (SocolarBaseParts[state]+"_" +color.ToString());
+        public override string BasePart(int state, int color) => m_isWheelTiling ? (WheelingBaseParts[state] + "_" + color.ToString()) : (SocolarBaseParts[state] );
 
         public override bool Level0IsComposite => true;
         public override void DefineCompositeBasePart(StringBuilder sb, int state, int color)
@@ -172,13 +172,16 @@ namespace BrunnianLink
             }
         }
 
-        private void DefineCompositeBasePartWheelTiling(StringBuilder sb, int state, int colorId)
+        private void DefineCompositeBasePartWheelTiling(StringBuilder sb, int state, int color)
         {
-            if (state == 1) return; //squares dissappear
-            MetaData.StartSubModel(sb,BasePart(state, colorId));
+            if (state == 1)
+            {
+                return; //squares dissappear
+            }
+            //MetaData.StartSubModel(sb,BasePart(state, colorId));
             string[] partNames = { "Bow_base_", "Flower_base_" };
             int i = state == 0 ? 0 : 1;
-            string baseName = partNames[i] + colorId.ToString();
+            string baseName = partNames[i] + color.ToString();
             Shape shape = new() { PartID = baseName, SubModel = true };
             if (state == 0)
             {
@@ -187,7 +190,7 @@ namespace BrunnianLink
             else
             {
                 Shape bow = new() { PartID = baseName, SubModel = true };
-                sb.AppendLine(shape.Rotate(45).Print(0, -3  * Math.Sqrt(2.0) * (Math.Sqrt(3.0) + 1), 0, 16));
+                sb.AppendLine(shape.Rotate(45-180).Print(0, 3  * Math.Sqrt(2.0) * (Math.Sqrt(3.0) + 1), 0, 16));
             }
 
             //copy .ldr contents...
@@ -199,6 +202,8 @@ namespace BrunnianLink
             double ldux_offset = double.Parse(parts[2], NumberStyles.Float, CultureInfo.InvariantCulture) - 10;
             double lduy_offset = double.Parse(parts[3], NumberStyles.Float, CultureInfo.InvariantCulture);
             double lduz_offset = double.Parse(parts[4], NumberStyles.Float, CultureInfo.InvariantCulture) - 10;
+
+            int colorId = ColorMap.Get(Colors[color]).id;
 
             MetaData.StartSubModel(sb, baseName);
             foreach (string line in fileLines.SkipWhile(line => line.StartsWith('0')))
