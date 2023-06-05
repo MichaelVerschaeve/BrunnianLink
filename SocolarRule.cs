@@ -133,8 +133,16 @@ namespace BrunnianLink
 
         private readonly string[] WheelingBaseParts = new[] { "Bow", "", "Flower", "Flower" };
         private readonly string[] SocolarBaseParts = new[] { "", Plate.XYPartID(4, 4) + ".dat", "Hexagon", "HexagonMirror" };
-        public override string BasePart(int state, int color) => m_isWheelTiling ? (WheelingBaseParts[state] + "_" + color.ToString()) : (SocolarBaseParts[state] );
+        public override string BasePart(int state, int color) {
 
+            if (m_isWheelTiling)
+            {
+                string p = WheelingBaseParts[state];
+                return string.IsNullOrEmpty(p)?"":(p + "_" + color.ToString());
+            }
+            else
+                return SocolarBaseParts[state];
+        }
         public override bool Level0IsComposite => true;
         public override void DefineCompositeBasePart(StringBuilder sb, int state, int color)
         {
@@ -222,6 +230,6 @@ namespace BrunnianLink
             }
         }
 
-        public override (double x, double y, double rotation, int state)[] StartStates => new[]{(0.0,0.0,0.0,1)};
+        public override (double x, double y, double rotation, int state)[] StartStates => new[]{(0.0,0.0,0.0,3)};
     }
 }
