@@ -77,7 +77,7 @@
             cbModelChoice.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             cbModelChoice.DropDownStyle = ComboBoxStyle.Simple;
             cbModelChoice.FormattingEnabled = true;
-            cbModelChoice.Items.AddRange(new object[] { "Brunnian links", "Gosper tiling", "Hat Polykite Plates Y-scale trick", "Hat Polykite Technic", "Chiral Spectre", "Hilbert 3D", "Cross tiling", "Octagonal snowflake", "Penrose rhombus tiling", "Random Maze generator", "Conway Radin pinwheel tiling", "Chair tiling", "Domino tiling", "Domino variant (9 tiles)", "Semi Detached House", "Wanderer (reflections) tiling", "Wanderer (rotations) tiling", "Ammann-Beenker tiling", "Shield tiling", "Labyrinth tiling", "Hofstetter arrowed tiling", "Wunderlich I", "Wunderlich II", "Wunderlich III", "Mini Tangram", "Socolar tiling", "Wheel tiling" });
+            cbModelChoice.Items.AddRange(new object[] { "Brunnian links", "Gosper tiling", "Hat Polykite Plates Y-scale trick", "Hat Polykite Technic", "Chiral Spectre", "Hilbert 3D", "Cross tiling", "Octagonal snowflake", "Penrose rhombus tiling", "Random Maze generator", "Conway Radin pinwheel tiling", "Chair tiling", "Domino tiling", "Domino variant (9 tiles)", "Semi Detached House", "Wanderer (reflections) tiling", "Wanderer (rotations) tiling", "Ammann-Beenker tiling", "Shield tiling", "Labyrinth tiling", "Hofstetter arrowed tiling", "Wunderlich I", "Wunderlich II", "Wunderlich III", "Mini Tangram", "Socolar tiling", "Wheel tiling", "Pentomino" });
             cbModelChoice.Location = new Point(93, 70);
             cbModelChoice.Name = "cbModelChoice";
             cbModelChoice.Size = new Size(387, 383);

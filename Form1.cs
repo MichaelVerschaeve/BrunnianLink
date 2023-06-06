@@ -25,7 +25,7 @@ namespace BrunnianLink
             int count = 0;
             //store original order
             foreach (var item in cbModelChoice.Items)
-                TextToIndex.Add(item?.ToString()??"", count++);
+                TextToIndex.Add(item?.ToString() ?? "", count++);
             cbModelChoice.Sorted = true;
         }
 
@@ -60,6 +60,7 @@ namespace BrunnianLink
             new() {Rule = new MiniTangramRule()},
             new() {Rule = new SocolarRule(false)},
             new() {Rule = new SocolarRule(true)},
+            new() {Rule = new Pentomino()},
         };
         private void BtGenerate_Click(object sender, EventArgs e)
         {
