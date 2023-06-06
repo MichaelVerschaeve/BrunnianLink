@@ -27,23 +27,25 @@ namespace BrunnianLink
             new List<(double x, double y, double rotation, int state)>()
             {
                 (0,0,0,0),
+                (1,4,-90,0),
                 (0,6,180,1),
                 (4,0,0,1)
             },
             new List<(double x, double y, double rotation, int state)>()
             {
                 (0,0,0,1),
+                (-1,4,90,1),
                 (0,6,180,0),
                 (-4,0,0,0)
             },
         };
         public override List<(double x, double y, double rotation, int state)> Rule(int state) => m_rules[state];
 
-        public override bool Level0IsComposite => base.Level0IsComposite;
+        public override bool Level0IsComposite => true;
 
         public override void DefineCompositeBasePart(StringBuilder sb, int state, int color)
         {
-            int s = state==0 ? 0 : 1;
+            int s = state==1 ? -1 : 1;
             int colorId = ColorMap.Get(Colors[state]).id;
             sb.AppendLine(new Plate(2, 2).Print(s, 1, 0, colorId));
             sb.AppendLine(new Plate(1, 1).Print(0.5*s, 2.5, 0, colorId));
