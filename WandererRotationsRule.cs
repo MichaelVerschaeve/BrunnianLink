@@ -24,7 +24,7 @@ namespace BrunnianLink
 
         public override void DefineCompositeBasePart(StringBuilder sb, int state, int color)
         {
-            MetaData.StartSubModel(sb, BasePart(state,0));
+            //MetaData.StartSubModel(sb, BasePart(state,0));
             bool vert = (state & 1) == 1;
             bool right = (state & 2) == 2;
             bool xor = vert ^ right;

@@ -21,7 +21,6 @@ namespace BrunnianLink
 
         public override void DefineCompositeBasePart(StringBuilder sb, int state, int color)
         {
-            MetaData.StartSubModel(sb, BasePart(state,color));
             Tile t = new(2);
             sb.AppendLine(t.Print(0, 0.5, 0, ColorMap.Get(m_colors[state]).id));
             sb.AppendLine(t.Print(0, -0.5, 0, ColorMap.Get(m_colors[1-state]).id));
