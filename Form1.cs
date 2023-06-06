@@ -22,7 +22,14 @@ namespace BrunnianLink
 
             cbModelChoice.SelectedIndex = Properties.Settings.Default.SelectedModel;
             nudLevel.Value = Properties.Settings.Default.SelectedLevel;
+            int count = 0;
+            //store original order
+            foreach (var item in cbModelChoice.Items)
+                TextToIndex.Add(item?.ToString()??"", count++);
+            cbModelChoice.Sorted = true;
         }
+
+        private Dictionary<String, int> TextToIndex = new();
 
         private void BtOpen_Click(object sender, EventArgs e)
         {
@@ -56,6 +63,8 @@ namespace BrunnianLink
         };
         private void BtGenerate_Click(object sender, EventArgs e)
         {
+            if (cbModelChoice.SelectedIndex == -1) return;
+
             StringBuilder sb = new();
             /*
             sb.Append("0 Test\r\n0 Name:  Test\r\n0 Author:  Michael Verschaeve\r\n0 CustomBrick\r\n");
@@ -69,7 +78,7 @@ namespace BrunnianLink
             sb.AppendLine(wedgePlate2.Print(0, 0, 3, ColorMap.Get("Black").id));
             */
             int level = (int)nudLevel.Value;
-            int modelChoice = cbModelChoice.SelectedIndex;
+            int modelChoice = TextToIndex[cbModelChoice.SelectedItem.ToString()];
             string file = tbPath.Text;
             string parentDir = Directory.GetParent(file)?.FullName!;
             if (!Directory.Exists(parentDir))
