@@ -46,8 +46,9 @@ namespace BrunnianLink
         private static readonly TilingGenerator[] tileGens = {
             new() { Rule = new PinWheelRules() },
             new() { Rule = new ChairRule() },
-            new() { Rule = new TennisRule() },
+            new() { Rule = new DominoRule() },
             new() { Rule = new Domino9Rule() },
+            new() { Rule = new SemiHouseRule() },
             new() { Rule = new WandererReflectionsRule() },
             new() { Rule = new WandererRotationsRule() },
             new() { Rule = new AmmannBeenkerRule()},

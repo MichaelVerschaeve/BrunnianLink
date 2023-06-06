@@ -44,7 +44,7 @@ namespace BrunnianLink
         public override List<(double x, double y, double rotation, int state)> Rule(int state)
         {
             if (state > 1)
-                return Rule(3 - state).Select(t => (-t.x, t.y, -t.rotation, 3 - state)).ToList();
+                return Rule(3 - state).Select(t => (-t.x, t.y, -t.rotation, 3 - t.state)).ToList();
             else if (state == 1)
                 return baseRule.Select(t => (t.x, t.y, t.rotation, t.state ^ 1)).ToList(); //swap state 0 and 1, swap state 2 and 3
             else

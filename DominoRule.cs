@@ -1,6 +1,6 @@
 ﻿namespace BrunnianLink
 {
-    public class TennisRule : SubstitutionRule
+    public class DominoRule : SubstitutionRule
     {
         static readonly string[] m_colors = new string[] { "Light_Bluish_Grey", "Tan", "Dark_Tan", "Dark_Bluish_Grey" };
         override public string[] Colors => m_colors;
