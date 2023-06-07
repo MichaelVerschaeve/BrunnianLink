@@ -49,6 +49,7 @@ namespace BrunnianLink
             new() { Rule = new DominoRule() },
             new() { Rule = new Domino9Rule() },
             new() { Rule = new SemiHouseRule() },
+            new() { Rule = new WedgeTileRule() },
             new() { Rule = new WandererReflectionsRule() },
             new() { Rule = new WandererRotationsRule() },
             new() { Rule = new AmmannBeenkerRule()},
