@@ -22,7 +22,7 @@ namespace BrunnianLink
         public override bool ColorByState => true;
 
         public override string BasePart(int state, int color) => state switch { 0 => "straight", _ => "mirror" };
-        List<(double x, double y, double rotation, int state)>[] m_rules = new[]
+        readonly List<(double x, double y, double rotation, int state)>[] m_rules = new[]
         {
             new List<(double x, double y, double rotation, int state)>()
             {

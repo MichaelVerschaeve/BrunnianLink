@@ -20,16 +20,16 @@ namespace BrunnianLink
             InitializeComponent();
             tbPath.Text = Properties.Settings.Default.OutputPath;
 
-            cbModelChoice.SelectedIndex = Properties.Settings.Default.SelectedModel;
             nudLevel.Value = Properties.Settings.Default.SelectedLevel;
             int count = 0;
             //store original order
             foreach (var item in cbModelChoice.Items)
                 TextToIndex.Add(item?.ToString() ?? "", count++);
             cbModelChoice.Sorted = true;
+            cbModelChoice.SelectedIndex = Properties.Settings.Default.SelectedModel;
         }
 
-        private Dictionary<String, int> TextToIndex = new();
+        private readonly Dictionary<String, int> TextToIndex = new();
 
         private void BtOpen_Click(object sender, EventArgs e)
         {
@@ -50,6 +50,7 @@ namespace BrunnianLink
             new() { Rule = new Domino9Rule() },
             new() { Rule = new SemiHouseRule() },
             new() { Rule = new WedgeTileRule() },
+            new() { Rule = new PentaTileRule()  },
             new() { Rule = new WandererReflectionsRule() },
             new() { Rule = new WandererRotationsRule() },
             new() { Rule = new AmmannBeenkerRule()},
@@ -81,13 +82,13 @@ namespace BrunnianLink
             sb.AppendLine(wedgePlate2.Print(0, 0, 3, ColorMap.Get("Black").id));
             */
             int level = (int)nudLevel.Value;
-            int modelChoice = TextToIndex[cbModelChoice.SelectedItem.ToString()];
+            int modelChoice = TextToIndex[cbModelChoice.SelectedItem.ToString()!];
             string file = tbPath.Text;
             string parentDir = Directory.GetParent(file)?.FullName!;
             if (!Directory.Exists(parentDir))
                 Directory.CreateDirectory(parentDir);
             Properties.Settings.Default.SelectedLevel = level;
-            Properties.Settings.Default.SelectedModel = modelChoice;
+            Properties.Settings.Default.SelectedModel = cbModelChoice.SelectedIndex;
             Properties.Settings.Default.OutputPath = file;
             Properties.Settings.Default.Save();
 
