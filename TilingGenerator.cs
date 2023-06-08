@@ -13,18 +13,16 @@ using static System.Windows.Forms.AxHost;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement.TaskbarClock;
 
 //tilings to still consider
-//MiniTangram
-//hoffstedter
 //Square Triangle Pinwheel Variant
 //Square - triangle
 //Monnier (scale Y)
-//Pentomino
 //Rhomb Square Octagon
 //Socolar - C5 (reuse penrose)
 //Tangram
 //Tetris
 //Tromino 2
 //Watanabe Ito Soma 8-fold
+//Nischke - Danzer 6 - fold 2
 
 namespace BrunnianLink
 {
