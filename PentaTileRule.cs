@@ -43,7 +43,6 @@ namespace BrunnianLink
             (0,2,45,2)
         };
 
-        static private readonly double unit = Math.Sqrt(2.0) * 0.5;
 
         //public override (double x, double y, double rotation, int state)[] StartStates => new[] { (0.0, 0.0, 0.0, 1) };
 
