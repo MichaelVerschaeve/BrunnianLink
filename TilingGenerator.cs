@@ -23,7 +23,7 @@ using static System.Windows.Forms.VisualStyles.VisualStyleElement.TaskbarClock;
 //Tromino 2
 //Watanabe Ito Soma 8-fold
 //Nischke - Danzer 6 - fold 2
-
+//TriTriangle
 namespace BrunnianLink
 {
     public abstract class SubstitutionRule
