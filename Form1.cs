@@ -64,6 +64,7 @@ namespace BrunnianLink
             new() {Rule = new SocolarRule(false)},
             new() {Rule = new SocolarRule(true)},
             new() {Rule = new Pentomino()},
+            new() {Rule = new PinWheel10()},
         };
         private void BtGenerate_Click(object sender, EventArgs e)
         {

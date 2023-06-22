@@ -25,6 +25,9 @@ using static System.Windows.Forms.VisualStyles.VisualStyleElement.TaskbarClock;
 //Nischke - Danzer 6 - fold 2
 //TriTriangle
 //Socolar square triangle
+//pinwheel 1-3
+//Socolar Square-Triangle
+
 namespace BrunnianLink
 {
     public abstract class SubstitutionRule
@@ -45,6 +48,9 @@ namespace BrunnianLink
         public abstract string BasePart(int state, int color); //names of the base parts
 
         public virtual bool Level0IsComposite { get => false; }
+
+        public virtual double XPostScale { get => 1; }
+        public virtual double YPostScale { get => 1; }
 
         private static readonly (double x, double y, double rotation, int state)[] m_startStates = new [] { (0.0,0.0,0.0,0) };
 
@@ -174,8 +180,14 @@ namespace BrunnianLink
 
         private void DoSubPart(StringBuilder sb, int level, bool top, int state, int color)
         {
-            MetaData.StartSubModel(sb, top && Rule.StartStates.Length==1? Rule.MainName : PartName(level, state, color));
-            double scale = Math.Pow(Rule.ScaleFactor, level-1)*Rule.InitialScale;
+            MetaData.StartSubModel(sb, top && Rule.StartStates.Length == 1 ? Rule.MainName : PartName(level, state, color));
+            double xscale = Math.Pow(Rule.ScaleFactor, level - 1) * Rule.InitialScale;
+            double yscale = xscale;
+            if (level == 0)
+            {
+                xscale *= Rule.XPostScale;
+                yscale *= Rule.YPostScale;
+            }
             color--;
             foreach (var t in Rule.Rule(state))
             {
@@ -191,9 +203,9 @@ namespace BrunnianLink
                     continue;
                 Shape subShape = new() { PartID = id, SubModel = level > 1 || Rule.Level0IsComposite };
                 subShape.RotateThis(t.rotation);
-                sb.AppendLine(subShape.Print(scale*t.x,scale*t.y, 1, ColorMap.Get(Rule.Colors[color]).id));
+                sb.AppendLine(subShape.Print(xscale * t.x, yscale * t.y, 1, ColorMap.Get(Rule.Colors[color]).id));
             }
-            Rule.Decorate(sb, level,top,state,color);
+            Rule.Decorate(sb, level, top, state, color);
         }
     }
 }
