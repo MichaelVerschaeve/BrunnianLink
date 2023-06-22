@@ -23,13 +23,18 @@ namespace BrunnianLink
 
         static private readonly double si60 = Math.Sqrt(3.0) * 0.5;
         private readonly List<(double x, double y, double rotation, int state)> halfSquareRule = new() {
-            (0.0,-2*si60/3.0,0.0,1)
-
+            (0.0,-2*si60/3.0,0.0,1),
+            (-0.5,-si60/3.0,180.0,2),
+            (-0.5,si60/3.0,120.0,1),
+            (-0.75+0.5*si60,0.5*si60+0.25,60.0,0),
+            (-0.75+0.5*si60,-0.5*si60-0.25,30.0,0),
+            (-1.0-2.0*si60/3.0,0.0,150.0,1)
         };
         
         private readonly List<(double x, double y, double rotation, int state)> halfTriangleRule = new() {
-            (0.0,-2*si60/3.0,0.0,1)
-
+            (-2.0*si60/3.0-2.5,0.0,30.0,1),
+            (-0.5*si60-0.25,-si60/3.0+0.25+0.5*si60,-30.0,0),
+            (-0.5*si60+si60/6.0,2.0*si60/3.0+0.5,-150.0,1)
         };
 
 
