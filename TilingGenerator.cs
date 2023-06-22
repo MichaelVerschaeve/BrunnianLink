@@ -25,9 +25,6 @@ using static System.Windows.Forms.VisualStyles.VisualStyleElement.TaskbarClock;
 //Nischke - Danzer 6 - fold 2
 //TriTriangle
 //Socolar square triangle
-//pinwheel 1-3
-//Socolar Square-Triangle
-
 namespace BrunnianLink
 {
     public abstract class SubstitutionRule
