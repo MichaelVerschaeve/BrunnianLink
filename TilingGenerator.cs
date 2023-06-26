@@ -24,7 +24,6 @@ using static System.Windows.Forms.VisualStyles.VisualStyleElement.TaskbarClock;
 //Watanabe Ito Soma 8-fold
 //Nischke - Danzer 6 - fold 2
 //TriTriangle
-//Socolar square triangle
 namespace BrunnianLink
 {
     public abstract class SubstitutionRule
