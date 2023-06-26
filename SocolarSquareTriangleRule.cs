@@ -101,7 +101,7 @@ namespace BrunnianLink
             }
         }
 
-        public override (double x, double y, double rotation, int state)[] StartStates => new[] {(0.0,0.0,0.0,0) };
+        // public override (double x, double y, double rotation, int state)[] StartStates => new[] {(0.0,0.0,0.0,0) };
 
     }
 }
