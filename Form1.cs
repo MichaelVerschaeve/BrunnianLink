@@ -147,8 +147,11 @@ namespace BrunnianLink
                 case 9:
                     new MazeGenerator(level).Generate(sb);
                     break;
+                case 10:
+                    CrossDissectionTiling.Generate(sb, level);
+                    break;
                 default:
-                    tileGens[modelChoice - 10].Generate(sb, level);
+                    tileGens[modelChoice - 11].Generate(sb, level);
                     break;
             }
             var utf8WithoutBom = new System.Text.UTF8Encoding(false);
