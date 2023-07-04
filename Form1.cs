@@ -150,8 +150,11 @@ namespace BrunnianLink
                 case 10:
                     CrossDissectionTiling.Generate(sb, level);
                     break;
+                case 11:
+                    TruchetTiling.Generate(sb, level);
+                    break;
                 default:
-                    tileGens[modelChoice - 11].Generate(sb, level);
+                    tileGens[modelChoice - 12].Generate(sb, level);
                     break;
             }
             var utf8WithoutBom = new System.Text.UTF8Encoding(false);
