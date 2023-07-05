@@ -1,4 +1,6 @@
-﻿using System.Text;
+﻿using Microsoft.VisualBasic.Devices;
+using System.Linq;
+using System.Text;
 
 namespace BrunnianLink
 {
@@ -33,15 +35,46 @@ namespace BrunnianLink
         }
     }
 
-    public static class TruchetTwinHeighwayDragon
+    public static class TruchetFractals
     {
-        public static void Generate(StringBuilder sb, int level)
+        public enum Kind
+        {
+            TwinDragon,
+            Sierpinski
+        }
+
+        public static void Generate(StringBuilder sb, int level, Kind fractalKind)
         {
             MetaData.StartSubModel(sb, "TruchetTwinDragon");
-            List<bool> moves = new () { true};
-            for (int i = 0; i < level; i++)
-                moves = moves.Concat(moves.Select(b=>!b).Reverse().Prepend(true)).ToList();
-            moves = moves.Concat(moves.Prepend(true)).Append(true).ToList(); //twin dragon, just close the loop
+            List<bool> moves = new() { true };
+
+            int outID = ColorMap.Get("Bright_Light_Orange").id;
+            int inID = ColorMap.Get("Black").id;
+
+            if (fractalKind == Kind.TwinDragon)
+            {
+               // moves = new() { true };
+                for (int i = 0; i < level; i++)
+                    moves = moves.Concat(moves.Select(b => !b).Reverse().Prepend(true)).ToList();
+                moves = moves.Concat(moves.Prepend(true)).Append(true).ToList(); //twin dragon, just close the loop
+            }
+            else
+            {
+                (inID, outID) = (outID, inID);
+                moves = new() { true};
+                for (int i = 0; i < level;i++)
+                {
+                    moves = moves.Append(false).Append(false)
+                        .Concat(moves)
+                        .Append(true)
+                        .Concat(moves)
+                        .Append(false).Append(false)
+                        .Concat(moves)
+                        .ToList();
+                }
+                moves = moves.Append(true).Concat(moves).Append(true).ToList();
+            }
+            
             Dictionary<(int x, int y), int> board = new();
             (int x, int y) position = (0,0);
             (int dx, int dy) direction = (0,1);
@@ -84,55 +117,59 @@ namespace BrunnianLink
             int yfrom = board.Keys.Select(t => t.y).Min();
             int yto = board.Keys.Select(t => t.y).Max();
 
-            int outID = ColorMap.Get("Black").id;
-            int InID = ColorMap.Get("Bright_Light_Orange").id;
 
-            for (double x = 2.0*xfrom; x <= 2.0*xto; x += 2.0 )
+            for (int ix = xfrom; ix <= xto; ix++)
             {
-                for (double y = 2.0 * yfrom; y <= 2.0 * yto; x += 2.0)
+                double x = ix * 2.0;
+                for (int iy =  yfrom; iy <=  yto; iy++)
                 {
-                    if (!board.TryGetValue(position, out int cornerstatus))
+                    double y = iy * 2.0;
+                    if (!board.TryGetValue((ix,iy), out int cornerstatus))
                     {
-                        sb.AppendLine(new Tile(2, 2).Print(x, y, 0.0, outID));
+                        sb.AppendLine(new Tile(2, 2).Print(x,y, 0.0, outID));
                         continue;
                     }
                     bool doRot = false;
                     int topId = outID;
                     int centerId = outID;
                     int bottomId = outID;
-                    switch (cornerstatus)
+                    if (cornerstatus < 0)
                     {
-                        case -1:
-                            centerId = InID; 
-                            break;
-                        case -2:
-                            centerId = InID;
+                        centerId = inID;
+                        doRot = cornerstatus == -2;
+                    }
+                    else
+                    {
+                        if ((cornerstatus & 1) == 1)
+                        {
                             doRot = true;
-                            break;
-
-
-
-                        default: throw new Exception("illegal board status");
+                            bottomId = inID;
+                        }
+                        if ((cornerstatus & 2) == 2)
+                            topId = inID;
+                        if ((cornerstatus & 4) == 4)
+                        {
+                            doRot = true;
+                            topId = inID;
+                        }
+                        if ((cornerstatus & 8) == 8)
+                            bottomId = inID;
                     }
 
                     if (doRot)
                     {
-                        sb.AppendLine(new Shape() { PartID = "3396" }.Print(0.0, 0.0, 0.0, centerId));
-                        sb.AppendLine(new Shape() { PartID = "25269" }.Print(-0.5, 0.5, 0.0, topId));
-                        sb.AppendLine(new Shape() { PartID = "25269" }.Rotate(180).Print(0.5, -0.5, 0.0, bottomId));
+                        sb.AppendLine(new Shape() { PartID = "3396" }.Rotate(90.0).Print(x, y, 0.0, centerId));
+                        sb.AppendLine(new Shape() { PartID = "25269" }.Print(x - 0.5, y + 0.5, 0.0, topId));
+                        sb.AppendLine(new Shape() { PartID = "25269" }.Rotate(180).Print(x + 0.5, y - 0.5, 0.0, bottomId));
                     }
                     else
                     {
-                        sb.AppendLine(new Shape() { PartID = "3396" }.Print(0.0, 0.0, 0.0, centerId));
-                        sb.AppendLine(new Shape() { PartID = "25269" }.Rotate(-90).Print(0.5, 0.5, 0.0, topId));
-                        sb.AppendLine(new Shape() { PartID = "25269" }.Rotate(90).Print(-0.5, -0.5, 0.0, bottomId));
+                        sb.AppendLine(new Shape() { PartID = "3396" }.Print(x, y, 0.0, centerId));
+                        sb.AppendLine(new Shape() { PartID = "25269" }.Rotate(-90).Print(x + 0.5, y + 0.5, 0.0, topId));
+                        sb.AppendLine(new Shape() { PartID = "25269" }.Rotate(90).Print(x - 0.5, y - 0.5, 0.0, bottomId));
                     }
                 }
-
             }
-
-
         }
-
     }
 }

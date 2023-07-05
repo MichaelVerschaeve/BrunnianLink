@@ -153,8 +153,14 @@ namespace BrunnianLink
                 case 11:
                     TruchetTiling.Generate(sb, level);
                     break;
+                case 12:
+                    TruchetFractals.Generate(sb, level, TruchetFractals.Kind.TwinDragon);
+                    break;
+                case 13:
+                    TruchetFractals.Generate(sb, level, TruchetFractals.Kind.Sierpinski);
+                    break;
                 default:
-                    tileGens[modelChoice - 12].Generate(sb, level);
+                    tileGens[modelChoice - 14].Generate(sb, level);
                     break;
             }
             var utf8WithoutBom = new System.Text.UTF8Encoding(false);
