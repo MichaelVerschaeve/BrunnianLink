@@ -40,7 +40,8 @@ namespace BrunnianLink
         public enum Kind
         {
             TwinDragon,
-            Sierpinski
+            Sierpinski,
+            Peano
         }
 
         public static void Generate(StringBuilder sb, int level, Kind fractalKind)
@@ -51,29 +52,56 @@ namespace BrunnianLink
             int outID = ColorMap.Get("Bright_Light_Orange").id;
             int inID = ColorMap.Get("Black").id;
 
-            if (fractalKind == Kind.TwinDragon)
+            bool tileOutside = true;
+
+            switch (fractalKind)
             {
-               // moves = new() { true };
-                for (int i = 0; i < level; i++)
-                    moves = moves.Concat(moves.Select(b => !b).Reverse().Prepend(true)).ToList();
-                moves = moves.Concat(moves.Prepend(true)).Append(true).ToList(); //twin dragon, just close the loop
+
+                case Kind.TwinDragon:
+                    {
+                        moves = new() { true };
+                        for (int i = 0; i < level; i++)
+                            moves = moves.Concat(moves.Select(b => !b).Reverse().Prepend(true)).ToList();
+                        moves = moves.Concat(moves.Prepend(true)).Append(true).ToList(); //twin dragon, just close the loop
+                    }
+                    break;
+                case Kind.Sierpinski:
+                    {
+                        (inID, outID) = (outID, inID);
+                        moves = new() { true };
+                        for (int i = 0; i < level; i++)
+                        {
+                            moves = moves.Append(false).Append(false)
+                                .Concat(moves)
+                                .Append(true)
+                                .Concat(moves)
+                                .Append(false).Append(false)
+                                .Concat(moves)
+                                .ToList();
+                        }
+                        moves = moves.Append(true).Concat(moves).Append(true).ToList();
+                    }
+                    break;
+                case Kind.Peano:
+                    {
+                        tileOutside = false;
+                        moves = new();
+                        for (int i = 0; i < level; i++)
+                            moves = moves.Append(false)
+                                .Concat(moves).Append(true)
+                                .Concat(moves).Append(true)
+                                .Concat(moves).Append(true)
+                                .Concat(moves).Append(false)
+                                .Concat(moves).Append(false)
+                                .Concat(moves).Append(false)
+                                .Concat(moves).Append(true)
+                                .Concat(moves)
+                                .ToList();
+                        moves = moves.Append(true).Concat(moves).Append(true).Concat(moves).Append(true).Concat(moves).Append(true).ToList();
+                    }
+                    break;
             }
-            else
-            {
-                (inID, outID) = (outID, inID);
-                moves = new() { true};
-                for (int i = 0; i < level;i++)
-                {
-                    moves = moves.Append(false).Append(false)
-                        .Concat(moves)
-                        .Append(true)
-                        .Concat(moves)
-                        .Append(false).Append(false)
-                        .Concat(moves)
-                        .ToList();
-                }
-                moves = moves.Append(true).Concat(moves).Append(true).ToList();
-            }
+
             
             Dictionary<(int x, int y), int> board = new();
             (int x, int y) position = (0,0);
@@ -126,7 +154,8 @@ namespace BrunnianLink
                     double y = iy * 2.0;
                     if (!board.TryGetValue((ix,iy), out int cornerstatus))
                     {
-                        sb.AppendLine(new Tile(2, 2).Print(x,y, 0.0, outID));
+                        if (tileOutside)
+                            sb.AppendLine(new Tile(2, 2).Print(x,y, 0.0, outID));
                         continue;
                     }
                     bool doRot = false;
