@@ -20,9 +20,16 @@ namespace BrunnianLink
             InitializeComponent();
             tbPath.Text = Properties.Settings.Default.OutputPath;
 
-            cbModelChoice.SelectedIndex = Properties.Settings.Default.SelectedModel;
             nudLevel.Value = Properties.Settings.Default.SelectedLevel;
+            int count = 0;
+            //store original order
+            foreach (var item in cbModelChoice.Items)
+                TextToIndex.Add(item?.ToString() ?? "", count++);
+            cbModelChoice.Sorted = true;
+            cbModelChoice.SelectedIndex = Properties.Settings.Default.SelectedModel;
         }
+
+        private readonly Dictionary<String, int> TextToIndex = new();
 
         private void BtOpen_Click(object sender, EventArgs e)
         {
@@ -39,13 +46,33 @@ namespace BrunnianLink
         private static readonly TilingGenerator[] tileGens = {
             new() { Rule = new PinWheelRules() },
             new() { Rule = new ChairRule() },
-            new() { Rule = new TennisRule() },
+            new() { Rule = new DominoRule() },
+            new() { Rule = new Domino9Rule() },
+            new() { Rule = new SemiHouseRule() },
+            new() { Rule = new WedgeTileRule() },
+            new() { Rule = new PentaTileRule()  },
             new() { Rule = new WandererReflectionsRule() },
             new() { Rule = new WandererRotationsRule() },
             new() { Rule = new AmmannBeenkerRule()},
+            new() { Rule = new ShieldRule() },
+            new() {Rule = new LabyrinthRule() },
+            new() {Rule = new HofStetterArrowedRule() },
+            new() {Rule = new Wunderlich(){CurveType=0} },
+            new() {Rule = new Wunderlich(){CurveType=1} },
+            new() {Rule = new Wunderlich(){CurveType=2} },
+            new() {Rule = new MiniTangramRule()},
+            new() {Rule = new SocolarRule(false)},
+            new() {Rule = new SocolarRule(true)},
+            new() {Rule = new Pentomino()},
+            new() {Rule = new PinWheel10()},
+            new() {Rule = new SocolarSquareTriangleRule()},
+            new() {Rule = new SquareTrianglePinwheelRule()},
+            new() {Rule = new HalfHex()}
         };
         private void BtGenerate_Click(object sender, EventArgs e)
         {
+            if (cbModelChoice.SelectedIndex == -1) return;
+
             StringBuilder sb = new();
             /*
             sb.Append("0 Test\r\n0 Name:  Test\r\n0 Author:  Michael Verschaeve\r\n0 CustomBrick\r\n");
@@ -59,13 +86,13 @@ namespace BrunnianLink
             sb.AppendLine(wedgePlate2.Print(0, 0, 3, ColorMap.Get("Black").id));
             */
             int level = (int)nudLevel.Value;
-            int modelChoice = cbModelChoice.SelectedIndex;
+            int modelChoice = TextToIndex[cbModelChoice.SelectedItem.ToString()!];
             string file = tbPath.Text;
             string parentDir = Directory.GetParent(file)?.FullName!;
             if (!Directory.Exists(parentDir))
                 Directory.CreateDirectory(parentDir);
             Properties.Settings.Default.SelectedLevel = level;
-            Properties.Settings.Default.SelectedModel = modelChoice;
+            Properties.Settings.Default.SelectedModel = cbModelChoice.SelectedIndex;
             Properties.Settings.Default.OutputPath = file;
             Properties.Settings.Default.Save();
 
@@ -83,9 +110,17 @@ namespace BrunnianLink
                     EinsteinHat.Generate(sb, level);
                     break;
                 case 3:
-                    Hilbert3D.Generate(sb, level);
+                    //sb.AppendLine(new Plate(2,2).Print(0,1,0,ColorMap.Get("Red").id));
+                    //sb.AppendLine(new Plate(2,2).Print(0, -1, 0, ColorMap.Get("Blue").id));
+                    EinsteinHat2.Generate(sb, level);
                     break;
                 case 4:
+                    ChiralSpectre.Generate(sb, level);
+                    break;
+                case 5:
+                    Hilbert3D.Generate(sb, level);
+                    break;
+                case 6:
 
                     for (int p1 = -5; p1 <= 5; p1++)
                         for (int p2 = -5; p2 <= 5; p2++)
@@ -103,11 +138,29 @@ namespace BrunnianLink
 
                         }
                     break;
-                case 5:
+                case 7:
+                    OctaFlake.Generate(sb, level);
+                    break;
+                case 8:
                     PenroseRhomb.Generate(sb, level);
                     break;
+                case 9:
+                    new MazeGenerator(level).Generate(sb);
+                    break;
+                case 10:
+                    CrossDissectionTiling.Generate(sb, level);
+                    break;
+                case 11:
+                    TruchetTiling.Generate(sb, level);
+                    break;
+                case 12:
+                    TruchetFractals.Generate(sb, level, TruchetFractals.Kind.TwinDragon);
+                    break;
+                case 13:
+                    TruchetFractals.Generate(sb, level, TruchetFractals.Kind.Sierpinski);
+                    break;
                 default:
-                    tileGens[cbModelChoice.SelectedIndex - 6].Generate(sb, level);
+                    tileGens[modelChoice - 14].Generate(sb, level);
                     break;
             }
             var utf8WithoutBom = new System.Text.UTF8Encoding(false);

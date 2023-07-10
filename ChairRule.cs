@@ -12,7 +12,7 @@
 
         override public string MainName => "ChairTiling";
 
-        override public string BasePart(int state)
+        override public string BasePart(int state, int color)
         {
             return "2420";
         }

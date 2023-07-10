@@ -13,7 +13,7 @@ namespace BrunnianLink
 
         override public string MainName => "Wanderer_rotations";
 
-        override public string BasePart(int state)
+        override public string BasePart(int state, int color)
         {
             bool vert = (state & 1) == 1;
             bool right = (state & 2) == 2;
@@ -22,9 +22,9 @@ namespace BrunnianLink
 
         public override bool Level0IsComposite => true;
 
-        public override void DefineCompositeBasePart(StringBuilder sb, int state)
+        public override void DefineCompositeBasePart(StringBuilder sb, int state, int color)
         {
-            MetaData.StartSubModel(sb, BasePart(state));
+            //MetaData.StartSubModel(sb, BasePart(state,0));
             bool vert = (state & 1) == 1;
             bool right = (state & 2) == 2;
             bool xor = vert ^ right;

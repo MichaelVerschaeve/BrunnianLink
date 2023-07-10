@@ -12,16 +12,15 @@ namespace BrunnianLink
         override public double InitialScale => 1;
 
         override public string MainName => "Wanderer_reflections";
-        override public string BasePart(int state)
+        override public string BasePart(int state, int color)
         {
             return state==0?"LeftHanded":"RightHanded";
         }
 
         public override bool Level0IsComposite => true;
 
-        public override void DefineCompositeBasePart(StringBuilder sb, int state)
+        public override void DefineCompositeBasePart(StringBuilder sb, int state, int color)
         {
-            MetaData.StartSubModel(sb, BasePart(state));
             Tile t = new(2);
             sb.AppendLine(t.Print(0, 0.5, 0, ColorMap.Get(m_colors[state]).id));
             sb.AppendLine(t.Print(0, -0.5, 0, ColorMap.Get(m_colors[1-state]).id));

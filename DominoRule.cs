@@ -1,6 +1,6 @@
 ﻿namespace BrunnianLink
 {
-    public class TennisRule : SubstitutionRule
+    public class DominoRule : SubstitutionRule
     {
         static readonly string[] m_colors = new string[] { "Light_Bluish_Grey", "Tan", "Dark_Tan", "Dark_Bluish_Grey" };
         override public string[] Colors => m_colors;
@@ -12,7 +12,7 @@
 
         override public string MainName => "TennisTiling";
 
-        override public string BasePart(int state)=> Plate.XYPartID(1, 2); 
+        override public string BasePart(int state, int color)=> Plate.XYPartID(1, 2); 
 
         static readonly List<(double x, double y, double rotation, int state)> m_rule = new()
             {

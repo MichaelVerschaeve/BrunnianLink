@@ -141,5 +141,20 @@ namespace BrunnianLink
         {
             return colorMap[color];
         }
+
+        // distance in RGB space
+        private static double ColorDiff(Color c1, Color c2)
+        {
+            return Math.Sqrt((c1.R - c2.R) * (c1.R - c2.R)
+                                 + (c1.G - c2.G) * (c1.G - c2.G)
+                                 + (c1.B - c2.B) * (c1.B - c2.B));
+        }
+
+        public static (int id, Color c) Closest(Color target)
+        {
+            return colorMap.TakeWhile(kvp => !kvp.Key.StartsWith("Chrome")).MinBy(kvp => ColorDiff(kvp.Value.c,target)).Value;
+
+        }
+
     }
 }

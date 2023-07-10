@@ -15,7 +15,7 @@
         override public double ScaleFactor => scaleFactor;
         override public double InitialScale => scaleFactor;
 
-        override public string BasePart(int state)
+        override public string BasePart(int state, int color)
         {
             return state==1 ? "65429" : "65426";
         }

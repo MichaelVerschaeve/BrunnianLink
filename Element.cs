@@ -19,7 +19,7 @@ namespace BrunnianLink
             sb.AppendLine($"0 STEP");
         }
 
-
+        public static readonly bool StudIOColor16BugFixed = false;
 
     }
 
@@ -50,7 +50,8 @@ namespace BrunnianLink
                 rotationAngleDegrees = rotationAngleDegrees,
                 SubModel = SubModel,
                 SwitchXZ = SwitchXZ,
-                SwitchYZ = SwitchYZ
+                SwitchYZ = SwitchYZ,
+                SwitchYZ2 = SwitchYZ2
             };
             return clone;
         }
@@ -62,6 +63,7 @@ namespace BrunnianLink
 
         public bool SwitchXZ { get; set; }
         public bool SwitchYZ { get; set; }
+        public bool SwitchYZ2 { get; set; }
         public bool SubModel { get; set; }
 
         protected double rotationAngleDegrees=0.0;
@@ -73,6 +75,10 @@ namespace BrunnianLink
             if (SwitchYZ) //x,yswitch cols, other axle minus to not go chiral
             {
                 return $"{c} {-s} 0 0 0 -1 {s} {c} 0";
+            }
+            else if (SwitchYZ2) //x,yswitch cols, other axle minus to not go chiral
+            {
+                return $"{c} {s} 0 0 0 1 {s} {-c} 0";
             }
             else if (SwitchXZ) {
                 return $"0 {c} {-s} -1 0 0 0 {s} {c}";
@@ -113,7 +119,7 @@ namespace BrunnianLink
             double dy = -topZPlates * 8;
             double dx = centerXStuds * 20 + ax;
             double dz = centerYStuds * 20 + az;
-            sb.Append($" {dx} {dy} {dz} ");
+            sb.Append($"{dx} {dy} {dz} ");
             sb.Append(RotMat());
             sb.Append(' ');
             sb.Append(partID);
@@ -133,6 +139,7 @@ namespace BrunnianLink
             ax = az = 0;
             partID = size switch
             {
+                16 => "3867",
                 32 => "3811",
                 48 => "4186",
                 _ => throw new ArgumentException("unsupported size"),
@@ -152,7 +159,7 @@ namespace BrunnianLink
 
     public class Bow : Shape
     {
-        public Bow(int size)
+        public Bow(int size, bool centerAtOrigin=false)
         {
             sx = sz = size * 20;
             sy = 8; //tile
@@ -169,6 +176,14 @@ namespace BrunnianLink
             }
             else
                 ax = az = 0;
+
+            if (centerAtOrigin)
+            {
+                ax += size * 10;
+                az -= size * 10;
+            }
+
+
             partID = size switch
             {
                 1 => "25269",

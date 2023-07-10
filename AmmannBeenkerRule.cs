@@ -21,10 +21,21 @@ namespace BrunnianLink
 
         public override string MainName => "Ammann_Beenker";
 
-        private static readonly int[] m_startStates = new int[] { 0,1 };
-        public override int[] StartStates { get => m_startStates; }
+        //private static readonly int[] m_startStates = new int[] { (0,1 };
+        public override (double x, double y, double rotation, int state)[] StartStates
+        {
+            get
+            {
+                var a = base.StartStates!.Clone() as (double x, double y, double rotation, int state)[];
+                var b = base.StartStates!.Clone() as (double x, double y, double rotation, int state)[];
+                if (b != null) 
+                    b[0].state = 1;
+                return a?.Concat(b!)?.ToArray()!;
 
-        public override string BasePart(int state) => state switch
+            }
+        }
+
+        public override string BasePart(int state, int color) => state switch
         {
             0 => "TriangleUp",
             1 => "TriangleDown",
@@ -67,11 +78,10 @@ namespace BrunnianLink
 
         override public List<(double x, double y, double rotation, int state)> Rule(int state) => m_rules[state];
 
-        static readonly bool StudIOColor16BugFixed = false;
 
         private static void DefineQuarter(StringBuilder sb, bool right)
         {
-            int color = StudIOColor16BugFixed ? 16 : ColorMap.Get(m_colors[0]).id;
+            int color = MetaData.StudIOColor16BugFixed ? 16 : ColorMap.Get(m_colors[0]).id;
             MetaData.StartSubModel(sb, right ? "QuarterRight" : "QuarterLeft");
             Shape wedge = new() { PartID = "15706" };   //from 135 to 180 degree wedge
             int s = right ? -1 : 1;
@@ -84,7 +94,7 @@ namespace BrunnianLink
 
         private static void DefineHalfRhomb(StringBuilder sb)
         {
-            int color = StudIOColor16BugFixed ? 16 : ColorMap.Get(m_colors[2]).id;
+            int color = MetaData.StudIOColor16BugFixed ? 16 : ColorMap.Get(m_colors[2]).id;
             MetaData.StartSubModel(sb, "HalfRhumb");
             sb.AppendLine(new Shape() { PartID = "15706" }.Print(0, 0, 0, color));
             sb.AppendLine(new Shape() { PartID = "2429" }.Rotate(180).Print(-8, 0, 0, color));
@@ -101,13 +111,13 @@ namespace BrunnianLink
 
         public override bool Level0IsComposite => true;
 
-        public override void DefineCompositeBasePart(StringBuilder sb, int state)
+        public override void DefineCompositeBasePart(StringBuilder sb, int state,int _)
         {
-            int color = StudIOColor16BugFixed ? 16 : ColorMap.Get(m_colors[state==1?0:state]).id;
+            int color = MetaData.StudIOColor16BugFixed ? 16 : ColorMap.Get(m_colors[state==1?0:state]).id;
             switch (state)
             {
                 case 0:
-                    Shape downTriangle = new() { PartID = BasePart(1), SubModel = true };
+                    Shape downTriangle = new() { PartID = BasePart(1,0), SubModel = true };
                     sb.AppendLine(downTriangle.Rotate(180).Print(0, 0, 0, color));
                     break;
                 case 1:
