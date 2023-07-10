@@ -13,12 +13,14 @@ namespace BrunnianLink
             var rand = new Random();
             int blackID = ColorMap.Get("Black").id;
             int orangeID = ColorMap.Get("Bright_Light_Orange").id;
-
+            List<bool> randList = Enumerable.Range(0,level*level).Select(i=>(i&1)==1).ToList();
             for (int iy = 0; iy < level; iy++)
             {
                 for (int ix = 0; ix < level; ix++)
                 {
-                    bool rotate = rand.Next(2) == 1;
+                    int index = rand.Next(randList.Count);
+                    bool rotate = randList[index];
+                    randList.RemoveAt(index);
                     bool odd = ((ix + iy) & 1) == 1;
                     sb.AppendLine(shapes[rotate==odd?0:1].Rotate(rotate?90.0:0).Print(2.0 * ix - level+1, 2.0 * iy - level+1, 0, 16));
 
