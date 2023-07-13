@@ -71,6 +71,8 @@ namespace BrunnianLink
 
          }*/
 
+        private readonly static int[] octagonRuns = new int[] { 3, 5, 5, 3, 3, 5, 5, 3 };
+
         public static void Generate(StringBuilder sb, int level)
         {
             MetaData.StartSubModel(sb, $"FibbonacciWordFractal_{level}");
@@ -78,14 +80,15 @@ namespace BrunnianLink
             for (int i = 1;i < level;i++)
             {
                 List<bool> newmoves = new();
-                bool invert = true;
-                foreach (bool move in moves)
+                //start with inverting
+                bool newMove = !moves[0];
+                newmoves.AddRange(Enumerable.Repeat(newMove, 3));
+                bool prevOldMove = moves[0];
+                foreach (bool oldMove in moves.Skip(1))
                 {
-                    if (invert)
-                        newmoves.AddRange(Enumerable.Repeat(!move, 3));
-                    else
-                        newmoves.AddRange(Enumerable.Repeat(move, 5));
-                    invert = !invert;
+                    newMove = !newMove;
+                    newmoves.AddRange(Enumerable.Repeat(newMove, octagonRuns[(newMove?1:0)+(oldMove?0:2)+ (prevOldMove ? 0 : 4)]));
+                    prevOldMove = oldMove;
                 }
                 moves = newmoves.Skip(1).Append(newmoves.First()).ToList();
             }
