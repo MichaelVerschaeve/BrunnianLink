@@ -55,20 +55,21 @@ namespace BrunnianLink
             new() { Rule = new WandererRotationsRule() },
             new() { Rule = new AmmannBeenkerRule()},
             new() { Rule = new ShieldRule() },
-            new() {Rule = new LabyrinthRule() },
-            new() {Rule = new HofStetterArrowedRule() },
-            new() {Rule = new Wunderlich(){CurveType=0} },
-            new() {Rule = new Wunderlich(){CurveType=1} },
-            new() {Rule = new Wunderlich(){CurveType=2} },
-            new() {Rule = new MiniTangramRule()},
-            new() {Rule = new SocolarRule(false)},
-            new() {Rule = new SocolarRule(true)},
-            new() {Rule = new Pentomino()},
-            new() {Rule = new PinWheel10()},
-            new() {Rule = new SocolarSquareTriangleRule()},
-            new() {Rule = new SquareTrianglePinwheelRule()},
-            new() {Rule = new HalfHex()}
+            new() { Rule = new LabyrinthRule() },
+            new() { Rule = new HofStetterArrowedRule() },
+            new() { Rule = new Wunderlich(){CurveType=0} },
+            new() { Rule = new Wunderlich(){CurveType=1} },
+            new() { Rule = new Wunderlich(){CurveType=2} },
+            new() { Rule = new MiniTangramRule()},
+            new() { Rule = new SocolarRule(false)},
+            new() { Rule = new SocolarRule(true)},
+            new() { Rule = new Pentomino()},
+            new() { Rule = new PinWheel10()},
+            new() { Rule = new SocolarSquareTriangleRule()},
+            new() { Rule = new SquareTrianglePinwheelRule()},
+            new() { Rule = new HalfHex()}
         };
+
         private void BtGenerate_Click(object sender, EventArgs e)
         {
             if (cbModelChoice.SelectedIndex == -1) return;
@@ -121,7 +122,6 @@ namespace BrunnianLink
                     Hilbert3D.Generate(sb, level);
                     break;
                 case 6:
-
                     for (int p1 = -5; p1 <= 5; p1++)
                         for (int p2 = -5; p2 <= 5; p2++)
                         {
@@ -162,8 +162,11 @@ namespace BrunnianLink
                 case 14:
                     TruchetFractals.Generate(sb, level, TruchetFractals.Kind.Peano);
                     break;
+                case 15:
+                    TerDragon.Generate(sb, level);
+                    break;
                 default:
-                    tileGens[modelChoice - 15].Generate(sb, level);
+                    tileGens[modelChoice - 16].Generate(sb, level);
                     break;
             }
             var utf8WithoutBom = new System.Text.UTF8Encoding(false);
