@@ -262,7 +262,7 @@ namespace BrunnianLink
 
             string file = Path.Combine(dir, thin ? "thinKite.ldr" : "thickKite.ldr");
             var fileLines = File.ReadAllLines(file).SkipWhile(t => t.StartsWith("0"));
-            var specialLines = fileLines.Where(t => t.EndsWith("29119.dat") || t.EndsWith("29120.dat") || t.EndsWith("35787.dat")); //determine origin lines
+            var specialLines = fileLines.Where(t => t.EndsWith("29119.dat") || t.EndsWith("49668.dat")); //determine origin lines
             double ldux_offset = 0.0;
             double lduy_offset = 0.0;
             double lduz_offset = 0.0;
@@ -279,9 +279,12 @@ namespace BrunnianLink
             lduy_offset /= specialLines.Count();
             lduz_offset /= specialLines.Count();
             if (thin)
-                lduz_offset -= 20.0*InitialScale * Math.Sin(Math.PI / 10);
+            {
+                lduz_offset -= 20.0 * InitialScale * Math.Sin(Math.PI / 10);
+                lduy_offset -= 16;
+            }
             else
-                lduz_offset -= 20.0*InitialScale * Math.Cos(Math.PI / 5);
+                lduz_offset -= 20.0 * InitialScale * Math.Cos(Math.PI / 5);
             foreach (string line in fileLines)
             {
                 var parts = line.Split(' ');
