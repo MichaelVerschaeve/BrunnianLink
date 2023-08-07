@@ -145,41 +145,44 @@ namespace BrunnianLink
                     PenroseRhomb.Generate(sb, level);
                     break;
                 case 9:
-                    new MazeGenerator(level).Generate(sb);
+                    PenroseRhomb.Generate(sb, level, false);
                     break;
                 case 10:
-                    CrossDissectionTiling.Generate(sb, level);
+                    new MazeGenerator(level).Generate(sb);
                     break;
                 case 11:
-                    TruchetTiling.Generate(sb, level);
+                    CrossDissectionTiling.Generate(sb, level);
                     break;
                 case 12:
-                    TruchetFractals.Generate(sb, level, TruchetFractals.Kind.TwinDragon);
+                    TruchetTiling.Generate(sb, level);
                     break;
                 case 13:
-                    TruchetFractals.Generate(sb, level, TruchetFractals.Kind.Sierpinski);
+                    TruchetFractals.Generate(sb, level, TruchetFractals.Kind.TwinDragon);
                     break;
                 case 14:
-                    TruchetFractals.Generate(sb, level, TruchetFractals.Kind.Peano);
+                    TruchetFractals.Generate(sb, level, TruchetFractals.Kind.Sierpinski);
                     break;
                 case 15:
-                    TerDragon.Generate(sb, level);
+                    TruchetFractals.Generate(sb, level, TruchetFractals.Kind.Peano);
                     break;
                 case 16:
-                    MetaData.StartSubModel(sb, "pentagonTest");
-                    double s = 2; //sidelength
-                    double a = 0.5*s / Math.Tan(Math.PI / 5);
-                    Plate plate = new Plate(1, 2);
-                    double d = (a+1)/Math.Cos(Math.PI/5);
-                    d *= 2*Math.Cos(3*Math.PI/5);
-                    for (int i = 0; i < 5; i++)
-                    {
-                        double angle = 2*i * Math.PI / 5;
-                        double angledegrees = i * 72;
-                        sb.AppendLine(plate.Rotate(angledegrees).Print(Math.Cos(angle) * (a + 0.5), Math.Sin(angle) * (a + 0.5), 0, ColorMap.Get("White").id));
-                        sb.AppendLine(plate.Rotate(180-angledegrees).Print(Math.Cos(Math.PI-angle) * (a + 0.5)+d, Math.Sin(Math.PI-angle) * (a + 0.5), -5, ColorMap.Get("Red").id));
-                    }
+                    TerDragon.Generate(sb, level);
                     break;
+                //case 17:
+                //    MetaData.StartSubModel(sb, "pentagonTest");
+                //    double s = 2; //sidelength
+                //    double a = 0.5 * s / Math.Tan(Math.PI / 5);
+                //    Plate plate = new Plate(1, 2);
+                //    double d = (a + 1) / Math.Cos(Math.PI / 5);
+                //    d *= 2 * Math.Cos(3 * Math.PI / 5);
+                //    for (int i = 0; i < 5; i++)
+                //    {
+                //        double angle = 2 * i * Math.PI / 5;
+                //        double angledegrees = i * 72;
+                //        sb.AppendLine(plate.Rotate(angledegrees).Print(Math.Cos(angle) * (a + 0.5), Math.Sin(angle) * (a + 0.5), 0, ColorMap.Get("White").id));
+                //        sb.AppendLine(plate.Rotate(180 - angledegrees).Print(Math.Cos(Math.PI - angle) * (a + 0.5) + d, Math.Sin(Math.PI - angle) * (a + 0.5), -5, ColorMap.Get("Red").id));
+                //    }
+                //    break;
                 default:
                     tileGens[modelChoice - 17].Generate(sb, level);
                     break;

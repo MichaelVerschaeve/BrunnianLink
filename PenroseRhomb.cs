@@ -2,6 +2,8 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Security.Cryptography.Xml;
 using System.Text;
@@ -60,7 +62,10 @@ namespace BrunnianLink
 
         public static double ScaleFactor => phi;
 
-        public static double InitialScale => 16;
+
+        private static bool doTechnic;
+
+        public static double InitialScale => doTechnic?16:((2+2*Math.Tan(Math.PI/5))*(phi+1));
 
         public static string MainName => "PenroseRhomb";
 
@@ -73,11 +78,19 @@ namespace BrunnianLink
         static readonly Dictionary<int, double> s = new();
 
 
-        public static void Generate(StringBuilder sb, int level)
+        public static void Generate(StringBuilder sb, int level, bool _doTechnic = true)
         {
+            doTechnic = _doTechnic;
             MetaData.StartSubModel(sb, MainName);
 
-            SortedSet<RhombData> oldSet = new() { new RhombData() { x= 0.0, y=0.0, rotation=0, thin=false } };
+            SortedSet<RhombData> oldSet = new()
+            {
+                new RhombData() { x= 0.0, y=0.0, rotation=0, thin=false },
+                new RhombData() { x= 0.0, y=0.0, rotation=72, thin=false },
+                new RhombData() { x= 0.0, y=0.0, rotation=144, thin=false },
+                new RhombData() { x= 0.0, y=0.0, rotation=-144, thin=false },
+                new RhombData() { x= 0.0, y=0.0, rotation=-72, thin=false }
+            };
             SortedSet<VertexData> vSet = new();
             for (int i = 0; i < level; i++)
             {
@@ -102,26 +115,34 @@ namespace BrunnianLink
             {
                 Shape s = new() { PartID = BasePart(data.thin), SubModel = true };
                 sb.AppendLine(s.Rotate(data.rotation).Print(data.x, data.y, 0, ColorMap.Get(Colors[data.thin ? 1 : 0]).id));
-                foreach (VertexData vdata in VerticesFromRhomb(data))
+                if (doTechnic)
                 {
-                    if (vSet.TryGetValue(vdata, out VertexData? vold))
+                    foreach (VertexData vdata in VerticesFromRhomb(data))
                     {
-                        vold.flags |= vdata.flags;
+                        if (vSet.TryGetValue(vdata, out VertexData? vold))
+                        {
+                            vold.flags |= vdata.flags;
+                        }
+                        else
+                            vSet.Add(vdata);
                     }
-                    else
-                        vSet.Add(vdata);
                 }
             }
-            SortedSet<int> usedVertices = new();
-            foreach (VertexData data in vSet)
+            if (doTechnic)
             {
-                Shape vertex = new() { PartID = $"Vertex_{data.flags}", SubModel = true };
-                usedVertices.Add(data.flags);
-                sb.AppendLine(vertex.Print(data.x, data.y, -2.5, LBGid));
-            }
+                SortedSet<int> usedVertices = new();
+                foreach (VertexData data in vSet)
+                {
+                    Shape vertex = new() { PartID = $"Vertex_{data.flags}", SubModel = true };
+                    usedVertices.Add(data.flags);
+                    sb.AppendLine(vertex.Print(data.x, data.y, -2.5, LBGid));
+                }
 
-            foreach (int i in usedVertices)
-                DefineVertex(sb, i);
+                foreach (int i in usedVertices)
+                    DefineVertex(sb, i);
+            }
+            
+
             
             MetaData.StartSubModel(sb,BasePart(false));
             DefineRhomb(sb, false);
@@ -224,7 +245,60 @@ namespace BrunnianLink
             return m_rules[thin?1:0];
         }
 
+
         public static void DefineRhomb(StringBuilder sb, bool thin)
+        {
+            if (doTechnic)
+            {
+                DefineRhombTechnic(sb, thin);
+                return;
+            }
+            string dir = Directory.GetParent(AppDomain.CurrentDomain.BaseDirectory)?.FullName!;
+            dir = Directory.GetParent(dir)?.FullName!;
+            dir = Directory.GetParent(dir)?.FullName!;
+            dir = Directory.GetParent(dir)?.FullName!;
+            dir = Path.Combine(dir, "PenroseKites");
+
+
+            string file = Path.Combine(dir, thin ? "thinKite.ldr" : "thickKite.ldr");
+            var fileLines = File.ReadAllLines(file).SkipWhile(t => t.StartsWith("0"));
+            var specialLines = fileLines.Where(t => t.EndsWith("29119.dat") || t.EndsWith("29120.dat")); //determine origin lines
+            double ldux_offset = 0.0;
+            double lduy_offset = 0.0;
+            double lduz_offset = 0.0;
+            int colorToReplace = 0;
+            foreach (string line in specialLines)
+            {
+                var parts = line.Split(' ');
+                colorToReplace = int.Parse(parts[1]);
+                ldux_offset += double.Parse(parts[2], NumberStyles.Float, CultureInfo.InvariantCulture);
+                lduy_offset += double.Parse(parts[3], NumberStyles.Float, CultureInfo.InvariantCulture);
+                lduz_offset += double.Parse(parts[4], NumberStyles.Float, CultureInfo.InvariantCulture);
+            }
+            ldux_offset /= specialLines.Count();
+            lduy_offset /= specialLines.Count();
+            lduz_offset /= specialLines.Count();
+            if (thin)
+                lduz_offset -= 20.0*InitialScale * Math.Sin(Math.PI / 10);
+            else
+                lduz_offset -= 20.0*InitialScale * Math.Cos(Math.PI / 5);
+            foreach (string line in fileLines)
+            {
+                var parts = line.Split(' ');
+                int color = int.Parse(parts[1]);
+                if (color == colorToReplace)
+                    color = ColorMap.Get(thin ? "Dark_Blue" : "Tan").id;
+                double ldux = double.Parse(parts[2], NumberStyles.Float, CultureInfo.InvariantCulture);
+                double lduy = double.Parse(parts[3], NumberStyles.Float, CultureInfo.InvariantCulture);
+                double lduz = double.Parse(parts[4], NumberStyles.Float, CultureInfo.InvariantCulture);
+                sb.Append($"1 {color} {ldux - ldux_offset} {lduy - lduy_offset} {lduz - lduz_offset} ");
+                sb.AppendLine(string.Join(" ", parts.Skip(5)));
+            }
+
+        }
+
+
+        public static void DefineRhombTechnic(StringBuilder sb, bool thin)
         {
             // Shape liftarm = new() { PartID = "40490" };
             Shape liftarm = new() { PartID = "32525" };
