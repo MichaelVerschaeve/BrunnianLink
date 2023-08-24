@@ -64,12 +64,10 @@ namespace BrunnianLink
 
         public MazeGenerator(int level)
         {
-            if (level == 4)
-                n = 22;
-            else if (level > 4)
-                n = (1 << (level + 2)) - 1;
-            else
-                n = (1 << (level + 1)) - 1;
+            int size = 1 << ((level >> 1) + 2);
+            if ((level & 1) == 1)
+                size += (size >> 1);
+            n = size / 2 - 1;
 
             maze = new Cell[n, n];
             HashSet<Cell> unassigned = new();
@@ -169,8 +167,19 @@ namespace BrunnianLink
             Tile vertTile = new(1, 2);
             int tanID = ColorMap.Get("Tan").id;
             //border
+
+            int grayID = ColorMap.Get("Light_Bluish_Grey").id;
+            BasePlate bp = new BasePlate(32);
+
+            if (n==31)
+                for (int x=0; x < 2; x++)
+                    for (int y = 0; y < 2; y++)
+                        sb.AppendLine(bp.Print(15+32*x, 15+32*y, -1,grayID));
+
             for (int i = 0; i < n; i++)
             {
+                if ((i & 7) == 0)
+                    MetaData.BuildStepFinished(sb);
                 sb.AppendLine(borderRight.Print(-0.5, 1 + 2 * i, 2, tanID));
                 sb.AppendLine(vertTile.Print(2 * n + 0.5, 1 + 2 * i, 0, tanID));
                 sb.AppendLine(borderTop.Print(1 + 2 * i, -0.5, 2, tanID));
@@ -189,6 +198,8 @@ namespace BrunnianLink
             for (int x = 0; x < n; x++)
                 for (int y = 0; y < n; y++)
                 {
+                    if ((y & 7) == 0)
+                        MetaData.BuildStepFinished(sb);
                     double centerX = 1.0 + 2 * x;
                     double centerY = 1.0 + 2 * y;
                     if (maze[x, y].Walls[(int) Direction.Up].Open && maze[x, y].Walls[(int)Direction.Right].Open)
