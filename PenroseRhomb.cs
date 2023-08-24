@@ -290,7 +290,7 @@ namespace BrunnianLink
                 var parts = line.Split(' ');
                 int color = int.Parse(parts[1]);
                 if (color == colorToReplace)
-                    color = ColorMap.Get(thin ? "Dark_Blue" : "Tan").id;
+                    color = ColorMap.Get(thin ? "Red" : "Green").id;
                 double ldux = double.Parse(parts[2], NumberStyles.Float, CultureInfo.InvariantCulture);
                 double lduy = double.Parse(parts[3], NumberStyles.Float, CultureInfo.InvariantCulture);
                 double lduz = double.Parse(parts[4], NumberStyles.Float, CultureInfo.InvariantCulture);

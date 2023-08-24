@@ -65,11 +65,11 @@ namespace BrunnianLink
         public MazeGenerator(int level)
         {
             if (level == 4)
-                n = 22;
+                n = 23;
             else if (level > 4)
-                n = (1 << (level + 2)) - 1;
-            else
                 n = (1 << (level + 1)) - 1;
+            else
+                n = (1 << (level + 2)) - 1;
 
             maze = new Cell[n, n];
             HashSet<Cell> unassigned = new();

@@ -25,6 +25,20 @@ namespace BrunnianLink
         public override bool ColorByState => false;
         public override bool Level0IsComposite => false;
 
+        public override void Decorate(StringBuilder sb, int level, bool top, int state, int color)
+        {
+            int whiteId = ColorMap.Get("White").id;
+            if (level==1)
+            {
+                Plate p = new Plate(1,2);
+                int s = state == 0 ? 1 : -1;
+                sb.AppendLine(p.Print(-0.5*s, 1, 2, whiteId));
+                sb.AppendLine(p.Print(0.5*s, 0, 2, whiteId));
+            }
+            else
+                base.Decorate(sb, level, top, state, color);
+        }
+
         List<(double x, double y, double rotation, int state)> m_rule = new()
         { (-0.5,0,0,0),
           (0.5,-1,0,0),
