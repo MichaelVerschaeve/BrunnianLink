@@ -169,13 +169,20 @@ namespace BrunnianLink
             //border
 
             int grayID = ColorMap.Get("Light_Bluish_Grey").id;
-            BasePlate bp = new BasePlate(32);
 
-            if (n==31)
-                for (int x=0; x < 2; x++)
+            if (n == 31)
+            {
+                BasePlate bp = new BasePlate(32);
+
+                for (int x = 0; x < 2; x++)
                     for (int y = 0; y < 2; y++)
-                        sb.AppendLine(bp.Print(15+32*x, 15+32*y, -1,grayID));
-
+                        sb.AppendLine(bp.Print(15 + 32 * x, 15 + 32 * y, -1, grayID));
+            }
+            else if (n == 23)
+            {
+                BasePlate bp = new BasePlate(48);
+                sb.AppendLine(bp.Print(23, 23, -1, grayID));
+            }
             for (int i = 0; i < n; i++)
             {
                 if ((i & 7) == 0)
