@@ -4,6 +4,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Forms.VisualStyles;
 
 namespace BrunnianLink
 {
@@ -15,7 +16,10 @@ namespace BrunnianLink
     public class CircleAprroximator
     {
         private double r;
+        private int xLimit;
         private double errorVal;
+        int plateHeight;
+        int color;
 
         private const double epsilon = 1.0-7;
 
@@ -25,7 +29,10 @@ namespace BrunnianLink
             public int bottommargin;
             public int dx;
             public int dy;
+            public string id = "";
+            public string mirrorId = "";
         }
+
 
         static Slope horzSlope = new Slope { leftmargin = 0, bottommargin = 0, dx = 1, dy = 0 };
         static Slope vertSlope = new Slope { leftmargin = 0, bottommargin = 0, dx = 0, dy = 1 };
@@ -47,14 +54,41 @@ namespace BrunnianLink
             vertSlope
         };
 
-        public CircleAprroximator(double _r) { r = _r; errorVal = (double)(r) * r; }
+        public CircleAprroximator(double _r, int _xlimit, int _plateHeight, int colorID) 
+        {
+            r = _r;
+            errorVal = (double)(r) * r;
+            xLimit = _xlimit;
+            plateHeight = _plateHeight;
+            color = colorID;
+        }
+        
 
-        //public void Generate(StringBuilder sb, int height, 
+
+        void PrintSlope(StringBuilder sb, Slope s, int x, int y, bool octoCopy=true)
+        {
+            Shape shape = new Shape() { PartID = s.id}.Rotate(s.dx==s.dy?90:180);
+            Shape mirrorshape = new Shape() { PartID = s.mirrorId }.Rotate(180);
+            double xd = x -s.leftmargin + (s.leftmargin + s.dx) * 0.5;
+            double yd = (s.bottommargin + s.dy) * 0.5;
+            sb.AppendLine(shape.Print(xd, yd, plateHeight, color));
+            sb.AppendLine(mirrorshape.Print(-xd, yd, plateHeight, color));
+            sb.AppendLine(shape.Rotate(180).Print(-xd, -yd, plateHeight, color));
+            sb.AppendLine(mirrorshape.Rotate(180).Print(xd, -yd, plateHeight, color));
+            if (octoCopy) //mirrored allong xy 
+            {
+                (shape, mirrorshape) = (mirrorshape.Rotate(-90), shape.Rotate(90));
+                (xd, yd) = (yd, xd);
+                sb.AppendLine(shape.Print(xd, yd, plateHeight, color));
+                sb.AppendLine(mirrorshape.Print(-xd, yd, plateHeight, color));
+                sb.AppendLine(shape.Rotate(180).Print(-xd, -yd, plateHeight, color));
+                sb.AppendLine(mirrorshape.Rotate(180).Print(xd, -yd, plateHeight, color));
+            }
+        }
 
         private Dictionary<(int x, int y, int fwidth,  int fy), (double err, Slope s)> m_cache = new Dictionary<(int x, int y, int fwidth, int fy), (double, Slope)>();
 
-
-        private void Calc()
+        public void Generate(StringBuilder sb)
         {
             int bestr = 0;
             int bestSlope = 0;
@@ -101,12 +135,105 @@ namespace BrunnianLink
                     }
                 }
             }
+
+
+            //now reconstruct and print
+            Slope? lastSlope = null;
+            int x = 0, y = 0, fx=0, fy=0;
+            if (bestSlope != 0) //one diagonal element
+            {
+                if ((bestSlope & 1) == 0) //even
+                {
+                    lastSlope = EvenSlopes.First(s=>s.dx == bestSlope);
+                    PrintSlope(sb, lastSlope, bestr- bestSlope / 2, bestr + bestSlope / 2, false);
+                    x = bestr + bestSlope / 2;
+                    y = bestr - bestSlope / 2;
+                }
+                else
+                {
+                    lastSlope = OddSlopes.First(s => s.dx == bestSlope);
+                    PrintSlope(sb, lastSlope, (int)(bestr+0.5 - 0.5*bestSlope),(int)(bestr+0.5 + 0.5*bestSlope), false);
+                    x = (int)(bestr + 0.5 + 0.5 * bestSlope);
+                    y = (int)(bestr + 0.5 - 0.5 * bestSlope);
+                }
+                fy = lastSlope.bottommargin;
+            }
+            else
+            {
+                lastSlope = null;
+                x = y = bestr;
+                fy = 1;
+            }
+
+            List<bool> lineCommands = new List<bool>();
+            while (m_cache.TryGetValue((x, y, fx, fy), out (double err, Slope s) val))
+            {
+                Slope slope = val.s;
+                if (slope==horzSlope)
+                {
+                    x++;
+                    if (fy > 0)
+                    {
+                        fx++;
+                        if (fx >= 2) //no limit imposed...
+                            fx=fy = 0;
+                    }
+                    lineCommands.Add(true);
+                }
+                else if (slope==vertSlope)
+                {
+                    y--;
+                    if ( fy > 0)
+                    {
+                        fy--;
+                        if (fy == 0)
+                            fx = 0;
+                    }
+                    lineCommands.Add(false);
+                }
+                else
+                {
+                    if (lineCommands.Count > 0)
+                    {
+                        if (lastSlope == null)
+                        {
+                            lineCommands = lineCommands.ToArray().Reverse().Concat(lineCommands).ToList();
+                            HandleLineCommands(sb, lineCommands, x, y, slope.leftmargin, slope.leftmargin, false);
+                        }
+                        else
+                            HandleLineCommands(sb, lineCommands, x, y, lastSlope.bottommargin, slope.leftmargin);
+                        lineCommands.Clear();
+                    }
+                    lastSlope = slope;
+                    PrintSlope(sb, lastSlope, x,y);
+                }
+            }
+            lineCommands.AddRange(Enumerable.Repeat<bool>(false,y));
+            if (lineCommands.Count > 0)
+            {
+                if (lastSlope == null)
+                {
+                    lineCommands = lineCommands.ToArray().Reverse().Concat(lineCommands).ToList();
+                    HandleLineCommands(sb, lineCommands, x, 0, 2, 2, false);
+                }
+                else
+                    HandleLineCommands(sb, lineCommands, x, 0, lastSlope.bottommargin, 2);
+            }
         }
+
+
+        void HandleLineCommands(StringBuilder sb, List<bool> lineCommands, int x, int y, int bottommarginPrev, int leftMarinNext, bool octoCopy = true)
+        {
+
+
+
+        }
+
 
         private double Recurse(int x, int y, int fx, int fy)
         {
             if (y - fy < 0 || x < 0 || x > Math.Ceiling(r)) return errorVal;
-            if (y == 0) return 0; //target achieved
+            if (y == 0 || x == xLimit) return 0; //target achieved
             //stay within a band of 2 plates
             double rxy = Math.Sqrt((double)(x)*x+(double)(y)*y);
             if (Math.Abs(rxy - r) > 2) return errorVal;
@@ -121,7 +248,7 @@ namespace BrunnianLink
 
             foreach(Slope slope in m_slopes) 
             {
-                if (fy > 0 && slope.leftmargin > fx) continue;
+                if (fy > 0 && slope.leftmargin > fx || x-slope.leftmargin < y) continue;
                 int newX = x + slope.dx;
                 int newY = y - slope.dy;
                 int newfy = slope.bottommargin;
