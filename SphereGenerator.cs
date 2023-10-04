@@ -20,8 +20,9 @@ namespace BrunnianLink
         private double errorVal;
         int plateHeight;
         int color;
+        const int band = 3;
 
-        private const double epsilon = 1.0-7;
+        private const double epsilon = 1.0 - 7;
 
         class Slope
         {
@@ -54,7 +55,7 @@ namespace BrunnianLink
             vertSlope
         };
 
-        public CircleAprroximator(double _r, int _xlimit, int _plateHeight, int colorID) 
+        public CircleAprroximator(double _r, int _xlimit, int _plateHeight, int colorID)
         {
             r = _r;
             errorVal = (double)(r) * r;
@@ -62,29 +63,24 @@ namespace BrunnianLink
             plateHeight = _plateHeight;
             color = colorID;
         }
-        
 
-
-        void PrintSlope(StringBuilder sb, Slope s, int x, int y, bool octoCopy=true)
+        [Flags] 
+        enum PrintFlag : short
         {
-            Shape shape = new Shape() { PartID = s.id}.Rotate(s.dx==s.dy?90:180);
-            Shape mirrorshape = new Shape() { PartID = s.mirrorId }.Rotate(180);
-            double xd = x -s.leftmargin + (s.leftmargin + s.dx) * 0.5;
-            double yd = (s.bottommargin + s.dy) * 0.5;
-            sb.AppendLine(shape.Print(xd, yd, plateHeight, color));
-            sb.AppendLine(mirrorshape.Print(-xd, yd, plateHeight, color));
-            sb.AppendLine(shape.Rotate(180).Print(-xd, -yd, plateHeight, color));
-            sb.AppendLine(mirrorshape.Rotate(180).Print(xd, -yd, plateHeight, color));
-            if (octoCopy) //mirrored allong xy 
-            {
-                (shape, mirrorshape) = (mirrorshape.Rotate(-90), shape.Rotate(90));
-                (xd, yd) = (yd, xd);
-                sb.AppendLine(shape.Print(xd, yd, plateHeight, color));
-                sb.AppendLine(mirrorshape.Print(-xd, yd, plateHeight, color));
-                sb.AppendLine(shape.Rotate(180).Print(-xd, -yd, plateHeight, color));
-                sb.AppendLine(mirrorshape.Rotate(180).Print(xd, -yd, plateHeight, color));
-            }
+            None = 0,
+            Octant1 = 1,
+            Octant2 = 2,
+            Octant3 = 4,
+            Octant4 = 8,
+            Octant5 = 16,
+            Octant6 = 32,
+            Octant7 = 64,
+            Octant8 = 128,
+            Quadrants = Octant1 | Octant4 | Octant5 | Octant8,
+            Quadrants2 = Octant2 | Octant3 | Octant6 | Octant7,
+            All = 255
         }
+
 
         private Dictionary<(int x, int y, int fwidth,  int fy), (double err, Slope s)> m_cache1 = new Dictionary<(int x, int y, int fwidth, int fy), (double, Slope)>();
         private Dictionary<(int x, int y, int fwidth, int fy), (double err, Slope s)> m_cache2 = new Dictionary<(int x, int y, int fwidth, int fy), (double, Slope)>();
@@ -95,17 +91,17 @@ namespace BrunnianLink
             int bestSlope = 0;
             double bestError = double.MaxValue;
             var EvenSlopes = m_slopes.Where(s => s.dx == s.dy && (s.dx & 1) == 0);
-            var OddSlopes = m_slopes.Where(s => s.dx == s.dy && (s.dx & 1) == 0);
-            int lowlimit = (int)Math.Ceiling((r - 2) / Math.Sqrt(2.0));
-            int uplimit = (int)Math.Floor((r + 2) / Math.Sqrt(2.0));
+            var OddSlopes = m_slopes.Where(s => s.dx == s.dy && (s.dx & 1) == 1);
+            int lowlimit = (int)Math.Ceiling((r - band) / Math.Sqrt(2.0));
+            int uplimit = (int)Math.Floor((r + band) / Math.Sqrt(2.0));
             bool symmetric = xLimit >= Math.Ceiling(r);
-        
+
 
 
             for (int r = lowlimit; r <= uplimit; r++)
             {
-                double candidateError = Recurse(r, r, 0, 1,true);
-                if (symmetric) candidateError += Recurse(r, r, 0, 1, false);
+                double candidateError = Recurse(r, r, 0, 1, true);
+                if (!symmetric) candidateError += Recurse(r, r, 0, 1, false);
                 if (candidateError < bestError)
                 {
                     bestError = candidateError;
@@ -118,10 +114,10 @@ namespace BrunnianLink
                     int newy = r - s.dy / 2;
                     candidateError = CalcError((newx, newy), (r, r));
                     if (symmetric)
-                        candidateError += Recurse(newx,newy, 0, 1, true);
+                        candidateError += Recurse(newx, newy, 0, 1, true);
                     else
                     {
-                        candidateError *= 2;
+                        candidateError *= 2.0;
                         candidateError += Recurse(newx, newy, 0, 1, false);
                     }
                     if (candidateError < bestError)
@@ -140,10 +136,10 @@ namespace BrunnianLink
                     int newy = (int)(r - s.dy * 0.5);
                     double candidateError = CalcError((newx, newy), (r, r));
                     if (symmetric)
-                        candidateError += Recurse(newx, newy, 0, 1,true);
+                        candidateError += Recurse(newx, newy, 0, 1, true);
                     else
                     {
-                        candidateError *= 2;
+                        candidateError *= 2.0;
                         candidateError += Recurse(newx, newy, 0, 1, false);
                     }
                     if (candidateError < bestError)
@@ -158,20 +154,20 @@ namespace BrunnianLink
 
             //now reconstruct and print
             Slope? lastSlope = null;
-            int x = 0, y = 0, fx=0, fy=0;
+            int x = 0, y = 0, fx = 0, fy = 0;
             if (bestSlope != 0) //one diagonal element
             {
                 if ((bestSlope & 1) == 0) //even
                 {
-                    lastSlope = EvenSlopes.First(s=>s.dx == bestSlope);
-                    PrintSlope(sb, lastSlope, bestr- bestSlope / 2, bestr + bestSlope / 2, false);
+                    lastSlope = EvenSlopes.First(s => s.dx == bestSlope);
+                    PrintSlope(sb, lastSlope, bestr - bestSlope / 2, bestr + bestSlope / 2, PrintFlag.Quadrants);
                     x = bestr + bestSlope / 2;
                     y = bestr - bestSlope / 2;
                 }
                 else
                 {
                     lastSlope = OddSlopes.First(s => s.dx == bestSlope);
-                    PrintSlope(sb, lastSlope, (int)(bestr+0.5 - 0.5*bestSlope),(int)(bestr+0.5 + 0.5*bestSlope), false);
+                    PrintSlope(sb, lastSlope, (int)(bestr + 0.5 - 0.5 * bestSlope), (int)(bestr + 0.5 + 0.5 * bestSlope), PrintFlag.Quadrants);
                     x = (int)(bestr + 0.5 + 0.5 * bestSlope);
                     y = (int)(bestr + 0.5 - 0.5 * bestSlope);
                 }
@@ -184,8 +180,19 @@ namespace BrunnianLink
                 fy = 1;
             }
 
+            Reconstruct(sb, symmetric, true, lastSlope, x, y, fx, fy);
+            if (!symmetric) 
+                Reconstruct(sb, true, false, lastSlope, x, y, fx, fy);
+        }
+
+
+        void Reconstruct(StringBuilder sb, bool symmetric, bool firstPass, Slope? lastSlope, int x, int y, int fx, int fy)
+        {
+            var cache = firstPass ? m_cache1 : m_cache2;
+
             List<bool> lineCommands = new List<bool>();
-            while (m_cache1.TryGetValue((x, y, fx, fy), out (double err, Slope s) val))
+            var flags = symmetric ? PrintFlag.All : (firstPass ? PrintFlag.Quadrants : PrintFlag.Quadrants2);
+            while (cache.TryGetValue((x, y, fx, fy), out (double err, Slope s) val))
             {
                 Slope slope = val.s;
                 if (slope==horzSlope)
@@ -217,14 +224,14 @@ namespace BrunnianLink
                         if (lastSlope == null)
                         {
                             lineCommands = lineCommands.ToArray().Reverse().Concat(lineCommands).ToList();
-                            HandleLineCommands(sb, lineCommands, x, y, slope.leftmargin, slope.leftmargin, false);
+                            HandleLineCommands(sb, lineCommands, x, y, slope.leftmargin, slope.leftmargin, flags);
                         }
                         else
-                            HandleLineCommands(sb, lineCommands, x, y, lastSlope.bottommargin, slope.leftmargin);
+                            HandleLineCommands(sb, lineCommands, x, y, lastSlope.bottommargin, slope.leftmargin,flags);
                         lineCommands.Clear();
                     }
                     lastSlope = slope;
-                    PrintSlope(sb, lastSlope, x,y);
+                    PrintSlope(sb, lastSlope, x,y,flags);
                 }
             }
             lineCommands.AddRange(Enumerable.Repeat<bool>(false,y));
@@ -233,29 +240,46 @@ namespace BrunnianLink
                 if (lastSlope == null)
                 {
                     lineCommands = lineCommands.ToArray().Reverse().Concat(lineCommands).ToList();
-                    HandleLineCommands(sb, lineCommands, x, 0, 2, 2, false);
+                    HandleLineCommands(sb, lineCommands, x, 0, 2, 2, flags);
                 }
                 else
-                    HandleLineCommands(sb, lineCommands, x, 0, lastSlope.bottommargin, 2);
+                    HandleLineCommands(sb, lineCommands, x, 0, lastSlope.bottommargin, 2,flags);
             }
         }
 
 
-        void HandleLineCommands(StringBuilder sb, List<bool> lineCommands, int x, int y, int bottommarginPrev, int leftMarinNext, bool octoCopy = true)
+        void HandleLineCommands(StringBuilder sb, List<bool> lineCommands, int x, int y, int bottommarginPrev, int leftMarinNext, PrintFlag printFlag)
         {
 
 
 
         }
 
+        void PrintSlope(StringBuilder sb, Slope s, int x, int y, PrintFlag flag = PrintFlag.All)
+        {
+            Shape shape = new Shape() { PartID = s.id }.Rotate(s.dx == s.dy ? 90 : 180);
+            Shape mirrorshape = new Shape() { PartID = s.mirrorId }.Rotate(180);
+            double xd = x - s.leftmargin + (s.leftmargin + s.dx) * 0.5;
+            double yd = (s.bottommargin + s.dy) * 0.5;
+            if ((flag & PrintFlag.Octant1) == PrintFlag.Octant1) sb.AppendLine(shape.Print(xd, yd, plateHeight, color));
+            if ((flag & PrintFlag.Octant4) == PrintFlag.Octant4) sb.AppendLine(mirrorshape.Print(-xd, yd, plateHeight, color));
+            if ((flag & PrintFlag.Octant5) == PrintFlag.Octant5) sb.AppendLine(shape.Rotate(180).Print(-xd, -yd, plateHeight, color));
+            if ((flag & PrintFlag.Octant8) == PrintFlag.Octant8) sb.AppendLine(mirrorshape.Rotate(180).Print(xd, -yd, plateHeight, color));
+            (shape, mirrorshape) = (mirrorshape.Rotate(-90), shape.Rotate(90));
+            (xd, yd) = (yd, xd);
+            if ((flag & PrintFlag.Octant2) == PrintFlag.Octant2) sb.AppendLine(shape.Print(xd, yd, plateHeight, color));
+            if ((flag & PrintFlag.Octant3) == PrintFlag.Octant3) sb.AppendLine(mirrorshape.Print(-xd, yd, plateHeight, color));
+            if ((flag & PrintFlag.Octant6) == PrintFlag.Octant6) sb.AppendLine(shape.Rotate(180).Print(-xd, -yd, plateHeight, color));
+            if ((flag & PrintFlag.Octant7) == PrintFlag.Octant7) sb.AppendLine(mirrorshape.Rotate(180).Print(xd, -yd, plateHeight, color));
+        }
 
         private double Recurse(int x, int y, int fx, int fy, bool symmetric)
         {
-            if (y - fy < 0 || x < 0 || x > Math.Ceiling(r) || !symmetric ) return errorVal;
+            if (y - fy < 0 || x < 0 || (!symmetric && x > Math.Ceiling(r) ) ) return errorVal;
             if (y == 0 || (!symmetric && x == xLimit)) return 0; //target achieved
             //stay within a band of 2 plates
             double rxy = Math.Sqrt((double)(x)*x+(double)(y)*y);
-            if (Math.Abs(rxy - r) > 2) return errorVal;
+            if (Math.Abs(rxy - r) > band) return errorVal;
             var key = (x, y, fx, fy);
             var cache = symmetric?m_cache1 : m_cache2;
             if (cache.TryGetValue(key,out (double,Slope) val))
