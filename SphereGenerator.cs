@@ -15,14 +15,14 @@ namespace BrunnianLink
 
     public class CircleAprroximator
     {
-        private double r;
-        private int xLimit;
-        private double errorVal;
-        int plateHeight;
-        int color;
+        private readonly double r;
+        private readonly int xLimit;
+        private readonly double errorVal;
+        private readonly int plateHeight;
+        private readonly int color;
         const int band = 3;
 
-        private const double epsilon = 1.0 - 7;
+        private const double epsilon = 1.0e-7;
 
         class Slope
         {
@@ -35,23 +35,23 @@ namespace BrunnianLink
         }
 
 
-        static Slope horzSlope = new Slope { leftmargin = 0, bottommargin = 0, dx = 1, dy = 0 };
-        static Slope vertSlope = new Slope { leftmargin = 0, bottommargin = 0, dx = 0, dy = 1 };
+        static readonly Slope horzSlope = new() { leftmargin = 0, bottommargin = 0, dx = 1, dy = 0 };
+        static readonly Slope vertSlope = new() { leftmargin = 0, bottommargin = 0, dx = 0, dy = 1 };
 
-        static List<Slope> m_slopes = new List<Slope>()
+        static readonly List<Slope> m_slopes = new()
         {
             horzSlope,
-            new Slope { leftmargin = 1, bottommargin = 1, dx = 1, dy = 1 },
-            new Slope { leftmargin = 1, bottommargin = 1, dx = 2, dy = 2 },
-            new Slope { leftmargin = 1, bottommargin = 1, dx = 3, dy = 3 },
-            new Slope { leftmargin = 2, bottommargin = 2, dx = 4, dy = 4 },
-            new Slope { leftmargin = 1, bottommargin = 1, dx = 7, dy = 7 },
-            new Slope { leftmargin = 1, bottommargin = 0, dx = 1, dy = 2 },
-            new Slope { leftmargin = 0, bottommargin = 0, dx = 2, dy = 4 },
-            new Slope { leftmargin = 1, bottommargin = 0, dx = 1, dy = 3 },
-            new Slope { leftmargin = 1, bottommargin = 0, dx = 1, dy = 4 },
-            new Slope { leftmargin = 1, bottommargin = 0, dx = 1, dy = 6 },
-            new Slope { leftmargin = 2, bottommargin = 2, dx = 8, dy = 8 },
+            new Slope { leftmargin = 1, bottommargin = 1, dx = 1, dy = 1, id="26601", mirrorId="26601"},
+            new Slope { leftmargin = 1, bottommargin = 1, dx = 2, dy = 2, id="2450", mirrorId="2450"},
+            new Slope { leftmargin = 1, bottommargin = 1, dx = 3, dy = 3, id="30503", mirrorId="30503"},
+            new Slope { leftmargin = 2, bottommargin = 2, dx = 4, dy = 4, id="6106", mirrorId="6106"},
+            new Slope { leftmargin = 1, bottommargin = 1, dx = 7, dy = 7, id="30504", mirrorId="30504"},
+            new Slope { leftmargin = 1, bottommargin = 0, dx = 1, dy = 2, id="24307", mirrorId="24299"},
+            new Slope { leftmargin = 0, bottommargin = 0, dx = 2, dy = 4, id="65426", mirrorId="65429"},
+            new Slope { leftmargin = 1, bottommargin = 0, dx = 1, dy = 3, id="43722", mirrorId="43723"},
+            new Slope { leftmargin = 1, bottommargin = 0, dx = 1, dy = 4, id="41769", mirrorId="41770"},
+            new Slope { leftmargin = 1, bottommargin = 0, dx = 1, dy = 6, id="78444", mirrorId="78443"},
+            new Slope { leftmargin = 2, bottommargin = 2, dx = 8, dy = 8, id="92584", mirrorId="92584"},
             vertSlope
         };
 
@@ -82,8 +82,8 @@ namespace BrunnianLink
         }
 
 
-        private Dictionary<(int x, int y, int fwidth,  int fy), (double err, Slope s)> m_cache1 = new Dictionary<(int x, int y, int fwidth, int fy), (double, Slope)>();
-        private Dictionary<(int x, int y, int fwidth, int fy), (double err, Slope s)> m_cache2 = new Dictionary<(int x, int y, int fwidth, int fy), (double, Slope)>();
+        private readonly Dictionary<(int x, int y, int fwidth,  int fy), (double err, Slope s)> m_cache1 = new();
+        private readonly Dictionary<(int x, int y, int fwidth, int fy), (double err, Slope s)> m_cache2 = new();
 
         public void Generate(StringBuilder sb)
         {
@@ -190,7 +190,7 @@ namespace BrunnianLink
         {
             var cache = firstPass ? m_cache1 : m_cache2;
 
-            List<bool> lineCommands = new List<bool>();
+            List<bool> lineCommands = new();
             var flags = symmetric ? PrintFlag.All : (firstPass ? PrintFlag.Quadrants : PrintFlag.Quadrants2);
             while (cache.TryGetValue((x, y, fx, fy), out (double err, Slope s) val))
             {
@@ -237,20 +237,17 @@ namespace BrunnianLink
             lineCommands.AddRange(Enumerable.Repeat<bool>(false,y));
             if (lineCommands.Count > 0)
             {
-                if (lastSlope == null)
-                {
-                    lineCommands = lineCommands.ToArray().Reverse().Concat(lineCommands).ToList();
-                    HandleLineCommands(sb, lineCommands, x, 0, 2, 2, flags);
-                }
-                else
-                    HandleLineCommands(sb, lineCommands, x, 0, lastSlope.bottommargin, 2,flags);
+                HandleLineCommands(sb, lineCommands, x, 0, lastSlope?.bottommargin??0, 2, flags);
             }
         }
 
 
         void HandleLineCommands(StringBuilder sb, List<bool> lineCommands, int x, int y, int bottommarginPrev, int leftMarinNext, PrintFlag printFlag)
         {
-
+            while (bottommarginPrev > 0 && lineCommands.Count > 0 && lineCommands[0]==false) 
+            { 
+            
+            }
 
 
         }
@@ -260,7 +257,7 @@ namespace BrunnianLink
             Shape shape = new Shape() { PartID = s.id }.Rotate(s.dx == s.dy ? 90 : 180);
             Shape mirrorshape = new Shape() { PartID = s.mirrorId }.Rotate(180);
             double xd = x - s.leftmargin + (s.leftmargin + s.dx) * 0.5;
-            double yd = (s.bottommargin + s.dy) * 0.5;
+            double yd = y - (s.bottommargin + s.dy) * 0.5;
             if ((flag & PrintFlag.Octant1) == PrintFlag.Octant1) sb.AppendLine(shape.Print(xd, yd, plateHeight, color));
             if ((flag & PrintFlag.Octant4) == PrintFlag.Octant4) sb.AppendLine(mirrorshape.Print(-xd, yd, plateHeight, color));
             if ((flag & PrintFlag.Octant5) == PrintFlag.Octant5) sb.AppendLine(shape.Rotate(180).Print(-xd, -yd, plateHeight, color));
@@ -368,8 +365,8 @@ namespace BrunnianLink
             throw new Exception("calculations incorrect");
         }
 
-        private double TriangleArea((double x, double y) p1, (double x, double y) p2) => 0.5*(p1.x * p2.y - p2.x*p1.y);
-        private double SectorArea(double r, double alpha1, double alpha2) => r * r * (alpha2 - alpha1) * 0.5;
+        //private static double TriangleArea((double x, double y) p1, (double x, double y) p2) => 0.5*(p1.x * p2.y - p2.x*p1.y);
+        private static double SectorArea(double r, double alpha1, double alpha2) => r * r * (alpha2 - alpha1) * 0.5;
 
 
     }
