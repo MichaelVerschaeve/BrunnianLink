@@ -86,7 +86,8 @@ namespace BrunnianLink
             }
         }
 
-        private Dictionary<(int x, int y, int fwidth,  int fy), (double err, Slope s)> m_cache = new Dictionary<(int x, int y, int fwidth, int fy), (double, Slope)>();
+        private Dictionary<(int x, int y, int fwidth,  int fy), (double err, Slope s)> m_cache1 = new Dictionary<(int x, int y, int fwidth, int fy), (double, Slope)>();
+        private Dictionary<(int x, int y, int fwidth, int fy), (double err, Slope s)> m_cache2 = new Dictionary<(int x, int y, int fwidth, int fy), (double, Slope)>();
 
         public void Generate(StringBuilder sb)
         {
@@ -97,10 +98,14 @@ namespace BrunnianLink
             var OddSlopes = m_slopes.Where(s => s.dx == s.dy && (s.dx & 1) == 0);
             int lowlimit = (int)Math.Ceiling((r - 2) / Math.Sqrt(2.0));
             int uplimit = (int)Math.Floor((r + 2) / Math.Sqrt(2.0));
+            bool symmetric = xLimit >= Math.Ceiling(r);
+        
+
 
             for (int r = lowlimit; r <= uplimit; r++)
             {
-                double candidateError = Recurse(r, r, 0, 1);
+                double candidateError = Recurse(r, r, 0, 1,true);
+                if (symmetric) candidateError += Recurse(r, r, 0, 1, false);
                 if (candidateError < bestError)
                 {
                     bestError = candidateError;
@@ -110,8 +115,15 @@ namespace BrunnianLink
                 foreach (Slope s in EvenSlopes)
                 {
                     int newx = r + s.dx / 2;
-                    int newy = r + s.dy / 2;
-                    candidateError = CalcError((newx, newy), (r, r)) + Recurse(newx,newy, 0, 1);
+                    int newy = r - s.dy / 2;
+                    candidateError = CalcError((newx, newy), (r, r));
+                    if (symmetric)
+                        candidateError += Recurse(newx,newy, 0, 1, true);
+                    else
+                    {
+                        candidateError *= 2;
+                        candidateError += Recurse(newx, newy, 0, 1, false);
+                    }
                     if (candidateError < bestError)
                     {
                         bestError = candidateError;
@@ -125,8 +137,15 @@ namespace BrunnianLink
                 foreach (Slope s in OddSlopes)
                 {
                     int newx = (int)(r + s.dx * 0.5);
-                    int newy = (int)(r + s.dy * 0.5);
-                    double candidateError = CalcError((newx, newy), (r, r)) + Recurse(newx, newy, 0, 1);
+                    int newy = (int)(r - s.dy * 0.5);
+                    double candidateError = CalcError((newx, newy), (r, r));
+                    if (symmetric)
+                        candidateError += Recurse(newx, newy, 0, 1,true);
+                    else
+                    {
+                        candidateError *= 2;
+                        candidateError += Recurse(newx, newy, 0, 1, false);
+                    }
                     if (candidateError < bestError)
                     {
                         bestError = candidateError;
@@ -166,7 +185,7 @@ namespace BrunnianLink
             }
 
             List<bool> lineCommands = new List<bool>();
-            while (m_cache.TryGetValue((x, y, fx, fy), out (double err, Slope s) val))
+            while (m_cache1.TryGetValue((x, y, fx, fy), out (double err, Slope s) val))
             {
                 Slope slope = val.s;
                 if (slope==horzSlope)
@@ -230,15 +249,16 @@ namespace BrunnianLink
         }
 
 
-        private double Recurse(int x, int y, int fx, int fy)
+        private double Recurse(int x, int y, int fx, int fy, bool symmetric)
         {
-            if (y - fy < 0 || x < 0 || x > Math.Ceiling(r)) return errorVal;
-            if (y == 0 || x == xLimit) return 0; //target achieved
+            if (y - fy < 0 || x < 0 || x > Math.Ceiling(r) || !symmetric ) return errorVal;
+            if (y == 0 || (!symmetric && x == xLimit)) return 0; //target achieved
             //stay within a band of 2 plates
             double rxy = Math.Sqrt((double)(x)*x+(double)(y)*y);
             if (Math.Abs(rxy - r) > 2) return errorVal;
             var key = (x, y, fx, fy);
-            if (m_cache.TryGetValue(key,out (double,Slope) val))
+            var cache = symmetric?m_cache1 : m_cache2;
+            if (cache.TryGetValue(key,out (double,Slope) val))
             {
                 return val.Item1;
             }
@@ -272,7 +292,7 @@ namespace BrunnianLink
                     }
 
                 }
-                double candidateError = CalcError((newX,newY), (x,y)) + Recurse(newX,newY,newfx,newfy);
+                double candidateError = CalcError((newX,newY), (x,y)) + Recurse(newX,newY,newfx,newfy,symmetric);
                 if (candidateError < bestError)
                 {
                     bestError = candidateError;
@@ -280,7 +300,7 @@ namespace BrunnianLink
                 }
             }
             if (bestError >= errorVal) return errorVal; //no solution...
-            m_cache.Add(key, (bestError, bestSlope));
+            cache.Add(key, (bestError, bestSlope));
             return bestError;
         }
         
