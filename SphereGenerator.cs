@@ -81,7 +81,6 @@ namespace BrunnianLink
             All = 255
         }
 
-
         private readonly Dictionary<(int x, int y, int fwidth,  int fy), (double err, Slope s)> m_cache1 = new();
         private readonly Dictionary<(int x, int y, int fwidth, int fy), (double err, Slope s)> m_cache2 = new();
 
@@ -95,8 +94,6 @@ namespace BrunnianLink
             int lowlimit = (int)Math.Ceiling((r - band) / Math.Sqrt(2.0));
             int uplimit = (int)Math.Floor((r + band) / Math.Sqrt(2.0));
             bool symmetric = xLimit >= Math.Ceiling(r);
-
-
 
             for (int r = lowlimit; r <= uplimit; r++)
             {
@@ -256,6 +253,18 @@ namespace BrunnianLink
                 x--;
             }
             if (lineCommands.Count == 0) return;
+            int w = lineCommands.Count(b => b);
+            int h = lineCommands.Count(b => !b);
+            if (bottommarginPrev == 0 && y+h<x-w) //spare room
+            { 
+                lineCommands.Insert(0, true);
+                w++;
+            }
+            if(leftMarinNext == 0 && y>0) //spare room;
+            {
+                lineCommands.Add(false);
+                y--;
+            }
         }
 
         void PrintSlope(StringBuilder sb, Slope s, int x, int y, PrintFlag flag = PrintFlag.All)
