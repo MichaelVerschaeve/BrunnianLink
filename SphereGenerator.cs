@@ -246,10 +246,16 @@ namespace BrunnianLink
         {
             while (bottommarginPrev > 0 && lineCommands.Count > 0 && lineCommands[0]==false) 
             { 
-            
+                lineCommands.RemoveAt(0);
+                bottommarginPrev--;
             }
-
-
+            while (leftMarinNext > 0 && lineCommands.Count > 0 && lineCommands.Last() == true)
+            {
+                lineCommands.RemoveAt(lineCommands.Count - 1);
+                leftMarinNext--;
+                x--;
+            }
+            if (lineCommands.Count == 0) return;
         }
 
         void PrintSlope(StringBuilder sb, Slope s, int x, int y, PrintFlag flag = PrintFlag.All)
