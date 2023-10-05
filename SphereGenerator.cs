@@ -264,6 +264,66 @@ namespace BrunnianLink
             {
                 lineCommands.Add(false);
                 y--;
+                h++;
+            }
+            if (lineCommands.Count > 0 && !lineCommands[0])
+            {//this should not happen...
+                h--;
+                lineCommands.RemoveAt(0);
+            }
+            x -= w;
+            int miny = y;
+            y += h;
+
+            while (lineCommands.Count > 0)
+            {
+                w = 0;
+                h = 0;
+                while (lineCommands.Count > 0 && lineCommands[0])
+                {
+                    lineCommands.RemoveAt(0);
+                    w++;
+                }
+                while (lineCommands.Count > 0 && !lineCommands[0])
+                {
+                    lineCommands.RemoveAt(0);
+                    h++;
+                }
+                if (w>0 && h>0)
+                    PrintRectange(sb,x, y, w, y - h > miny ? (h + 1) : h, printFlag);
+                x+= w;
+                y -= h;
+            }
+        }
+
+        void PrintRectange(StringBuilder sb, int x, int y, int w, int h, PrintFlag flag) 
+        {
+            if (w <= 0 || h <= 0) return;
+            if (Plate.PlateExists(w,h))
+            {
+                double xd = x + 0.5*w;
+                double yd = y - 0.5*h;
+                Plate p = new(w, h);
+                if ((flag & PrintFlag.Octant1) == PrintFlag.Octant1) sb.AppendLine(p.Print(xd, yd, plateHeight, color));
+                if ((flag & PrintFlag.Octant4) == PrintFlag.Octant4) sb.AppendLine(p.Print(-xd, yd, plateHeight, color));
+                if ((flag & PrintFlag.Octant5) == PrintFlag.Octant5) sb.AppendLine(p.Print(-xd, -yd, plateHeight, color));
+                if ((flag & PrintFlag.Octant8) == PrintFlag.Octant8) sb.AppendLine(p.Print(xd, -yd, plateHeight, color));
+                p = new(h, w);
+                (xd, yd) = (yd, xd);
+                if ((flag & PrintFlag.Octant2) == PrintFlag.Octant2) sb.AppendLine(p.Print(xd, yd, plateHeight, color));
+                if ((flag & PrintFlag.Octant3) == PrintFlag.Octant3) sb.AppendLine(p.Print(-xd, yd, plateHeight, color));
+                if ((flag & PrintFlag.Octant6) == PrintFlag.Octant6) sb.AppendLine(p.Print(-xd, -yd, plateHeight, color));
+                if ((flag & PrintFlag.Octant7) == PrintFlag.Octant7) sb.AppendLine(p.Print(xd, -yd, plateHeight, color));
+            }
+            else if (w >= h)
+            {
+                PrintRectange(sb, x, y, w / 2, h, flag);
+                PrintRectange(sb, x + w/2, y, w-w/2, h, flag);
+            }
+            else
+            {
+                PrintRectange(sb, x, y, w ,h/2, flag);
+                PrintRectange(sb, x, y-h/2, w, h-h/2, flag);
             }
         }
 
