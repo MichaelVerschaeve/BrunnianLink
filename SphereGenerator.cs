@@ -239,17 +239,17 @@ namespace BrunnianLink
         }
 
 
-        void HandleLineCommands(StringBuilder sb, List<bool> lineCommands, int x, int y, int bottommarginPrev, int leftMarinNext, PrintFlag printFlag)
+        void HandleLineCommands(StringBuilder sb, List<bool> lineCommands, int x, int y, int bottommarginPrev, int leftMarginNext, PrintFlag printFlag)
         {
             while (bottommarginPrev > 0 && lineCommands.Count > 0 && lineCommands[0]==false) 
             { 
                 lineCommands.RemoveAt(0);
                 bottommarginPrev--;
             }
-            while (leftMarinNext > 0 && lineCommands.Count > 0 && lineCommands.Last() == true)
+            while (leftMarginNext > 0 && lineCommands.Count > 0 && lineCommands.Last() == true)
             {
                 lineCommands.RemoveAt(lineCommands.Count - 1);
-                leftMarinNext--;
+                leftMarginNext--;
                 x--;
             }
             if (lineCommands.Count == 0) return;
@@ -260,7 +260,7 @@ namespace BrunnianLink
                 lineCommands.Insert(0, true);
                 w++;
             }
-            if(leftMarinNext == 0 && y>0) //spare room;
+            if(leftMarginNext == 0 && y>0) //spare room;
             {
                 lineCommands.Add(false);
                 y--;
