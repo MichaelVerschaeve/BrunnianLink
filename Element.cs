@@ -281,6 +281,7 @@ namespace BrunnianLink
         };
 
         public static string XYPartID(int sizeY, int sizeX) => plateIDs[(sizeY, sizeX)];
+        public static bool PlateExists(int sizeY, int sizeX) => plateIDs.ContainsKey((sizeY, sizeX)) || plateIDs.ContainsKey((sizeX, sizeY));
 
         public Plate(int sizeX, int sizeY = 1)
         {
