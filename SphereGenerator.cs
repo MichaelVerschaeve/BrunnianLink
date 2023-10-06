@@ -179,7 +179,7 @@ namespace BrunnianLink
 
             Reconstruct(sb, symmetric, true, lastSlope, x, y, fx, fy);
             if (!symmetric) 
-                Reconstruct(sb, true, false, lastSlope, x, y, fx, fy);
+                Reconstruct(sb, false, false, lastSlope, x, y, fx, fy);
         }
 
 
@@ -220,8 +220,13 @@ namespace BrunnianLink
                     {
                         if (lastSlope == null)
                         {
-                            lineCommands = lineCommands.ToArray().Reverse().Concat(lineCommands).ToList();
-                            HandleLineCommands(sb, lineCommands, x, y, slope.leftmargin, slope.leftmargin, flags);
+                            if (symmetric)
+                            {
+                                lineCommands = lineCommands.ToArray().Reverse().Concat(lineCommands).ToList();
+                                HandleLineCommands(sb, lineCommands, x, y, slope.leftmargin, slope.leftmargin, PrintFlag.Quadrants);
+                            }
+                            else
+                                HandleLineCommands(sb, lineCommands, x, y, 0, slope.leftmargin, flags);
                         }
                         else
                             HandleLineCommands(sb, lineCommands, x, y, lastSlope.bottommargin, slope.leftmargin,flags);
@@ -229,6 +234,10 @@ namespace BrunnianLink
                     }
                     lastSlope = slope;
                     PrintSlope(sb, lastSlope, x,y,flags);
+                    x += slope.dx;
+                    y -= slope.dy;
+                    fy = slope.bottommargin;
+                    fx = 0;
                 }
             }
             lineCommands.AddRange(Enumerable.Repeat<bool>(false,y));
@@ -241,12 +250,12 @@ namespace BrunnianLink
 
         void HandleLineCommands(StringBuilder sb, List<bool> lineCommands, int x, int y, int bottommarginPrev, int leftMarginNext, PrintFlag printFlag)
         {
-            while (bottommarginPrev > 0 && lineCommands.Count > 0 && lineCommands[0]==false) 
+            while (bottommarginPrev > 0 && lineCommands.Count > 0 && !lineCommands[0]) 
             { 
                 lineCommands.RemoveAt(0);
                 bottommarginPrev--;
             }
-            while (leftMarginNext > 0 && lineCommands.Count > 0 && lineCommands.Last() == true)
+            while (leftMarginNext > 0 && lineCommands.Count > 0 && lineCommands.Last())
             {
                 lineCommands.RemoveAt(lineCommands.Count - 1);
                 leftMarginNext--;
@@ -291,7 +300,7 @@ namespace BrunnianLink
                 }
                 if (w>0 && h>0)
                     PrintRectange(sb,x, y, w, y - h > miny ? (h + 1) : h, printFlag);
-                x+= w;
+                x += w;
                 y -= h;
             }
         }
