@@ -8,8 +8,12 @@ using System.Windows.Forms.VisualStyles;
 
 namespace BrunnianLink
 {
-    public class SphereGenerator
+    static public class SphereGenerator
     {
+        public static void Generate(StringBuilder sb, int level)
+        {
+            new CircleAprroximator(level,level+1,0,ColorMap.Get("White").id).Generate(sb);
+        }
     }
 
 
@@ -179,7 +183,7 @@ namespace BrunnianLink
 
             Reconstruct(sb, symmetric, true, lastSlope, x, y, fx, fy);
             if (!symmetric) 
-                Reconstruct(sb, false, false, lastSlope, x, y, fx, fy);
+                Reconstruct(sb, true, false, lastSlope, x, y, fx, fy);
         }
 
 
@@ -220,13 +224,8 @@ namespace BrunnianLink
                     {
                         if (lastSlope == null)
                         {
-                            if (symmetric)
-                            {
-                                lineCommands = lineCommands.ToArray().Reverse().Concat(lineCommands).ToList();
-                                HandleLineCommands(sb, lineCommands, x, y, slope.leftmargin, slope.leftmargin, PrintFlag.Quadrants);
-                            }
-                            else
-                                HandleLineCommands(sb, lineCommands, x, y, 0, slope.leftmargin, flags);
+                            lineCommands = lineCommands.ToArray().Reverse().Concat(lineCommands).ToList();
+                            HandleLineCommands(sb, lineCommands, x, y, slope.leftmargin, slope.leftmargin, flags);
                         }
                         else
                             HandleLineCommands(sb, lineCommands, x, y, lastSlope.bottommargin, slope.leftmargin,flags);
@@ -234,10 +233,6 @@ namespace BrunnianLink
                     }
                     lastSlope = slope;
                     PrintSlope(sb, lastSlope, x,y,flags);
-                    x += slope.dx;
-                    y -= slope.dy;
-                    fy = slope.bottommargin;
-                    fx = 0;
                 }
             }
             lineCommands.AddRange(Enumerable.Repeat<bool>(false,y));
@@ -248,17 +243,17 @@ namespace BrunnianLink
         }
 
 
-        void HandleLineCommands(StringBuilder sb, List<bool> lineCommands, int x, int y, int bottommarginPrev, int leftMarginNext, PrintFlag printFlag)
+        void HandleLineCommands(StringBuilder sb, List<bool> lineCommands, int x, int y, int bottommarginPrev, int leftMarinNext, PrintFlag printFlag)
         {
-            while (bottommarginPrev > 0 && lineCommands.Count > 0 && !lineCommands[0]) 
+            while (bottommarginPrev > 0 && lineCommands.Count > 0 && lineCommands[0]==false) 
             { 
                 lineCommands.RemoveAt(0);
                 bottommarginPrev--;
             }
-            while (leftMarginNext > 0 && lineCommands.Count > 0 && lineCommands.Last())
+            while (leftMarinNext > 0 && lineCommands.Count > 0 && lineCommands.Last() == true)
             {
                 lineCommands.RemoveAt(lineCommands.Count - 1);
-                leftMarginNext--;
+                leftMarinNext--;
                 x--;
             }
             if (lineCommands.Count == 0) return;
@@ -269,7 +264,7 @@ namespace BrunnianLink
                 lineCommands.Insert(0, true);
                 w++;
             }
-            if(leftMarginNext == 0 && y>0) //spare room;
+            if(leftMarinNext == 0 && y>0) //spare room;
             {
                 lineCommands.Add(false);
                 y--;
@@ -300,7 +295,7 @@ namespace BrunnianLink
                 }
                 if (w>0 && h>0)
                     PrintRectange(sb,x, y, w, y - h > miny ? (h + 1) : h, printFlag);
-                x += w;
+                x+= w;
                 y -= h;
             }
         }
@@ -426,7 +421,6 @@ namespace BrunnianLink
             }
             double dx = p2.x- p1.x;
             double dy = p2.y- p1.y; 
-            System.Diagnostics.Debug.Assert(dy >  epsilon);
             double dr2 = dx * dx + dy * dy;
             double rootArg = r*r*dr2-D*D;
             if (rootArg < -epsilon) //no intersection
@@ -446,7 +440,8 @@ namespace BrunnianLink
             {
                 return CalcError( p1, p3) + CalcError(p3, p2);
             }
-            throw new Exception("calculations incorrect");
+            //no intersection
+            return 0.5 * D - SectorArea(r, alpha1, alpha2);
         }
 
         //private static double TriangleArea((double x, double y) p1, (double x, double y) p2) => 0.5*(p1.x * p2.y - p2.x*p1.y);

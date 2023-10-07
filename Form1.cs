@@ -168,6 +168,9 @@ namespace BrunnianLink
                 case 16:
                     TerDragon.Generate(sb, level);
                     break;
+                case 17:
+                    SphereGenerator.Generate(sb, level);
+                    break;
                 //case 17:
                 //    MetaData.StartSubModel(sb, "pentagonTest");
                 //    double s = 2; //sidelength
