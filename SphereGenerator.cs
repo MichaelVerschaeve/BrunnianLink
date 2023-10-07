@@ -12,7 +12,7 @@ namespace BrunnianLink
     {
         public static void Generate(StringBuilder sb, int level)
         {
-            new CircleAprroximator(level,level+1,0,ColorMap.Get("White").id).Generate(sb);
+            new CircleAprroximator(level,10*level+1,0,ColorMap.Get("White").id).Generate(sb);
         }
     }
 
@@ -115,11 +115,11 @@ namespace BrunnianLink
                     int newy = r - s.dy / 2;
                     candidateError = CalcError((newx, newy), (r, r));
                     if (symmetric)
-                        candidateError += Recurse(newx, newy, 0, 1, true);
+                        candidateError += Recurse(newx, newy, 0, s.bottommargin, true);
                     else
                     {
                         candidateError *= 2.0;
-                        candidateError += Recurse(newx, newy, 0, 1, false);
+                        candidateError += Recurse(newx, newy, 0, s.leftmargin, false);
                     }
                     if (candidateError < bestError)
                     {
@@ -137,11 +137,11 @@ namespace BrunnianLink
                     int newy = (int)(r - s.dy * 0.5);
                     double candidateError = CalcError((newx, newy), (r, r));
                     if (symmetric)
-                        candidateError += Recurse(newx, newy, 0, 1, true);
+                        candidateError += Recurse(newx, newy, 0, s.bottommargin, true);
                     else
                     {
                         candidateError *= 2.0;
-                        candidateError += Recurse(newx, newy, 0, 1, false);
+                        candidateError += Recurse(newx, newy, 0, s.leftmargin, false);
                     }
                     if (candidateError < bestError)
                     {
@@ -224,15 +224,24 @@ namespace BrunnianLink
                     {
                         if (lastSlope == null)
                         {
-                            lineCommands = lineCommands.ToArray().Reverse().Concat(lineCommands).ToList();
-                            HandleLineCommands(sb, lineCommands, x, y, slope.leftmargin, slope.leftmargin, flags);
+                            if (symmetric)
+                            {
+                                lineCommands = lineCommands.Select(b=>!b).ToArray().Reverse().Concat(lineCommands).ToList();
+                                HandleLineCommands(sb, lineCommands, x, y, slope.leftmargin, slope.leftmargin, PrintFlag.Quadrants);
+                            }
+                            else
+                                HandleLineCommands(sb, lineCommands, x, y, 0, slope.leftmargin, flags);
                         }
                         else
-                            HandleLineCommands(sb, lineCommands, x, y, lastSlope.bottommargin, slope.leftmargin,flags);
+                            HandleLineCommands(sb, lineCommands, x, y, lastSlope.bottommargin, slope.leftmargin, flags);
                         lineCommands.Clear();
                     }
                     lastSlope = slope;
-                    PrintSlope(sb, lastSlope, x,y,flags);
+                    PrintSlope(sb, lastSlope, x, y, flags);
+                    x += slope.dx;
+                    y -= slope.dy;
+                    fy = slope.bottommargin;
+                    fx = 0;
                 }
             }
             lineCommands.AddRange(Enumerable.Repeat<bool>(false,y));
