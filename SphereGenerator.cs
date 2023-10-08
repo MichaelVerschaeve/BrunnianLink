@@ -10,11 +10,75 @@ namespace BrunnianLink
 {
     static public class SphereGenerator
     {
+        private const double epsilon = 1.0e-7;
         public static void Generate(StringBuilder sb, int level)
         {
-            new CircleAprroximator(level,10*level+1,0,ColorMap.Get("White").id).Generate(sb);
+            int innerR = level;
+            double outerR = Math.Sqrt(3) * innerR;
+            //new CircleAprroximator(level,10*level+1,0,ColorMap.Get("White").id).Generate(sb);
+            //
+            MetaData.StartSubModel(sb, $"Sphere{level}");
+            //List<string> colors = new List<string>() { "Violet", "Bright_Light_Orange", "Sand_Green", "Tan","Lime", "Medium_Azure" };
+            List<string> colors = new() { "Red", "Red", "Green", "Green", "Blue", "Blue" };
+            foreach (Direction dir in Enum.GetValues<Direction>())
+            {
+                PrintPart(sb, innerR, dir, ColorMap.Get(colors[(int)dir]).id);
+            }
+            MetaData.StartSubModel(sb, "Slice");
+            int i = 0;
+            double plateHeight = 0.4;
+            for (double h = innerR; h < outerR - epsilon; h += plateHeight)
+            {
+                Shape layer = new() { SubModel = true, PartID = $"layer{i++}" };
+                sb.AppendLine(layer.Print(0, 0, i, 16));
+            }
+            i = 0;
+            double currentVolume = CapVolume(innerR, outerR);
+            for (double h = innerR; h < outerR - epsilon; h += plateHeight)
+            {
+                MetaData.StartSubModel(sb, $"layer{i++}");
+                double nextVolume = CapVolume(h + plateHeight, outerR);
+                double r = Math.Sqrt((currentVolume - nextVolume) / plateHeight);
+                if (r < 0.5) break;
+                CircleAprroximator ca = new(r, innerR, 16);
+                ca.Generate(sb);
+                currentVolume = nextVolume;
+            }
+
+            //sb.AppendLine(new Plate(6, 6).Print(0, 0, 1, 16));
+            // sb.AppendLine(new Plate(2, 4).Print(0, 0, 2, ColorMap.Get("Black").id));
+        }
+
+        private static double CapVolume(double h, double outerR)
+        {   //volume of sphere/Pi
+            double hrem = outerR - h;
+            if (hrem < 0) return 0;
+            return hrem * hrem * (3 * outerR - hrem) / 3.0;
+        }
+
+        enum Direction { Top, Bottom, Left, Right, Front, Back };
+
+        static void PrintPart(StringBuilder sb, int distance, Direction dir, int color)
+        {
+            string rotmat = dir switch
+            {
+                Direction.Top => "1 0 0 0 1 0 0 0 1",
+                Direction.Bottom => "-1 0 0 0 -1 0 0 0 1",
+                Direction.Left => "0 1 0 0 0 -1 -1 0 0",
+                Direction.Right => "0 -1 0 0 0 -1 1 0 0",
+                Direction.Front => "0 0 1 1 0 0 0 1 0",
+                Direction.Back => "0 0 1 -1 0 0 0 -1 0",
+                _ => ""
+            };
+            double ldudistance = distance * 20;
+            double dx = dir switch { Direction.Left => -ldudistance, Direction.Right => ldudistance, _ => 0.0 };
+            double dy = dir switch { Direction.Top => -ldudistance, Direction.Bottom => ldudistance, _ => 0.0 }; ;
+            double dz = dir switch { Direction.Front => -ldudistance, Direction.Back => ldudistance, _ => 0.0 }; ;
+            sb.AppendLine($"1 {color} {dx} {dy} {dz} {rotmat} Slice");
         }
     }
+
+    
 
 
     public class CircleAprroximator
@@ -59,12 +123,12 @@ namespace BrunnianLink
             vertSlope
         };
 
-        public CircleAprroximator(double _r, int _xlimit, int _plateHeight, int colorID)
+        public CircleAprroximator(double _r, int _xlimit, int colorID)
         {
             r = _r;
             errorVal = (double)(r) * r;
             xLimit = _xlimit;
-            plateHeight = _plateHeight;
+            plateHeight = 0;
             color = colorID;
         }
 
@@ -113,12 +177,14 @@ namespace BrunnianLink
                 {
                     int newx = r + s.dx / 2;
                     int newy = r - s.dy / 2;
+                    if (newy - s.bottommargin < 0) continue;
                     candidateError = CalcError((newx, newy), (r, r));
                     if (symmetric)
                         candidateError += Recurse(newx, newy, 0, s.bottommargin, true);
                     else
                     {
                         candidateError *= 2.0;
+                        candidateError += Recurse(newx, newy, 0, s.bottommargin, true);
                         candidateError += Recurse(newx, newy, 0, s.leftmargin, false);
                     }
                     if (candidateError < bestError)
@@ -135,12 +201,14 @@ namespace BrunnianLink
                 {
                     int newx = (int)(r + s.dx * 0.5);
                     int newy = (int)(r - s.dy * 0.5);
+                    if (newy - s.bottommargin < 0) continue;
                     double candidateError = CalcError((newx, newy), (r, r));
                     if (symmetric)
                         candidateError += Recurse(newx, newy, 0, s.bottommargin, true);
                     else
                     {
                         candidateError *= 2.0;
+                        candidateError += Recurse(newx, newy, 0, s.bottommargin, true);
                         candidateError += Recurse(newx, newy, 0, s.leftmargin, false);
                     }
                     if (candidateError < bestError)
@@ -303,13 +371,13 @@ namespace BrunnianLink
                     h++;
                 }
                 if (w>0 && h>0)
-                    PrintRectange(sb,x, y, w, y - h > miny ? (h + 1) : h, printFlag);
+                    PrintRectangle(sb,x, y, w, y - h > miny ? (h + 1) : h, printFlag);
                 x+= w;
                 y -= h;
             }
         }
 
-        void PrintRectange(StringBuilder sb, int x, int y, int w, int h, PrintFlag flag) 
+        void PrintRectangle(StringBuilder sb, int x, int y, int w, int h, PrintFlag flag) 
         {
             if (w <= 0 || h <= 0) return;
             if (Plate.PlateExists(w,h))
@@ -330,13 +398,13 @@ namespace BrunnianLink
             }
             else if (w >= h)
             {
-                PrintRectange(sb, x, y, w / 2, h, flag);
-                PrintRectange(sb, x + w/2, y, w-w/2, h, flag);
+                PrintRectangle(sb, x, y, w / 2, h, flag);
+                PrintRectangle(sb, x + w/2, y, w-w/2, h, flag);
             }
             else
             {
-                PrintRectange(sb, x, y, w ,h/2, flag);
-                PrintRectange(sb, x, y-h/2, w, h-h/2, flag);
+                PrintRectangle(sb, x, y, w ,h/2, flag);
+                PrintRectangle(sb, x, y-h/2, w, h-h/2, flag);
             }
         }
 
@@ -360,8 +428,8 @@ namespace BrunnianLink
 
         private double Recurse(int x, int y, int fx, int fy, bool symmetric)
         {
-            if (y - fy < 0 || x < 0 || (!symmetric && x > Math.Ceiling(r) ) ) return errorVal;
-            if (y == 0 || (!symmetric && x == xLimit)) return 0; //target achieved
+            if (y - fy < 0 || x < 0 || (symmetric && (x > Math.Ceiling(r)) ) || (!symmetric && (x > xLimit)) ) return errorVal;
+            if (y == 0 || (!symmetric && (x == xLimit))) return 0; //target achieved
             //stay within a band of 2 plates
             double rxy = Math.Sqrt((double)(x)*x+(double)(y)*y);
             if (Math.Abs(rxy - r) > band) return errorVal;

@@ -172,7 +172,7 @@ namespace BrunnianLink
 
             if (n == 31)
             {
-                BasePlate bp = new BasePlate(32);
+                BasePlate bp = new(32);
 
                 for (int x = 0; x < 2; x++)
                     for (int y = 0; y < 2; y++)
@@ -180,7 +180,7 @@ namespace BrunnianLink
             }
             else if (n == 23)
             {
-                BasePlate bp = new BasePlate(48);
+                BasePlate bp = new(48);
                 sb.AppendLine(bp.Print(23, 23, -1, grayID));
             }
             for (int i = 0; i < n; i++)
