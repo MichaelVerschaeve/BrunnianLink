@@ -20,7 +20,7 @@ namespace BrunnianLink
             MetaData.StartSubModel(sb, $"Sphere{level}");
             //List<string> colors = new List<string>() { "Violet", "Bright_Light_Orange", "Sand_Green", "Tan","Lime", "Medium_Azure" };
             List<string> colors = new() { "Red", "Red", "Green", "Green", "Blue", "Blue" };
-            foreach (Direction dir in Enum.GetValues<Direction>())
+            foreach (Direction dir in Enum.GetValues<Direction>().Take(1))
             {
                 PrintPart(sb, innerR, dir, ColorMap.Get(colors[(int)dir]).id);
             }
@@ -34,13 +34,14 @@ namespace BrunnianLink
             }
             i = 0;
             double currentVolume = CapVolume(innerR, outerR);
+            int whiteId = ColorMap.Get("White").id;
             for (double h = innerR; h < outerR - epsilon; h += plateHeight)
             {
                 MetaData.StartSubModel(sb, $"layer{i++}");
                 double nextVolume = CapVolume(h + plateHeight, outerR);
                 double r = Math.Sqrt((currentVolume - nextVolume) / plateHeight);
                 if (r < 0.5) break;
-                CircleAprroximator ca = new(r, innerR, 16);
+                CircleAprroximator ca = new(r, innerR, /*16*/whiteId);
                 ca.Generate(sb);
                 currentVolume = nextVolume;
             }
@@ -251,7 +252,7 @@ namespace BrunnianLink
 
             Reconstruct(sb, symmetric, true, lastSlope, x, y, fx, fy);
             if (!symmetric) 
-                Reconstruct(sb, true, false, lastSlope, x, y, fx, fy);
+                Reconstruct(sb, false, false, lastSlope, x, y, fx, fy);
         }
 
 
