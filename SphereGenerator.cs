@@ -11,6 +11,9 @@ namespace BrunnianLink
     static public class SphereGenerator
     {
         private const double epsilon = 1.0e-7;
+
+        const bool forceColor = true; //set to true for renderings
+
         public static void Generate(StringBuilder sb, int level)
         {
             int innerR = level;
@@ -20,7 +23,7 @@ namespace BrunnianLink
             MetaData.StartSubModel(sb, $"Sphere{level}");
             //List<string> colors = new List<string>() { "Violet", "Bright_Light_Orange", "Sand_Green", "Tan","Lime", "Medium_Azure" };
             List<string> colors = new() { "Red", "Red", "Green", "Green", "Blue", "Blue" };
-            foreach (Direction dir in Enum.GetValues<Direction>().Take(1))
+            foreach (Direction dir in Enum.GetValues<Direction>())
             {
                 PrintPart(sb, innerR, dir, ColorMap.Get(colors[(int)dir]).id);
             }
@@ -41,7 +44,7 @@ namespace BrunnianLink
                 double nextVolume = CapVolume(h + plateHeight, outerR);
                 double r = Math.Sqrt((currentVolume - nextVolume) / plateHeight);
                 if (r < 0.5) break;
-                CircleAprroximator ca = new(r, innerR, /*16*/whiteId);
+                CircleAprroximator ca = new(r, innerR, forceColor?whiteId:16);
                 ca.Generate(sb);
                 currentVolume = nextVolume;
             }
@@ -155,6 +158,7 @@ namespace BrunnianLink
 
         public void Generate(StringBuilder sb)
         {
+            midTaken = false;
             int bestr = 0;
             int bestSlope = 0;
             double bestError = double.MaxValue;
@@ -313,13 +317,15 @@ namespace BrunnianLink
                     fx = 0;
                 }
             }
-            lineCommands.AddRange(Enumerable.Repeat<bool>(false,y));
+            if (y>=0)
+                lineCommands.AddRange(Enumerable.Repeat<bool>(false,y));
             if (lineCommands.Count > 0)
             {
-                HandleLineCommands(sb, lineCommands, x, 0, lastSlope?.bottommargin??0, 2, flags);
+                HandleLineCommands(sb, lineCommands, x, 0, lastSlope?.bottommargin??(midTaken?1:0), 2, flags);
             }
         }
 
+        bool midTaken;
 
         void HandleLineCommands(StringBuilder sb, List<bool> lineCommands, int x, int y, int bottommarginPrev, int leftMarinNext, PrintFlag printFlag)
         {
@@ -337,8 +343,10 @@ namespace BrunnianLink
             if (lineCommands.Count == 0) return;
             int w = lineCommands.Count(b => b);
             int h = lineCommands.Count(b => !b);
-            if (bottommarginPrev == 0 && y+h<x-w) //spare room
+            if (bottommarginPrev == 0 && ((y+h<x-w) || (!midTaken && y+h==x-w))) //spare room
             { 
+                if (y + h == x - w)
+                    midTaken = true;
                 lineCommands.Insert(0, true);
                 w++;
             }
