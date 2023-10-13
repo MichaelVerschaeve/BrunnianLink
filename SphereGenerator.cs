@@ -227,10 +227,11 @@ namespace BrunnianLink
 
             if (symmetric && r<band+4)
             {
-                int candidateR = (int) Math.Max(1.0,Math.Min(4.0,Math.Round(r)));
+                int candidateR = (int) Math.Max(0.0,Math.Min(4.0,Math.Round(r)));
                 double candidateError = Math.PI * (r+ candidateR)*Math.Abs(r-candidateR)*0.125;
                 if (candidateError < bestError)
                 {
+                    if (candidateR == 0) return; //nothing is best...
                     Shape circle = new() { PartID = candidateR switch { 1 => "4032", 2 => "60474", 3 => "11213", 4 => "74611", _ => "" } };
                     sb.AppendLine(circle.Print(0, 0, plateHeight, color));
                     return;
