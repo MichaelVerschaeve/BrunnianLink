@@ -229,6 +229,13 @@ namespace BrunnianLink
             {
                 int candidateR = (int) Math.Max(0.0,Math.Min(4.0,Math.Round(r)));
                 double candidateError = Math.PI * (r+ candidateR)*Math.Abs(r-candidateR)*0.125;
+                double dotCandidateError = Math.PI * (r + 0.5) * Math.Abs(r - 0.5) * 0.125;
+                if (dotCandidateError < bestError && dotCandidateError < candidateError)
+                { //dot wins
+                    Shape circle = new() { PartID ="4073"};
+                    sb.AppendLine(circle.Print(0, 0, plateHeight, color));
+                    return;
+                }
                 if (candidateError < bestError)
                 {
                     if (candidateR == 0) return; //nothing is best...

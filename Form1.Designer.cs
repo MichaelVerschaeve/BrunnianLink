@@ -106,7 +106,7 @@
             // 
             nudLevel.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
             nudLevel.Location = new Point(100, 464);
-            nudLevel.Maximum = new decimal(new int[] { 20, 0, 0, 0 });
+            nudLevel.Maximum = new decimal(new int[] { 40, 0, 0, 0 });
             nudLevel.Minimum = new decimal(new int[] { 1, 0, 0, 0 });
             nudLevel.Name = "nudLevel";
             nudLevel.Size = new Size(120, 23);
