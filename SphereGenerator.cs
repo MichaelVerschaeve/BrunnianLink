@@ -82,9 +82,6 @@ namespace BrunnianLink
         }
     }
 
-    
-
-
     public class CircleAprroximator
     {
         private readonly double r;
@@ -244,7 +241,6 @@ namespace BrunnianLink
                     return;
                 }
             }
-
 
             //now reconstruct and print
             Slope? lastSlope = null;
@@ -549,6 +545,68 @@ namespace BrunnianLink
             //no intersection
             return 0.5 * D - SectorArea(r, alpha1, alpha2);
         }
+
+        private double CalcErrorRoundPlate((double x, double y) p1, (double x, double y) p2)
+        {
+            double r1 = Math.Sqrt(p1.x * p1.x + p1.y * p1.y);
+            double r2 = Math.Sqrt(p2.x * p2.x + p2.y * p2.y);
+            double alpha1 = Math.Atan2(p1.y, p1.x);
+            double alpha2 = Math.Atan2(p2.y, p2.x);
+            double D = p1.x * p2.y - p2.x * p1.y;
+            double plateR = Math.Abs(p1.x - p2.x);
+            (double x, double y) plateCenter = (p2.x, p1.y);
+            if (r1 > (r - epsilon) && r2 > (r - epsilon)) //slope entirely inside
+            {
+                return 0.5*D + (0.25*Math.PI-0.5)*plateR*plateR - SectorArea(r, alpha1, alpha2);
+            }
+            var intersects = CircleIntersectionPoints((0,0),r,plateCenter,plateR).Select(p=>(p,Math.Atan2(p.y,p.x), Math.Atan2(p.y - plateCenter.y, p.x - plateCenter.x))).Where(pa=>
+            {
+                if (pa.Item2 < alpha1 + epsilon || pa.Item2 > alpha2 - epsilon) return false;
+                if (pa.Item3 < epsilon || pa.Item3 > Math.PI / 2 - epsilon) return false;
+                return true;
+            });
+
+            switch (intersects.Count())
+            {
+                case 0:
+                    return SectorArea(r, alpha1, alpha2) - 0.5 * D - (0.25 * Math.PI - 0.5) * plateR * plateR;
+                case 1:
+                    (double x, double y) p3 = intersects.First().Item1;
+                    double tria1 = 0.5*(p1.x * p3.y - p3.x * p1.y);
+                    double anglePlate = intersects.First().Item3;
+                    double tria2 = 0.5 * (p3.x * p2.y - p2.x * p3.y);
+                    double seg1 = 0.5*plateR*plateR*(anglePlate-Math.Sin(anglePlate));
+                    double seg2 = 0.5 * plateR * plateR * (0.5*Math.PI-anglePlate - Math.Cos(anglePlate));
+                    if (r1 > r + epsilon && r2 < r - epsilon)
+                    {
+                        return tria1+seg1 - SectorArea(r,alpha1,intersects.First().Item2)-tria2-seg2 + SectorArea(r,intersects.First().Item2,alpha2);
+                    }
+                    else if (r1 < r - epsilon && r2 > r - epsilon)
+                    {
+                        return tria2 + seg2 - SectorArea(r, intersects.First().Item2,alpha2) - tria1 - seg1 + SectorArea(r, alpha1, intersects.First().Item2);
+                    }
+                    else System.Diagnostics.Debug.Assert(false);
+                    break;
+                case 2:
+                    System.Diagnostics.Debug.Assert(r1 < (r - epsilon) && r2 < (r - epsilon));
+                    break;
+                default:
+                    System.Diagnostics.Debug.Assert(false);
+            }
+            return 0.0;
+        }
+
+        List<(double x,double y)> CircleIntersectionPoints((double x, double y) p0, double r0, (double x, double y) p1, double r1)
+        {
+            double d = Math.Sqrt((p1.x - p0.x) * (p1.x - p0.x) + (p1.y - p0.y)*(p1.y - p0.y));
+            if (d < r0+r1 +epsilon) return new(); //disjunct or touching -> can be handled the same as calling code, return empty list
+            double a = (r0 * r0 - r1 * r1 + d * d) / (2 * d);
+            double h = Math.Sqrt(r0*r0 - a*a);
+            (double x, double y) mid = (p0.x + a * (p1.x - p0.x) / d, p0.y + a * (p1.y - p0.y) / d);
+            return new () { (mid.x + h * (p1.y - p0.y) / d, mid.y - h * (p1.x - p0.x) / d), (mid.x - h * (p1.y - p0.y) / d, mid.y + h * (p1.x - p0.x) / d) };  
+        }
+
+
 
         //private static double TriangleArea((double x, double y) p1, (double x, double y) p2) => 0.5*(p1.x * p2.y - p2.x*p1.y);
         private static double SectorArea(double r, double alpha1, double alpha2) => r * r * (alpha2 - alpha1) * 0.5;
