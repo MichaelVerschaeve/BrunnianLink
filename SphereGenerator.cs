@@ -101,6 +101,7 @@ namespace BrunnianLink
             public int dy;
             public string id = "";
             public string mirrorId = "";
+            public bool rounded=false;
         }
 
 
@@ -121,7 +122,10 @@ namespace BrunnianLink
             new Slope { leftmargin = 1, bottommargin = 0, dx = 1, dy = 4, id="41769", mirrorId="41770"},
             new Slope { leftmargin = 1, bottommargin = 0, dx = 1, dy = 6, id="78444", mirrorId="78443"},
             new Slope { leftmargin = 2, bottommargin = 2, dx = 8, dy = 8, id="92584", mirrorId="92584"},
-            vertSlope
+            vertSlope,
+            new Slope { leftmargin = 1, bottommargin = 1, dx = 1, dy = 1, id="79491", mirrorId="79491", rounded=true},
+            new Slope { leftmargin = 1, bottommargin = 1, dx = 2, dy = 2, id="30357", mirrorId="30357", rounded=true},
+            new Slope { leftmargin = 0, bottommargin = 0, dx = 4, dy = 4, id="30565", mirrorId="30565", rounded=true},
         };
 
         public CircleAprroximator(double _r, int _xlimit, int colorID)
@@ -180,7 +184,7 @@ namespace BrunnianLink
                     int newx = r + s.dx / 2;
                     int newy = r - s.dy / 2;
                     if (newy - s.bottommargin < 0) continue;
-                    candidateError = CalcError((newx, newy), (r, r));
+                    candidateError = CalcError((newx, newy), (r, r),s.rounded);
                     if (symmetric)
                         candidateError += Recurse(newx, newy, 0, s.bottommargin, true);
                     else
@@ -204,7 +208,7 @@ namespace BrunnianLink
                     int newx = (int)(r + s.dx * 0.5);
                     int newy = (int)(r - s.dy * 0.5);
                     if (newy - s.bottommargin < 0) continue;
-                    double candidateError = CalcError((newx, newy), (r, r));
+                    double candidateError = CalcError((newx, newy), (r, r), s.rounded);
                     if (symmetric)
                         candidateError += Recurse(newx, newy, 0, s.bottommargin, true);
                     else
@@ -439,16 +443,31 @@ namespace BrunnianLink
             Shape mirrorshape = new Shape() { PartID = s.mirrorId }.Rotate(180);
             double xd = x - s.leftmargin + (s.leftmargin + s.dx) * 0.5;
             double yd = y - (s.bottommargin + s.dy) * 0.5;
-            if ((flag & PrintFlag.Octant1) == PrintFlag.Octant1) sb.AppendLine(shape.Print(xd, yd, plateHeight, color));
-            if ((flag & PrintFlag.Octant4) == PrintFlag.Octant4) sb.AppendLine(mirrorshape.Print(-xd, yd, plateHeight, color));
-            if ((flag & PrintFlag.Octant5) == PrintFlag.Octant5) sb.AppendLine(shape.Rotate(180).Print(-xd, -yd, plateHeight, color));
-            if ((flag & PrintFlag.Octant8) == PrintFlag.Octant8) sb.AppendLine(mirrorshape.Rotate(180).Print(xd, -yd, plateHeight, color));
+            double height = plateHeight;
+            if (s.id=="79491") //rotary 
+            {
+                shape.RotateThis(-90);
+                mirrorshape.RotateThis(-90);
+                height -= 1;
+            }
+            else if (s.id == "30357" )
+            {
+                shape.RotateThis(-90);
+                mirrorshape.RotateThis(-90);
+                xd -= 1;
+                yd -= 1;
+            }
+
+            if ((flag & PrintFlag.Octant1) == PrintFlag.Octant1) sb.AppendLine(shape.Print(xd, yd, height, color));
+            if ((flag & PrintFlag.Octant4) == PrintFlag.Octant4) sb.AppendLine(mirrorshape.Print(-xd, yd, height, color));
+            if ((flag & PrintFlag.Octant5) == PrintFlag.Octant5) sb.AppendLine(shape.Rotate(180).Print(-xd, -yd, height, color));
+            if ((flag & PrintFlag.Octant8) == PrintFlag.Octant8) sb.AppendLine(mirrorshape.Rotate(180).Print(xd, -yd, height, color));
             (shape, mirrorshape) = (mirrorshape.Rotate(-90), shape.Rotate(90));
             (xd, yd) = (yd, xd);
-            if ((flag & PrintFlag.Octant2) == PrintFlag.Octant2) sb.AppendLine(shape.Print(xd, yd, plateHeight, color));
-            if ((flag & PrintFlag.Octant3) == PrintFlag.Octant3) sb.AppendLine(mirrorshape.Print(-xd, yd, plateHeight, color));
-            if ((flag & PrintFlag.Octant6) == PrintFlag.Octant6) sb.AppendLine(shape.Rotate(180).Print(-xd, -yd, plateHeight, color));
-            if ((flag & PrintFlag.Octant7) == PrintFlag.Octant7) sb.AppendLine(mirrorshape.Rotate(180).Print(xd, -yd, plateHeight, color));
+            if ((flag & PrintFlag.Octant2) == PrintFlag.Octant2) sb.AppendLine(shape.Print(xd, yd, height, color));
+            if ((flag & PrintFlag.Octant3) == PrintFlag.Octant3) sb.AppendLine(mirrorshape.Print(-xd, yd, height, color));
+            if ((flag & PrintFlag.Octant6) == PrintFlag.Octant6) sb.AppendLine(shape.Rotate(180).Print(-xd, -yd, height, color));
+            if ((flag & PrintFlag.Octant7) == PrintFlag.Octant7) sb.AppendLine(mirrorshape.Rotate(180).Print(xd, -yd, height, color));
         }
 
         private double Recurse(int x, int y, int fx, int fy, bool symmetric)
@@ -494,7 +513,7 @@ namespace BrunnianLink
                     }
 
                 }
-                double candidateError = CalcError((newX,newY), (x,y)) + Recurse(newX,newY,newfx,newfy,symmetric);
+                double candidateError = CalcError((newX,newY), (x,y),slope.rounded) + Recurse(newX,newY,newfx,newfy,symmetric);
                 if (candidateError < bestError)
                 {
                     bestError = candidateError;
@@ -506,8 +525,9 @@ namespace BrunnianLink
             return bestError;
         }
         
-        private double CalcError((double x, double y) p1, (double x, double y) p2) //code assumes in 1st quadrant and alpha1 < alpha2
+        private double CalcError((double x, double y) p1, (double x, double y) p2, bool rounded=false) //code assumes in 1st quadrant and alpha1 < alpha2
         {
+            if (rounded) return CalcErrorRoundPlate(p1,p2);
             double r1 = Math.Sqrt(p1.x * p1.x + p1.y * p1.y);
             double r2 = Math.Sqrt(p2.x * p2.x + p2.y * p2.y);
             double alpha1 = Math.Atan2(p1.y, p1.x);
@@ -548,62 +568,84 @@ namespace BrunnianLink
 
         private double CalcErrorRoundPlate((double x, double y) p1, (double x, double y) p2)
         {
+            double plateR = Math.Abs(p1.x - p2.x);
+            if (plateR > r - epsilon) return errorVal; //do not consider plates larger than the target radius
             double r1 = Math.Sqrt(p1.x * p1.x + p1.y * p1.y);
             double r2 = Math.Sqrt(p2.x * p2.x + p2.y * p2.y);
             double alpha1 = Math.Atan2(p1.y, p1.x);
             double alpha2 = Math.Atan2(p2.y, p2.x);
             double D = p1.x * p2.y - p2.x * p1.y;
-            double plateR = Math.Abs(p1.x - p2.x);
+            
             (double x, double y) plateCenter = (p2.x, p1.y);
             if (r1 > (r - epsilon) && r2 > (r - epsilon)) //slope entirely inside
             {
                 return 0.5*D + (0.25*Math.PI-0.5)*plateR*plateR - SectorArea(r, alpha1, alpha2);
             }
-            var intersects = CircleIntersectionPoints((0,0),r,plateCenter,plateR).Select(p=>(p,Math.Atan2(p.y,p.x), Math.Atan2(p.y - plateCenter.y, p.x - plateCenter.x))).Where(pa=>
+            var intersects = CircleIntersectionPoints(plateCenter,plateR).Select(p=>(p,Math.Atan2(p.y,p.x), Math.Atan2(p.y - plateCenter.y, p.x - plateCenter.x))).Where(pa=>
             {
                 if (pa.Item2 < alpha1 + epsilon || pa.Item2 > alpha2 - epsilon) return false;
-                if (pa.Item3 < epsilon || pa.Item3 > Math.PI / 2 - epsilon) return false;
+                if (pa.Item3 < epsilon || pa.Item3 > Math.PI * 0.5 - epsilon) return false;
                 return true;
-            });
+            }).OrderBy(t3=>t3.Item2).ToList();
 
-            switch (intersects.Count())
+            switch (intersects.Count)
             {
                 case 0:
                     return SectorArea(r, alpha1, alpha2) - 0.5 * D - (0.25 * Math.PI - 0.5) * plateR * plateR;
                 case 1:
-                    (double x, double y) p3 = intersects.First().Item1;
-                    double tria1 = 0.5*(p1.x * p3.y - p3.x * p1.y);
-                    double anglePlate = intersects.First().Item3;
-                    double tria2 = 0.5 * (p3.x * p2.y - p2.x * p3.y);
-                    double seg1 = 0.5*plateR*plateR*(anglePlate-Math.Sin(anglePlate));
-                    double seg2 = 0.5 * plateR * plateR * (0.5*Math.PI-anglePlate - Math.Cos(anglePlate));
-                    if (r1 > r + epsilon && r2 < r - epsilon)
                     {
-                        return tria1+seg1 - SectorArea(r,alpha1,intersects.First().Item2)-tria2-seg2 + SectorArea(r,intersects.First().Item2,alpha2);
+                        (double x, double y) = intersects[0].p;
+                        double tria1 = 0.5 * (p1.x * y - x * p1.y);
+                        double tria2 = 0.5 * (x * p2.y - p2.x * y);
+                        double anglePlate = intersects[0].Item3;
+                        double seg1 = 0.5 * plateR * plateR * (anglePlate - Math.Sin(anglePlate));
+                        double seg2 = 0.5 * plateR * plateR * (0.5 * Math.PI - anglePlate - Math.Cos(anglePlate));
+                        if (r1 > r + epsilon && r2 < r - epsilon)
+                        {
+                            return tria1 + seg1 - SectorArea(r, alpha1, intersects[0].Item2) 
+                                 - tria2 - seg2 + SectorArea(r, intersects[0].Item2, alpha2);
+                        }
+                        else if (r1 < r - epsilon && r2 > r - epsilon)
+                        {
+                            return tria2 + seg2 - SectorArea(r, intersects[0].Item2, alpha2) 
+                                 - tria1 - seg1 + SectorArea(r, alpha1, intersects[0].Item2);
+                        }
+                        else System.Diagnostics.Debug.Assert(false);
                     }
-                    else if (r1 < r - epsilon && r2 > r - epsilon)
-                    {
-                        return tria2 + seg2 - SectorArea(r, intersects.First().Item2,alpha2) - tria1 - seg1 + SectorArea(r, alpha1, intersects.First().Item2);
-                    }
-                    else System.Diagnostics.Debug.Assert(false);
                     break;
                 case 2:
-                    System.Diagnostics.Debug.Assert(r1 < (r - epsilon) && r2 < (r - epsilon));
-                    break;
+                    {                        
+                        System.Diagnostics.Debug.Assert(r1 < (r - epsilon) && r2 < (r - epsilon));
+                        (double x3, double y3) = intersects[0].p;
+                        (double x4, double y4) = intersects[1].p;
+                        double tria1 = 0.5 * (p1.x * y3 - x3 * p1.y);
+                        double tria2 = 0.5 * (x3 * y4 - x4 * y3);
+                        double tria3 = 0.5 * (x4 * p2.y - p2.x * y4);
+                        double anglePlate1 = intersects[0].Item3;
+                        double anglePlate2 = intersects[1].Item3-anglePlate1;
+                        double anglePlate3 = 0.5 * Math.PI - intersects[1].Item3;
+                        double seg1 = 0.5 * plateR * plateR * (anglePlate1 - Math.Sin(anglePlate1));
+                        double seg2 = 0.5 * plateR * plateR * (anglePlate2 - Math.Sin(anglePlate2));
+                        double seg3 = 0.5 * plateR * plateR * (anglePlate3 - Math.Sin(anglePlate3));
+                        return tria2 + seg2 - SectorArea(r, intersects[0].Item2, intersects[1].Item2)
+                             - tria1 - seg1 + SectorArea(r, alpha1, intersects[0].Item2)
+                             - tria3 - seg3 + SectorArea(r, intersects[1].Item2, alpha2);
+                    }
                 default:
                     System.Diagnostics.Debug.Assert(false);
+                    break;
             }
             return 0.0;
         }
 
-        List<(double x,double y)> CircleIntersectionPoints((double x, double y) p0, double r0, (double x, double y) p1, double r1)
+        List<(double x, double y)> CircleIntersectionPoints((double x, double y) p1, double r1)
         {
-            double d = Math.Sqrt((p1.x - p0.x) * (p1.x - p0.x) + (p1.y - p0.y)*(p1.y - p0.y));
-            if (d < r0+r1 +epsilon) return new(); //disjunct or touching -> can be handled the same as calling code, return empty list
-            double a = (r0 * r0 - r1 * r1 + d * d) / (2 * d);
-            double h = Math.Sqrt(r0*r0 - a*a);
-            (double x, double y) mid = (p0.x + a * (p1.x - p0.x) / d, p0.y + a * (p1.y - p0.y) / d);
-            return new () { (mid.x + h * (p1.y - p0.y) / d, mid.y - h * (p1.x - p0.x) / d), (mid.x - h * (p1.y - p0.y) / d, mid.y + h * (p1.x - p0.x) / d) };  
+            double d = Math.Sqrt(p1.x * p1.x + p1.y * p1.y);
+            if (d > r + r1 - epsilon) return new(); //disjunct or touching -> can be handled the same as calling code, return empty list
+            double a = (r * r - r1 * r1 + d * d) / (2 * d);
+            double h = Math.Sqrt(r * r - a * a);
+            (double xmid, double ymid) = (a * p1.x / d, a * p1.y / d);
+            return new() { (xmid+ h * p1.y / d, ymid - h * p1.x / d), (xmid - h * p1.y / d, ymid + h * p1.x / d) };
         }
 
 
