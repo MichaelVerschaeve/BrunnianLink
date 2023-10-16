@@ -187,7 +187,7 @@ namespace BrunnianLink
                 //    }
                 //    break;
                 default:
-                    tileGens[modelChoice - 17].Generate(sb, level);
+                    tileGens[modelChoice - 18].Generate(sb, level);
                     break;
             }
             var utf8WithoutBom = new System.Text.UTF8Encoding(false);
