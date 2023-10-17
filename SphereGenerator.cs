@@ -122,10 +122,11 @@ namespace BrunnianLink
             new Slope { leftmargin = 1, bottommargin = 0, dx = 1, dy = 4, id="41769", mirrorId="41770"},
             new Slope { leftmargin = 1, bottommargin = 0, dx = 1, dy = 6, id="78444", mirrorId="78443"},
             new Slope { leftmargin = 2, bottommargin = 2, dx = 8, dy = 8, id="92584", mirrorId="92584"},
-            vertSlope,
             new Slope { leftmargin = 1, bottommargin = 1, dx = 1, dy = 1, id="79491", mirrorId="79491", rounded=true},
             new Slope { leftmargin = 1, bottommargin = 1, dx = 2, dy = 2, id="30357", mirrorId="30357", rounded=true},
             new Slope { leftmargin = 0, bottommargin = 0, dx = 4, dy = 4, id="30565", mirrorId="30565", rounded=true},
+            vertSlope,
+
         };
 
         public CircleAprroximator(double _r, int _xlimit, int colorID)
@@ -162,6 +163,7 @@ namespace BrunnianLink
             midTaken = false;
             int bestr = 0;
             int bestSlope = 0;
+            bool bestRounded = false;
             double bestError = double.MaxValue;
             var EvenSlopes = m_slopes.Where(s => s.dx == s.dy && (s.dx & 1) == 0);
             var OddSlopes = m_slopes.Where(s => s.dx == s.dy && (s.dx & 1) == 1);
@@ -178,6 +180,7 @@ namespace BrunnianLink
                     bestError = candidateError;
                     bestSlope = 0;
                     bestr = r;
+                    bestRounded = false;
                 }
                 foreach (Slope s in EvenSlopes)
                 {
@@ -198,6 +201,7 @@ namespace BrunnianLink
                         bestError = candidateError;
                         bestSlope = s.dx;
                         bestr = r;
+                        bestRounded = s.rounded;
                     }
                 }
             }
@@ -222,6 +226,7 @@ namespace BrunnianLink
                         bestError = candidateError;
                         bestSlope = s.dx;
                         bestr = (int)r;
+                        bestRounded = s.rounded;
                     }
                 }
             }
@@ -253,14 +258,14 @@ namespace BrunnianLink
             {
                 if ((bestSlope & 1) == 0) //even
                 {
-                    lastSlope = EvenSlopes.First(s => s.dx == bestSlope);
+                    lastSlope = EvenSlopes.First(s => s.dx == bestSlope && s.rounded == bestRounded);
                     PrintSlope(sb, lastSlope, bestr - bestSlope / 2, bestr + bestSlope / 2, PrintFlag.Quadrants);
                     x = bestr + bestSlope / 2;
                     y = bestr - bestSlope / 2;
                 }
                 else
                 {
-                    lastSlope = OddSlopes.First(s => s.dx == bestSlope);
+                    lastSlope = OddSlopes.First(s => s.dx == bestSlope && s.rounded == bestRounded);
                     PrintSlope(sb, lastSlope, (int)(bestr + 0.5 - 0.5 * bestSlope), (int)(bestr + 0.5 + 0.5 * bestSlope), PrintFlag.Quadrants);
                     x = (int)(bestr + 0.5 + 0.5 * bestSlope);
                     y = (int)(bestr + 0.5 - 0.5 * bestSlope);
