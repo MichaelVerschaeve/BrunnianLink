@@ -169,6 +169,15 @@ namespace BrunnianLink
                     TerDragon.Generate(sb, level);
                     break;
                 case 17:
+                    Shape dot = new() { PartID = "4073" };
+                    //sb.AppendLine(new Shape() { PartID = "79491" }.Print(0, 0, -1, ColorMap.Get("White").id));
+                    //sb.AppendLine(dot.Print(0, 0, 1, ColorMap.Get("Red").id));
+                    //sb.AppendLine(new Shape() { PartID = "30357" }.Print(0, 10, 0, ColorMap.Get("White").id));
+                    //sb.AppendLine(dot.Print(0, 10, 1, ColorMap.Get("Red").id));
+                    //sb.AppendLine(new Shape() { PartID = "30565" }.Print(0, 20, 0, ColorMap.Get("White").id));
+                    //sb.AppendLine(dot.Print(0, 20, 1, ColorMap.Get("Red").id));
+                    //sb.AppendLine(new Shape() { PartID = "25269" }.Print(0, 30, 0, ColorMap.Get("White").id));
+                    //sb.AppendLine(dot.Print(0, 30, 1, ColorMap.Get("Red").id));
                     SphereGenerator.Generate(sb, level);
                     break;
                 //case 17:

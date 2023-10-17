@@ -124,6 +124,7 @@ namespace BrunnianLink
             new Slope { leftmargin = 2, bottommargin = 2, dx = 8, dy = 8, id="92584", mirrorId="92584"},
             new Slope { leftmargin = 1, bottommargin = 1, dx = 1, dy = 1, id="79491", mirrorId="79491", rounded=true},
             new Slope { leftmargin = 1, bottommargin = 1, dx = 2, dy = 2, id="30357", mirrorId="30357", rounded=true},
+            new Slope { leftmargin = 0, bottommargin = 0, dx = 1, dy = 1, id="25269", mirrorId="25269", rounded=true},
             new Slope { leftmargin = 0, bottommargin = 0, dx = 4, dy = 4, id="30565", mirrorId="30565", rounded=true},
             vertSlope,
 
