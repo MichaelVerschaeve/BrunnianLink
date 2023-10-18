@@ -18,8 +18,6 @@ namespace BrunnianLink
         {
             int innerR = level;
             double outerR = Math.Sqrt(3) * innerR;
-            //new CircleAprroximator(level,10*level+1,0,ColorMap.Get("White").id).Generate(sb);
-            //
             MetaData.StartSubModel(sb, $"Sphere{level}");
             //List<string> colors = new List<string>() { "Violet", "Bright_Light_Orange", "Sand_Green", "Tan","Lime", "Medium_Azure" };
             List<string> colors = new() { "Red", "Red", "Green", "Green", "Blue", "Blue" };
@@ -30,27 +28,30 @@ namespace BrunnianLink
             MetaData.StartSubModel(sb, "Slice");
             int i = 0;
             double plateHeight = 0.4;
+            double currentVolume = CapVolume(innerR, outerR);
+            List<double> radii = new();
             for (double h = innerR; h < outerR - epsilon; h += plateHeight)
             {
                 Shape layer = new() { SubModel = true, PartID = $"layer{i++}" };
                 sb.AppendLine(layer.Print(0, 0, i, 16));
-            }
-            i = 0;
-            double currentVolume = CapVolume(innerR, outerR);
-            int whiteId = ColorMap.Get("Black").id;
-            for (double h = innerR; h < outerR - epsilon; h += plateHeight)
-            {
-                MetaData.StartSubModel(sb, $"layer{i++}");
                 double nextVolume = CapVolume(h + plateHeight, outerR);
                 double r = Math.Sqrt((currentVolume - nextVolume) / plateHeight);
                 if (r < 0.5) break;
-                CircleAprroximator ca = new(r, innerR, forceColor?whiteId:16);
-                ca.Generate(sb);
+                radii.Add(r);
                 currentVolume = nextVolume;
             }
-
-            //sb.AppendLine(new Plate(6, 6).Print(0, 0, 1, 16));
-            // sb.AppendLine(new Plate(2, 4).Print(0, 0, 2, ColorMap.Get("Black").id));
+          
+            int whiteId = ColorMap.Get("Black").id;
+            i = 0;
+            for (double h = innerR; h < outerR - epsilon; h += plateHeight)
+            {
+                double r = radii[i];
+                MetaData.StartSubModel(sb, $"layer{i++}");
+                double nextr = i<radii.Count?radii[i]:0;
+                if (r < 0.5) break;
+                CircleAprroximator ca = new(r, nextr, innerR, forceColor?whiteId:16);
+                ca.Generate(sb);
+            }
         }
 
         private static double CapVolume(double h, double outerR)
@@ -85,6 +86,7 @@ namespace BrunnianLink
     public class CircleAprroximator
     {
         private readonly double r;
+        private readonly double nextR;
         private readonly int xLimit;
         private readonly double errorVal;
         private readonly int plateHeight;
@@ -131,9 +133,10 @@ namespace BrunnianLink
 
         };
 
-        public CircleAprroximator(double _r, int _xlimit, int colorID)
+        public CircleAprroximator(double _r, double _nextR, int _xlimit, int colorID)
         {
             r = _r;
+            nextR = _nextR;
             errorVal = (double)(r) * r;
             xLimit = _xlimit;
             plateHeight = 0;
@@ -159,6 +162,9 @@ namespace BrunnianLink
 
         private readonly Dictionary<(int x, int y, int fwidth,  int fy), (double err, Slope s)> m_cache1 = new();
         private readonly Dictionary<(int x, int y, int fwidth, int fy), (double err, Slope s)> m_cache2 = new();
+
+        private readonly List<(int x, int y, int w, int h)> m_rects1 = new();
+        private readonly List<(int x, int y, int w, int h)> m_rects2 = new();
 
         public void Generate(StringBuilder sb)
         {
@@ -286,8 +292,46 @@ namespace BrunnianLink
             Reconstruct(sb, symmetric, true, lastSlope, x, y, fx, fy);
             if (!symmetric) 
                 Reconstruct(sb, false, false, lastSlope, x, y, fx, fy);
+            
+            HandleInnerRects(sb, symmetric);
         }
 
+        void HandleInnerRects(StringBuilder sb, bool symmetric)
+        {
+            List<(int x, int y, int w, int h)> rects = m_rects1.Concat((symmetric?m_rects1:m_rects2).Select(r=>(r.y-r.h,r.x+r.w,r.h,r.w))).Distinct().ToList();
+            var flags = PrintFlag.Quadrants;
+
+            rects.Sort((r1, r2) => r1.x == r2.x ? r2.y.CompareTo(r1.y) : r1.x.CompareTo(r2.x));
+            while (rects.Count > 1)
+            {
+                int bestindex = 0;
+                double largestRadius = 0;
+                for (int i = 0; i < rects.Count - 1; i++)
+                {
+                    var cr1 = rects[i];
+                    var cr2 = rects[i + 1];
+                    double cx = Math.Min(cr1.x + cr1.w, cr2.x);
+                    double cy = Math.Min(cr1.y - cr1.h, cr2.y);
+                    double cr = Math.Sqrt(cx * cx + cy * cy);
+                    if (cr > largestRadius)
+                    {
+                        largestRadius = cr;
+                        bestindex = i;
+                    }
+                }
+                if (largestRadius == 0) break;
+                var r1 = rects[bestindex];
+                var r2 = rects[bestindex + 1];
+                double x = Math.Min(r1.x + r1.w, r2.x) + 1;
+                double y = Math.Min(r1.y - r1.h, r2.y) + 1;
+                if (Math.Sqrt(x * x + y * y) <= nextR) break; //all good
+                PrintRectangle(sb, r1.x, Math.Min(r1.y - r1.h, r2.y), Math.Min(r2.x - r1.x, r1.w), Math.Min(r1.y -r1.h - r2.y+r2.h, r2.h), flags, true);
+                rects[bestindex] = (r1.x, r1.y, r2.x + r2.w - r1.x, r1.y - r2.y + r2.h);
+                rects.RemoveAt(bestindex + 1);
+
+
+            }
+        }
 
         void Reconstruct(StringBuilder sb, bool symmetric, bool firstPass, Slope? lastSlope, int x, int y, int fx, int fy)
         {
@@ -415,9 +459,12 @@ namespace BrunnianLink
             }
         }
 
-        void PrintRectangle(StringBuilder sb, int x, int y, int w, int h, PrintFlag flag) 
+        void PrintRectangle(StringBuilder sb, int x, int y, int w, int h, PrintFlag flag, bool recursing = false) 
         {
             if (w <= 0 || h <= 0) return;
+            if (!recursing)
+                (flag == PrintFlag.Quadrants2 ? m_rects2 : m_rects1).Add((x,y,w,h));
+
             if (Plate.PlateExists(w,h))
             {
                 double xd = x + 0.5*w;
@@ -436,18 +483,20 @@ namespace BrunnianLink
             }
             else if (w >= h)
             {
-                PrintRectangle(sb, x, y, w / 2, h, flag);
-                PrintRectangle(sb, x + w/2, y, w-w/2, h, flag);
+                PrintRectangle(sb, x, y, w / 2, h, flag,true);
+                PrintRectangle(sb, x + w/2, y, w-w/2, h, flag,true);
             }
             else
             {
-                PrintRectangle(sb, x, y, w ,h/2, flag);
-                PrintRectangle(sb, x, y-h/2, w, h-h/2, flag);
+                PrintRectangle(sb, x, y, w ,h/2, flag,true);
+                PrintRectangle(sb, x, y-h/2, w, h-h/2, flag,true);
             }
         }
 
         void PrintSlope(StringBuilder sb, Slope s, int x, int y, PrintFlag flag = PrintFlag.All)
         {
+            (flag == PrintFlag.Quadrants2 ? m_rects2 : m_rects1).Add((x-s.leftmargin, y, s.leftmargin+s.dx, s.bottommargin+s.dy));
+
             Shape shape = new Shape() { PartID = s.id }.Rotate(s.dx == s.dy ? 90 : 180);
             Shape mirrorshape = new Shape() { PartID = s.mirrorId }.Rotate(180);
             double xd = x - s.leftmargin + (s.leftmargin + s.dx) * 0.5;
