@@ -178,6 +178,8 @@ namespace BrunnianLink
                     //sb.AppendLine(dot.Print(0, 20, 1, ColorMap.Get("Red").id));
                     //sb.AppendLine(new Shape() { PartID = "25269" }.Print(0, 30, 0, ColorMap.Get("White").id));
                     //sb.AppendLine(dot.Print(0, 30, 1, ColorMap.Get("Red").id));
+                    //sb.AppendLine(new Shape() { PartID = "35787" }.Print(0, 40, 0, ColorMap.Get("White").id));
+                    //sb.AppendLine(dot.Print(0, 40, 1, ColorMap.Get("Red").id));
                     SphereGenerator.Generate(sb, level);
                     break;
                 //case 17:

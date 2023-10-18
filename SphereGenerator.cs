@@ -13,7 +13,7 @@ namespace BrunnianLink
         private const double epsilon = 1.0e-7;
 
         const bool forceColor = true; //set to true for renderings
-
+        static readonly int colorId = ColorMap.Get("Black").id; //only black has currently all parts...
         public static void Generate(StringBuilder sb, int level)
         {
             int innerR = level;
@@ -37,7 +37,7 @@ namespace BrunnianLink
             }
             i = 0;
             double currentVolume = CapVolume(innerR, outerR);
-            int whiteId = ColorMap.Get("White").id;
+            int whiteId = ColorMap.Get("Black").id;
             for (double h = innerR; h < outerR - epsilon; h += plateHeight)
             {
                 MetaData.StartSubModel(sb, $"layer{i++}");
@@ -126,6 +126,7 @@ namespace BrunnianLink
             new Slope { leftmargin = 1, bottommargin = 1, dx = 2, dy = 2, id="30357", mirrorId="30357", rounded=true},
             new Slope { leftmargin = 0, bottommargin = 0, dx = 1, dy = 1, id="25269", mirrorId="25269", rounded=true},
             new Slope { leftmargin = 0, bottommargin = 0, dx = 4, dy = 4, id="30565", mirrorId="30565", rounded=true},
+            new Slope { leftmargin = 0, bottommargin = 0, dx = 2, dy = 2, id="35787", mirrorId="35787" },
             vertSlope,
 
         };
@@ -164,11 +165,11 @@ namespace BrunnianLink
             midTaken = false;
             int bestr = 0;
             int bestSlope = 0;
-            bool bestRounded = false;
+            string bestId = "" ;
             double bestError = double.MaxValue;
             var EvenSlopes = m_slopes.Where(s => s.dx == s.dy && (s.dx & 1) == 0);
             var OddSlopes = m_slopes.Where(s => s.dx == s.dy && (s.dx & 1) == 1);
-            int lowlimit = (int)Math.Ceiling((r - band) / Math.Sqrt(2.0));
+            int lowlimit = (int)Math.Max(0,Math.Ceiling((r - band) / Math.Sqrt(2.0)));
             int uplimit = (int)Math.Floor((r + band) / Math.Sqrt(2.0));
             bool symmetric = xLimit >= Math.Ceiling(r);
 
@@ -181,13 +182,14 @@ namespace BrunnianLink
                     bestError = candidateError;
                     bestSlope = 0;
                     bestr = r;
-                    bestRounded = false;
+                    bestId = "";
                 }
                 foreach (Slope s in EvenSlopes)
                 {
+                    if (r - s.dx/2-s.leftmargin<0) continue;
                     int newx = r + s.dx / 2;
                     int newy = r - s.dy / 2;
-                    if (newy - s.bottommargin < 0) continue;
+                    if (newy - s.bottommargin < 0 ) continue;
                     candidateError = CalcError((newx, newy), (r, r),s.rounded);
                     if (symmetric)
                         candidateError += Recurse(newx, newy, 0, s.bottommargin, true);
@@ -202,7 +204,7 @@ namespace BrunnianLink
                         bestError = candidateError;
                         bestSlope = s.dx;
                         bestr = r;
-                        bestRounded = s.rounded;
+                        bestId = s.id;
                     }
                 }
             }
@@ -210,6 +212,7 @@ namespace BrunnianLink
             {
                 foreach (Slope s in OddSlopes)
                 {
+                    if (r - s.dx *0.5 - s.leftmargin < 0) continue;
                     int newx = (int)(r + s.dx * 0.5);
                     int newy = (int)(r - s.dy * 0.5);
                     if (newy - s.bottommargin < 0) continue;
@@ -227,7 +230,7 @@ namespace BrunnianLink
                         bestError = candidateError;
                         bestSlope = s.dx;
                         bestr = (int)r;
-                        bestRounded = s.rounded;
+                        bestId = s.id;
                     }
                 }
             }
@@ -259,14 +262,14 @@ namespace BrunnianLink
             {
                 if ((bestSlope & 1) == 0) //even
                 {
-                    lastSlope = EvenSlopes.First(s => s.dx == bestSlope && s.rounded == bestRounded);
+                    lastSlope = EvenSlopes.First(s => s.dx == bestSlope && s.id == bestId);
                     PrintSlope(sb, lastSlope, bestr - bestSlope / 2, bestr + bestSlope / 2, PrintFlag.Quadrants);
                     x = bestr + bestSlope / 2;
                     y = bestr - bestSlope / 2;
                 }
                 else
                 {
-                    lastSlope = OddSlopes.First(s => s.dx == bestSlope && s.rounded == bestRounded);
+                    lastSlope = OddSlopes.First(s => s.dx == bestSlope && s.id == bestId);
                     PrintSlope(sb, lastSlope, (int)(bestr + 0.5 - 0.5 * bestSlope), (int)(bestr + 0.5 + 0.5 * bestSlope), PrintFlag.Quadrants);
                     x = (int)(bestr + 0.5 + 0.5 * bestSlope);
                     y = (int)(bestr + 0.5 - 0.5 * bestSlope);
@@ -463,6 +466,11 @@ namespace BrunnianLink
                 xd -= 1;
                 yd -= 1;
             }
+            else if ( s.id == "35787")
+            {
+                shape.RotateThis(-90);
+                mirrorshape.RotateThis(-90);
+            }
 
             if ((flag & PrintFlag.Octant1) == PrintFlag.Octant1) sb.AppendLine(shape.Print(xd, yd, height, color));
             if ((flag & PrintFlag.Octant4) == PrintFlag.Octant4) sb.AppendLine(mirrorshape.Print(-xd, yd, height, color));
@@ -498,6 +506,7 @@ namespace BrunnianLink
                 if (fy > 0 && slope.leftmargin > fx || x-slope.leftmargin < y) continue;
                 int newX = x + slope.dx;
                 int newY = y - slope.dy;
+                if (newY - slope.bottommargin < 0) continue;
                 int newfy = slope.bottommargin;
                 int newfx = 0;
                 if(slope==horzSlope && fy>0) //horz
