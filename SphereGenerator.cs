@@ -36,14 +36,14 @@ namespace BrunnianLink
                 sb.AppendLine(layer.Print(0, 0, i, 16));
                 double nextVolume = CapVolume(h + plateHeight, outerR);
                 double r = Math.Sqrt((currentVolume - nextVolume) / plateHeight);
-                if (r < 0.5) break;
+                if (r < 0.25) break;
                 radii.Add(r);
                 currentVolume = nextVolume;
             }
           
             int whiteId = ColorMap.Get("Black").id;
             i = 0;
-            for (double h = innerR; h < outerR - epsilon; h += plateHeight)
+            for (double h = innerR; h < outerR - epsilon && i <radii.Count; h += plateHeight)
             {
                 double r = radii[i];
                 MetaData.StartSubModel(sb, $"layer{i++}");
@@ -322,8 +322,8 @@ namespace BrunnianLink
                 if (largestRadius == 0) break;
                 var r1 = rects[bestindex];
                 var r2 = rects[bestindex + 1];
-                double x = Math.Min(r1.x + r1.w, r2.x) + 1;
-                double y = Math.Min(r1.y - r1.h, r2.y) + 1;
+                double x = Math.Min(r1.x + r1.w, r2.x) + 0.5;
+                double y = Math.Min(r1.y - r1.h, r2.y) +0.5;
                 if (Math.Sqrt(x * x + y * y) <= nextR) break; //all good
                 PrintRectangle(sb, r1.x, Math.Min(r1.y - r1.h, r2.y), Math.Min(r2.x - r1.x, r1.w), Math.Min(r1.y -r1.h - r2.y+r2.h, r2.h), flags, true);
                 rects[bestindex] = (r1.x, r1.y, r2.x + r2.w - r1.x, r1.y - r2.y + r2.h);

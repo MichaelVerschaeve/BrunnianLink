@@ -51,8 +51,8 @@ namespace BrunnianLink
             MetaData.StartSubModel(sb, "TruchetTwinDragon");
             List<bool> moves = new() { true };
 
-            int outID = ColorMap.Get("Bright_Light_Orange").id;
-            int inID = ColorMap.Get("Black").id;
+            int inID = ColorMap.Get("Bright_Light_Orange").id;
+            int outID = ColorMap.Get("Black").id;
 
             bool tileOutside = true;
 

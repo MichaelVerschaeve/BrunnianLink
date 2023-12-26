@@ -51,7 +51,7 @@ namespace BrunnianLink
             {"Medium_Nougat",(84,ColorTranslator.FromHtml("#AA7D55"))},
             {"Medium_Lilac",(85,ColorTranslator.FromHtml("#441A91"))},
             {"Medium_Brown",(86,ColorTranslator.FromHtml("#7B5D41"))},
-            {"Blue_Violet",(89,ColorTranslator.FromHtml("#1C58A7"))},
+            {"Blue_Violet",(89,ColorTranslator.FromHtml("#3F3691"))},
             {"Nougat",(92,ColorTranslator.FromHtml("#BB805A"))},
             {"Light_Salmon",(100,ColorTranslator.FromHtml("#F9B7A5"))},
             {"Violet",(110,ColorTranslator.FromHtml("#26469A"))},
