@@ -169,7 +169,7 @@ namespace BrunnianLink
                     TerDragon.Generate(sb, level);
                     break;
                 case 17:
-                    Shape dot = new() { PartID = "4073" };
+                    //Shape dot = new() { PartID = "4073" };
                     //sb.AppendLine(new Shape() { PartID = "79491" }.Print(0, 0, -1, ColorMap.Get("White").id));
                     //sb.AppendLine(dot.Print(0, 0, 1, ColorMap.Get("Red").id));
                     //sb.AppendLine(new Shape() { PartID = "30357" }.Print(0, 10, 0, ColorMap.Get("White").id));
@@ -181,6 +181,9 @@ namespace BrunnianLink
                     //sb.AppendLine(new Shape() { PartID = "35787" }.Print(0, 40, 0, ColorMap.Get("White").id));
                     //sb.AppendLine(dot.Print(0, 40, 1, ColorMap.Get("Red").id));
                     SphereGenerator.Generate(sb, level);
+                    break;
+                case 18:
+                    LavesGraphGenerator.Generate(sb, level);
                     break;
                 //case 17:
                 //    MetaData.StartSubModel(sb, "pentagonTest");
@@ -198,7 +201,7 @@ namespace BrunnianLink
                 //    }
                 //    break;
                 default:
-                    tileGens[modelChoice - 18].Generate(sb, level);
+                    tileGens[modelChoice - 19].Generate(sb, level);
                     break;
             }
             var utf8WithoutBom = new System.Text.UTF8Encoding(false);
