@@ -147,23 +147,26 @@ namespace BrunnianLink
             int yfrom = board.Keys.Select(t => t.y).Min();
             int yto = board.Keys.Select(t => t.y).Max();
 
+            bool doOrig = false;
+            bool doRotated = true;
 
             for (int ix = xfrom; ix <= xto; ix++)
             {
                 double x = ix * 2.0;
-                for (int iy =  yfrom; iy <=  yto; iy++)
+                for (int iy = yfrom; iy <= yto; iy++)
                 {
                     double y = iy * 2.0;
-                    if (!board.TryGetValue((ix,iy), out int cornerstatus))
+                    if (!board.TryGetValue((ix, iy), out int cornerstatus))
                     {
                         if (tileOutside)
-                            sb.AppendLine(new Tile(2, 2).Print(x,y, 0.0, outID));
+                            sb.AppendLine(new Tile(2, 2).Print(x, y, 0.0, outID));
                         continue;
                     }
                     bool doRot = false;
                     int topId = outID;
                     int centerId = outID;
                     int bottomId = outID;
+                    
                     if (cornerstatus < 0)
                     {
                         centerId = inID;
@@ -186,18 +189,49 @@ namespace BrunnianLink
                         if ((cornerstatus & 8) == 8)
                             bottomId = inID;
                     }
-
-                    if (doRot)
+                  
+                    if (!doOrig && topId != bottomId) 
                     {
-                        sb.AppendLine(new Shape() { PartID = "3396" }.Rotate(90.0).Print(x, y, 0.0, centerId));
-                        sb.AppendLine(new Shape() { PartID = "25269" }.Print(x - 0.5, y + 0.5, 0.0, topId));
-                        sb.AppendLine(new Shape() { PartID = "25269" }.Rotate(180).Print(x + 0.5, y - 0.5, 0.0, bottomId));
+                        if (topId == centerId)
+                            topId = bottomId;
+                        else
+                            bottomId = topId;
                     }
-                    else
+
+
+                    int wop = (doOrig||!doRot)?0:(((ix+iy) & 1)==0?-1:1);
+                    int rot = (4+(doRot ? 1 : 0)+(wop))%4;
+
+                    switch (rot)
                     {
-                        sb.AppendLine(new Shape() { PartID = "3396" }.Print(x, y, 0.0, centerId));
-                        sb.AppendLine(new Shape() { PartID = "25269" }.Rotate(-90).Print(x + 0.5, y + 0.5, 0.0, topId));
-                        sb.AppendLine(new Shape() { PartID = "25269" }.Rotate(90).Print(x - 0.5, y - 0.5, 0.0, bottomId));
+                        case 0:
+                            {
+                                sb.AppendLine(new Shape() { PartID = "3396" }.Print(x, y, 0.0, centerId));
+                                sb.AppendLine(new Shape() { PartID = "25269" }.Rotate(-90).Print(x + 0.5, y + 0.5, 0.0, topId));
+                                sb.AppendLine(new Shape() { PartID = "25269" }.Rotate(90).Print(x - 0.5, y - 0.5, 0.0, bottomId));
+                            }
+                            break;
+                        case 1:
+                            {
+                                sb.AppendLine(new Shape() { PartID = "3396" }.Rotate(90.0).Print(x, y, 0.0, centerId));
+                                sb.AppendLine(new Shape() { PartID = "25269" }.Print(x - 0.5, y + 0.5, 0.0, topId));
+                                sb.AppendLine(new Shape() { PartID = "25269" }.Rotate(180).Print(x + 0.5, y - 0.5, 0.0, bottomId));
+                            }
+                            break;
+                        case 2:
+                            {
+                                sb.AppendLine(new Shape() { PartID = "3396" }.Print(x, y, 0.0, centerId));
+                                sb.AppendLine(new Shape() { PartID = "25269" }.Rotate(90).Print(x - 0.5, y - 0.5, 0.0, topId));
+                                sb.AppendLine(new Shape() { PartID = "25269" }.Rotate(-90).Print(x + 0.5, y + 0.5, 0.0, bottomId));
+                            }
+                            break;
+                        case 3:
+                            {
+                                sb.AppendLine(new Shape() { PartID = "3396" }.Rotate(90).Print(x, y, 0.0, centerId));
+                                sb.AppendLine(new Shape() { PartID = "25269" }.Rotate(180).Print(x + 0.5, y - 0.5, 0.0, topId));
+                                sb.AppendLine(new Shape() { PartID = "25269" }.Print(x - 0.5, y + 0.5, 0.0, bottomId));
+                            }
+                            break;
                     }
                 }
             }
