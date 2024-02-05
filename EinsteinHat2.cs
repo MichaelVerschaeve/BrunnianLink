@@ -12,25 +12,25 @@ namespace BrunnianLink
     {//second version, with actual hats
 
 
-        //static readonly Dictionary<string, int> HatTypeColor = new()
-        //{
-        //    { "H1", ColorMap.Get("Red").id },
-        //    { "H", ColorMap.Get("Yellow").id },
-        //    { "T", ColorMap.Get("Black").id },
-        //    { "P", ColorMap.Get("White").id },
-        //    { "F", ColorMap.Get("Light_Bluish_Grey").id }
-        //};
-
         static readonly Dictionary<string, int> HatTypeColor = new()
         {
-            { "H1", ColorMap.Get("Dark_Blue").id },
-            { "H", ColorMap.Get("Medium_Azure").id },
-            { "T", ColorMap.Get("Red").id },
-            { "P", ColorMap.Get("Lime").id },
-            { "F", ColorMap.Get("White").id }
+            { "H1", ColorMap.Get("Black").id },
+            { "H", ColorMap.Get("Light_Bluish_Grey").id },
+            { "T", ColorMap.Get("Yellow").id },
+            { "P", ColorMap.Get("White").id },
+            { "F", ColorMap.Get("Red").id }
         };
 
-        static readonly bool smallerKite = true; //set to false for larger kites
+        //static readonly Dictionary<string, int> HatTypeColor = new()
+        //{
+        //    { "H1", ColorMap.Get("Dark_Blue").id },
+        //    { "H", ColorMap.Get("Medium_Azure").id },
+        //    { "T", ColorMap.Get("Red").id },
+        //    { "P", ColorMap.Get("Lime").id },
+        //    { "F", ColorMap.Get("White").id }
+        //};
+
+        static readonly bool smallerKite = false; //set to false for larger kites
 
         public static void Generate(StringBuilder sb, int level)
         {

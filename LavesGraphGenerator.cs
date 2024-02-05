@@ -10,8 +10,8 @@ namespace BrunnianLink
 {
     public class LavesGraphGenerator
     {
-        static readonly int orangeId = ColorMap.Get("Orange").id; //only black has currently all parts...
-        static readonly int transNeonOrangeId = 38;
+        static readonly int blueId = ColorMap.Get("Dark_Azure").id; //only black has currently all parts...
+        static readonly int transBlueId = 41;
         static readonly int yellowId = ColorMap.Get("Yellow").id; //only black has currently all parts...
         static readonly int transYellowId = 46;
         public static void Generate(StringBuilder sb, int level)
@@ -73,7 +73,7 @@ namespace BrunnianLink
             (double x, double y, double z) vy = VectorProduct(vz, vx);
             c = VectorSum(c, VectorScale(0.5,vy));
            // if (sb!= null) PrintPart(sb, c, vx, vy, vz, bColor1 ? redId : blueId, "10288.dat");
-            if (sb!= null) PrintPart(sb, c, vx, vy, vz, bColor1 ? transNeonOrangeId : transYellowId, "42409.dat");
+            if (sb!= null) PrintPart(sb, c, vx, vy, vz, bColor1 ? transBlueId : transYellowId, "42409.dat");
             return vy;
         }
 
@@ -88,7 +88,7 @@ namespace BrunnianLink
             vy = VectorNormalize(VectorDiff(vy, VectorScale(p, vx)));
             (double x, double y, double z) vz = VectorProduct(vx, vy); 
             //PrintPart(sb, c, vx, vy, vz, bColor1?orangeId:yellowId, "62462.dat");
-            PrintPart(sb, c, vz, vy, vx, bColor1?orangeId:yellowId, "59443.dat");
+            PrintPart(sb, c, vz, vy, vx, bColor1?blueId:yellowId, "59443.dat");
         }
 
         private static void PrintPart(StringBuilder sb, (double x, double y, double z) c, (double x, double y, double z) vx, (double x, double y, double z) vy, (double x, double y, double z) vz, int colorId, string part)
