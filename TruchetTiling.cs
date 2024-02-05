@@ -199,7 +199,7 @@ namespace BrunnianLink
                     }
 
 
-                    int wop = (doOrig||!doRot)?0:(((ix+iy) & 1)==0?-1:1);
+                    int wop = (doOrig)?0:(((ix+iy) & 1)==0?-1:1);
                     int rot = (4+(doRot ? 1 : 0)+(wop))%4;
 
                     switch (rot)
