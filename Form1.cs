@@ -185,6 +185,9 @@ namespace BrunnianLink
                 case 18:
                     LavesGraphGenerator.Generate(sb, level);
                     break;
+                case 19:
+                    BoerdijkCoxeter.Generate(sb, level);
+                    break;
                 //case 17:
                 //    MetaData.StartSubModel(sb, "pentagonTest");
                 //    double s = 2; //sidelength
@@ -201,7 +204,7 @@ namespace BrunnianLink
                 //    }
                 //    break;
                 default:
-                    tileGens[modelChoice - 19].Generate(sb, level);
+                    tileGens[modelChoice - 20].Generate(sb, level);
                     break;
             }
             var utf8WithoutBom = new System.Text.UTF8Encoding(false);
