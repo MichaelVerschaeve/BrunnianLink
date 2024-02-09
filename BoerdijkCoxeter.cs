@@ -20,7 +20,7 @@ namespace BrunnianLink
             dir = Directory.GetParent(dir)?.FullName!;
             string file = Path.Combine(dir, "TetraHedronTiled.ldr");
             string[] fileLines = File.ReadAllLines(file);
-            var partsGrouped = fileLines.Where(s => s.EndsWith("15535.dat")).Select(l => l.Split(' ')).GroupBy(parts => parts[1]);
+            var partsGrouped = fileLines.Where(s => s.EndsWith("15535.dat")|| s.EndsWith("18674.dat")).Select(l => l.Split(' ')).GroupBy(parts => parts[1]);
             var fx = partsGrouped.Select(g => g.Average(parts => double.Parse(parts[2], NumberStyles.Float, CultureInfo.InvariantCulture)));
             var fy = partsGrouped.Select(g => g.Average(parts => double.Parse(parts[3], NumberStyles.Float, CultureInfo.InvariantCulture)));
             var fz = partsGrouped.Select(g => g.Average(parts => double.Parse(parts[4], NumberStyles.Float, CultureInfo.InvariantCulture)));
@@ -34,18 +34,7 @@ namespace BrunnianLink
             double dy = (py[1] - py[0]);
             double dz = (pz[1] - pz[0]);
             double scale = Math.Sqrt(dx * dx + dy * dy + dz * dz);
-
-            /*for (int i = 0; i < px.Length; i++)
-                for (int j = i + 1; j < px.Length; j++)
-                {
-                     dx = (px[j] - px[i]);
-                     dy = (py[j] - py[i]);
-                     dz = (pz[j] - pz[i]);
-                     double s = Math.Sqrt(dx * dx + dy * dy + dz * dz);
-                    System.Diagnostics.Debug.WriteLine($"{i}-{j} {s}");
-                }
-            System.Diagnostics.Debug.WriteLine(scale);
-            */
+          
             double[][] PInv = MatInverse(new double[][]{
                 new double[] { px[1]- px[0], px[2] - px[0], px[3] - px[0] },
                 new double[] { py[1]- py[0], py[2] - py[0], py[3] - py[0] },
@@ -53,11 +42,11 @@ namespace BrunnianLink
             );
             foreach ((double[] pxt, double[] pyt, double[] pzt) in SpiralPoints(level, scale))
             {
-                double[][] M = MatMatMul(new double[][] {
+                double[][] M = Normalize(MatMatMul(new double[][] {
                     new double[] { pxt[1] - pxt[0], pxt[2] - pxt[0], pxt[3] - pxt[0] },
                     new double[] { pyt[1] - pyt[0], pyt[2] - pyt[0], pyt[3] - pyt[0] },
                     new double[] { pzt[1] - pzt[0], pzt[2] - pzt[0], pzt[3] - pzt[0] }
-                }, PInv);
+                }, PInv));
                 double[] t = MathVecMul(M, new double[] { px[0], py[0], pz[0] });
                 double[] C = new double[] { pxt[0] - t[0], pyt[0] - t[1], pzt[0] - t[2] };
                 string pos = String.Join(" ", C.Select(d => d.ToString(CultureInfo.InvariantCulture)));
@@ -86,7 +75,18 @@ namespace BrunnianLink
                 pz.Add(i * h);
                 if (px.Count >= 4)
                 {
-                    yield return (px.ToArray(), py.ToArray(), pz.ToArray());
+                    switch (i % 3)
+                    {
+                        case 0:
+                            yield return (px.ToArray(), py.ToArray(), pz.ToArray());
+                            break;
+                        case 1:
+                            yield return (new double[] { px[0], px[3], px[1], px[2] }, new double[] { py[0], py[3], py[1], py[2] }, new double[] { pz[0], pz[3], pz[1], pz[2] });
+                            break;
+                        case 2:
+                            yield return (new double[] { px[0], px[2], px[3], px[1] }, new double[] { py[0], py[2], py[3], py[1] }, new double[] { pz[0], pz[2], pz[3], pz[1] });
+                            break;
+                    }
                     px.RemoveAt(0);
                     py.RemoveAt(0);
                     pz.RemoveAt(0);
@@ -141,6 +141,23 @@ namespace BrunnianLink
                 for (int j = 0; j < 3; j++)
                     res[i] += mat[i][j] * v[j];
             return res;
+        }
+
+        public static double[][] Normalize(double[][] mat)
+        {
+            double[] scales = { 0.0, 0.0, 0.0 };
+            for (int j = 0; j < 3; j++)
+            {
+                for (int i = 0; i < 3; i++)
+                    scales[j] += mat[i][j] * mat[i][j];
+                scales[j] = Math.Sqrt(scales[j]);
+            }
+
+            for (int i = 0; i < 3; i++)
+                for (int j = 0; j < 3; j++)
+                    for (int k = 0; k < 3; k++)
+                        mat[i][j] /= scales[j];
+            return mat;
         }
 
     }

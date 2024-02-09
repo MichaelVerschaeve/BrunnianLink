@@ -148,7 +148,6 @@ namespace BrunnianLink
             int yto = board.Keys.Select(t => t.y).Max();
 
             bool doOrig = false;
-            bool doRotated = true;
 
             for (int ix = xfrom; ix <= xto; ix++)
             {
