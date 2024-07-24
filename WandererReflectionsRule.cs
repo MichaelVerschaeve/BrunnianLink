@@ -4,7 +4,7 @@ namespace BrunnianLink
 {
     public class WandererReflectionsRule : SubstitutionRule
     {
-        static readonly string[] m_colors = new string[] { "Reddish_Brown", "White" };
+        static readonly string[] m_colors = new string[] { "Dark_Red", "Tan" };
         override public string[] Colors => m_colors;
         override public int StateCount => 2;
 
