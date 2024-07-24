@@ -234,21 +234,21 @@ namespace BrunnianLink
         public void GenerateSloped(StringBuilder sb)
         {
             MetaData.StartSubModel(sb, $"SlopedMaze_{n}x{n}");
-            Shape HorzStraight = new() { PartID = "HorizontalStraight" };
+            Shape HorzStraight = new() { PartID = "HorizontalStraight", SubModel=true };
             Shape VertStraight = HorzStraight.Rotate();
-            Shape CornerDtoR= new() { PartID = "Corner" };
+            Shape CornerDtoR= new() { PartID = "Corner", SubModel = true };
             Shape CornerRtoU = CornerDtoR.Rotate();
             Shape CornerUtoL = CornerDtoR.Rotate(180);
             Shape CornerLtoD = CornerDtoR.Rotate(-90);
-            Shape TshapeDown = new() { PartID = "TshapeDown" };
+            Shape TshapeDown = new() { PartID = "TShapeDown", SubModel = true };
             Shape TshapeRight = TshapeDown.Rotate();
             Shape TshapeUp = TshapeDown.Rotate(180);
             Shape TshapeLeft = TshapeDown.Rotate(-90);
-            Shape Cross = new() { PartID = "Cross" };
-            Shape TEndDown = new() { PartID = "TEnd" };
-            Shape TEndRight = TEndDown.Rotate();
-            Shape TEndUp = TEndDown.Rotate(180);
-            Shape TEndLeft = TEndDown.Rotate(-90);
+            Shape Cross = new() { PartID = "Cross", SubModel = true };
+            Shape TEndUp = new() { PartID = "TEnd", SubModel = true };
+            Shape TEndRight = TEndUp.Rotate(-90);
+            Shape TEndDown = TEndUp.Rotate(180);
+            Shape TEndLeft = TEndUp.Rotate();
 
 
             int redId = ColorMap.Get("Red").id;
@@ -260,60 +260,60 @@ namespace BrunnianLink
 
                 for (int x = 0; x < 2; x++)
                     for (int y = 0; y < 2; y++)
-                        sb.AppendLine(bp.Print(15 + 32 * x, 15 + 32 * y, -3, grayID));
+                        sb.AppendLine(bp.Print(14+ 32 * x, 14 + 32 * y,-3, grayID));
             }
             else if (n == 11)
             {
                 BasePlate bp = new(48);
-                sb.AppendLine(bp.Print(23, 23, -3, grayID));
+                sb.AppendLine(bp.Print(22, 22,-3, grayID));
             }
 
             //corners
-            sb.AppendLine(CornerDtoR.Print(0,0,0,redId));
-            sb.AppendLine(CornerRtoU.Print(0, 4*n, 0, redId));
-            sb.AppendLine(CornerUtoL.Print(4*n, 4 * n, 0, redId));
-            sb.AppendLine(CornerLtoD.Print(4 * n, 4 * n, 0, redId));
+            sb.AppendLine(CornerDtoR.Print(0,4*n,0,redId));
+            sb.AppendLine(CornerRtoU.Print(0,0, 0, redId));
+            sb.AppendLine(CornerUtoL.Print(4*n,0, 0, redId));
+            sb.AppendLine(CornerLtoD.Print(4 * n, 4*n, 0, redId));
             //sides
             for (int k = 1; k < n; k++)
             {
                 if (maze[k, 0].Walls[(int)Direction.Left].Open)
                     sb.AppendLine(HorzStraight.Print(4 * k, 0, 0, redId));
                 else
-                    sb.AppendLine(TshapeDown.Print(4*k,0,0,redId));
+                    sb.AppendLine(TshapeUp.Print(4*k,0,0,redId));
 
                 if (maze[k, n-1].Walls[(int)Direction.Left].Open)
-                    sb.AppendLine(HorzStraight.Print(4 * k, n, 0, redId));
+                    sb.AppendLine(HorzStraight.Print(4 * k, 4*n, 0, redId));
                 else
-                    sb.AppendLine(TshapeUp.Print(4 * k, n, 0, redId));
+                    sb.AppendLine(TshapeDown.Print(4 * k, 4*n, 0, redId));
 
-                if (maze[0, k].Walls[(int)Direction.Up].Open)
+                if (maze[0, k].Walls[(int)Direction.Down].Open)
                     sb.AppendLine(VertStraight.Print(0,4 * k, 0, redId));
                 else
                     sb.AppendLine(TshapeRight.Print(0,4 * k, 0, redId));
 
-                if (maze[n-1, k].Walls[(int)Direction.Up].Open)
-                    sb.AppendLine(VertStraight.Print(n, 4 * k, 0, redId));
+                if (maze[n-1, k].Walls[(int)Direction.Down].Open)
+                    sb.AppendLine(VertStraight.Print(4 * n, 4 * k, 0, redId));
                 else
-                    sb.AppendLine(TshapeLeft.Print(n, 4 * k, 0, redId));
+                    sb.AppendLine(TshapeLeft.Print(4 * n, 4 * k, 0, redId));
             }
             //mids
             for (int x = 1; x < n; x++)
             {
                 for (int y = 1; y < n; y++)
                 {
-                    Cell dr = maze[x, y];
-                    Cell ul = maze[x - 1, y - 1];
+                    Cell ur = maze[x, y];
+                    Cell dl = maze[x - 1, y - 1];
                     HashSet<Direction> links = new HashSet<Direction>();
-                    if (ul.Walls[(int)Direction.Right].Open)
+                    if (ur.Walls[(int)Direction.Left].Open)
                         links.Add(Direction.Up);
-                    if (ul.Walls[(int)Direction.Down].Open)
-                        links.Add(Direction.Left);
-                    if (dr.Walls[(int)Direction.Left].Open)
-                        links.Add(Direction.Down);
-                    if (dr.Walls[(int)Direction.Up].Open)
+                    if (ur.Walls[(int)Direction.Down].Open)
                         links.Add(Direction.Right);
+                    if (dl.Walls[(int)Direction.Right].Open)
+                        links.Add(Direction.Down);
+                    if (dl.Walls[(int)Direction.Up].Open)
+                        links.Add(Direction.Left);
 
-                    Shape s = Cross;
+                    Shape? s = Cross;
                     if (links.Count == 1) // t-shape
                     {
                         s = links.First() switch
@@ -328,25 +328,51 @@ namespace BrunnianLink
                     {
                         if (!links.Contains(Direction.Left)) s = TEndLeft;
                         else if (!links.Contains(Direction.Right)) s = TEndRight;
-                        else if (!links.Contains(Direction.Down)) s = TEndDown;
-                        else s = TEndUp;
+                        else if (!links.Contains(Direction.Up)) s = TEndUp;
+                        else s = TEndDown;
                     }
-                    else if (links.Count == 3) //straight or corner
+                    else if (links.Count == 2) //straight or corner
                     {
                         if (!links.Contains(Direction.Left) && !links.Contains(Direction.Right)) s = HorzStraight;
                         else if (!links.Contains(Direction.Left) && !links.Contains(Direction.Up)) s = CornerUtoL;
                         else if (!links.Contains(Direction.Left) && !links.Contains(Direction.Down)) s = CornerLtoD;
-                        if (!links.Contains(Direction.Up) && !links.Contains(Direction.Down)) s = VertStraight;
+                        else if (!links.Contains(Direction.Up) && !links.Contains(Direction.Down)) s = VertStraight;
                         else if (!links.Contains(Direction.Right) && !links.Contains(Direction.Up)) s = CornerRtoU;
                         else if (!links.Contains(Direction.Right) && !links.Contains(Direction.Down)) s = CornerDtoR;
                     }
-                    sb.AppendLine(s.Print(4 * x, 4 * y, 0, redId));
+                    if (s!= null) sb.AppendLine(s.Print(4 * x, 4 * y, 0, redId));
                 }
             }
             //define subshapes...
+
+            Shape Slope2x2 = new() { PartID = "3039" };
+            Shape Slope2x2Convex = new() { PartID = "3046" };
+            Shape Slope2x2Concave = new() { PartID = "3045" };
             MetaData.StartSubModel(sb, "HorizontalStraight");
-
-
+            sb.AppendLine(Slope2x2.Print(-1, -0.5, 0, redId));
+            sb.AppendLine(Slope2x2.Print(1, -0.5, 0, redId));
+            sb.AppendLine(Slope2x2.Rotate(180).Print(-1, 0.5, 0, redId));
+            sb.AppendLine(Slope2x2.Rotate(180).Print(1, 0.5, 0, redId));
+            MetaData.StartSubModel(sb, "Corner");
+            sb.AppendLine(Slope2x2Convex.Print(0.5, -0.5, 0, redId));
+            sb.AppendLine(Slope2x2.Rotate(-90).Print(-0.5, -1, 0, redId));
+            sb.AppendLine(Slope2x2.Rotate(180).Print(1, 0.5, 0, redId));
+            sb.AppendLine(Slope2x2Concave.Rotate(180).Print(-0.5, 0.5, 0, redId));
+            MetaData.StartSubModel(sb, "TShapeDown");
+            sb.AppendLine(Slope2x2Convex.Rotate(-90).Print(-0.5, -0.5, 0, redId));
+            sb.AppendLine(Slope2x2Convex.Print(0.5, -0.5, 0, redId));
+            sb.AppendLine(Slope2x2.Rotate(180).Print(-1, 0.5, 0, redId));
+            sb.AppendLine(Slope2x2.Rotate(180).Print(1, 0.5, 0, redId));
+            MetaData.StartSubModel(sb, "Cross");
+            sb.AppendLine(Slope2x2Convex.Rotate(180).Print(-0.5, 0.5, 0, redId));
+            sb.AppendLine(Slope2x2Convex.Rotate(90).Print(0.5, 0.5, 0, redId));
+            sb.AppendLine(Slope2x2Convex.Rotate(-90).Print(-0.5, -0.5, 0, redId));
+            sb.AppendLine(Slope2x2Convex.Print(0.5, -0.5, 0, redId));
+            MetaData.StartSubModel(sb, "TEnd");
+            sb.AppendLine(Slope2x2.Rotate(-90).Print(-0.5, 1, 0, redId));
+            sb.AppendLine(Slope2x2.Rotate(90).Print(0.5, 1, 0, redId));
+            sb.AppendLine(Slope2x2Concave.Rotate(-90).Print(-0.5, -0.5, 0, redId));
+            sb.AppendLine(Slope2x2Concave.Print(0.5, -0.5, 0, redId));
         }
 
     }

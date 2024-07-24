@@ -148,7 +148,7 @@ namespace BrunnianLink
                     PenroseRhomb.Generate(sb, level, false);
                     break;
                 case 10:
-                    new MazeGenerator(level).Generate(sb);
+                    new MazeGenerator(level).GenerateSloped(sb);
                     break;
                 case 11:
                     CrossDissectionTiling.Generate(sb, level);
