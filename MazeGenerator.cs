@@ -346,33 +346,52 @@ namespace BrunnianLink
             //define subshapes...
 
             Shape Slope2x2 = new() { PartID = "3039" };
+            Shape Slope2x4 = new() { PartID = "3037" };
             Shape Slope2x2Convex = new() { PartID = "3046" };
             Shape Slope2x2Concave = new() { PartID = "3045" };
+            Shape TopSlope2x2 = new() { PartID = "3043" };
+            Shape TopSlope2x4 = new() { PartID = "3041" };
+            Shape TopSlopeOverLap = new() { PartID = "3049c" };
+            Shape TopSlopeHalfPyramid = new() { PartID = "15571" };
+            Shape TopSlopePyramid = new() { PartID = "Pyramid", SubModel = true };
             MetaData.StartSubModel(sb, "HorizontalStraight");
-            sb.AppendLine(Slope2x2.Print(-1, -0.5, 0, redId));
-            sb.AppendLine(Slope2x2.Print(1, -0.5, 0, redId));
-            sb.AppendLine(Slope2x2.Rotate(180).Print(-1, 0.5, 0, redId));
-            sb.AppendLine(Slope2x2.Rotate(180).Print(1, 0.5, 0, redId));
+            sb.AppendLine(Slope2x4.Print(0, -0.5, 0, redId));
+            sb.AppendLine(Slope2x4.Rotate(180).Print(0, 0.5, 0, redId));
+            sb.AppendLine(TopSlope2x4.Print(0,0,3, redId));
             MetaData.StartSubModel(sb, "Corner");
             sb.AppendLine(Slope2x2Convex.Print(0.5, -0.5, 0, redId));
             sb.AppendLine(Slope2x2.Rotate(-90).Print(-0.5, -1, 0, redId));
             sb.AppendLine(Slope2x2.Rotate(180).Print(1, 0.5, 0, redId));
             sb.AppendLine(Slope2x2Concave.Rotate(180).Print(-0.5, 0.5, 0, redId));
+            sb.AppendLine(TopSlopePyramid.Print(0, 0, 3, redId));
+            sb.AppendLine(TopSlopeOverLap.Print(0, -1.5, 3, redId));
+            sb.AppendLine(TopSlopeOverLap.Rotate(90).Print(1.5, 0, 3, redId));
             MetaData.StartSubModel(sb, "TShapeDown");
             sb.AppendLine(Slope2x2Convex.Rotate(-90).Print(-0.5, -0.5, 0, redId));
             sb.AppendLine(Slope2x2Convex.Print(0.5, -0.5, 0, redId));
-            sb.AppendLine(Slope2x2.Rotate(180).Print(-1, 0.5, 0, redId));
-            sb.AppendLine(Slope2x2.Rotate(180).Print(1, 0.5, 0, redId));
+            sb.AppendLine(Slope2x4.Rotate(180).Print(0, 0.5, 0, redId));
+            sb.AppendLine(TopSlope2x4.Print(0, 0, 3, redId));
+            sb.AppendLine(TopSlopeOverLap.Print(0, -1.5, 3, redId));
             MetaData.StartSubModel(sb, "Cross");
             sb.AppendLine(Slope2x2Convex.Rotate(180).Print(-0.5, 0.5, 0, redId));
             sb.AppendLine(Slope2x2Convex.Rotate(90).Print(0.5, 0.5, 0, redId));
             sb.AppendLine(Slope2x2Convex.Rotate(-90).Print(-0.5, -0.5, 0, redId));
             sb.AppendLine(Slope2x2Convex.Print(0.5, -0.5, 0, redId));
+            sb.AppendLine(TopSlopePyramid.Print(0, 0, 3, redId));
+            sb.AppendLine(TopSlopeOverLap.Print(0, -1.5, 3, redId));
+            sb.AppendLine(TopSlopeOverLap.Rotate(90).Print(1.5, 0, 3, redId));
+            sb.AppendLine(TopSlopeOverLap.Rotate(180).Print(0,1.5, 3, redId));
+            sb.AppendLine(TopSlopeOverLap.Rotate(-90).Print(-1.5, 0, 3, redId));
             MetaData.StartSubModel(sb, "TEnd");
             sb.AppendLine(Slope2x2.Rotate(-90).Print(-0.5, 1, 0, redId));
             sb.AppendLine(Slope2x2.Rotate(90).Print(0.5, 1, 0, redId));
             sb.AppendLine(Slope2x2Concave.Rotate(-90).Print(-0.5, -0.5, 0, redId));
             sb.AppendLine(Slope2x2Concave.Print(0.5, -0.5, 0, redId));
+            sb.AppendLine(TopSlope2x2.Rotate(90).Print(0,1, 3, redId));
+            sb.AppendLine(TopSlopeHalfPyramid.Print(0, -0.5, 3, redId));
+            MetaData.StartSubModel(sb, "Pyramid");
+            sb.AppendLine(TopSlopeHalfPyramid.Print(0, -0.5, 0, redId));
+            sb.AppendLine(TopSlopeHalfPyramid.Rotate(180).Print(0, 0.5, 0, redId));
         }
 
     }
