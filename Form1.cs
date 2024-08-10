@@ -169,17 +169,6 @@ namespace BrunnianLink
                     TerDragon.Generate(sb, level);
                     break;
                 case 17:
-                    //Shape dot = new() { PartID = "4073" };
-                    //sb.AppendLine(new Shape() { PartID = "79491" }.Print(0, 0, -1, ColorMap.Get("White").id));
-                    //sb.AppendLine(dot.Print(0, 0, 1, ColorMap.Get("Red").id));
-                    //sb.AppendLine(new Shape() { PartID = "30357" }.Print(0, 10, 0, ColorMap.Get("White").id));
-                    //sb.AppendLine(dot.Print(0, 10, 1, ColorMap.Get("Red").id));
-                    //sb.AppendLine(new Shape() { PartID = "30565" }.Print(0, 20, 0, ColorMap.Get("White").id));
-                    //sb.AppendLine(dot.Print(0, 20, 1, ColorMap.Get("Red").id));
-                    //sb.AppendLine(new Shape() { PartID = "25269" }.Print(0, 30, 0, ColorMap.Get("White").id));
-                    //sb.AppendLine(dot.Print(0, 30, 1, ColorMap.Get("Red").id));
-                    //sb.AppendLine(new Shape() { PartID = "35787" }.Print(0, 40, 0, ColorMap.Get("White").id));
-                    //sb.AppendLine(dot.Print(0, 40, 1, ColorMap.Get("Red").id));
                     SphereGenerator.Generate(sb, level);
                     break;
                 case 18:
@@ -188,21 +177,6 @@ namespace BrunnianLink
                 case 19:
                     BoerdijkCoxeter.Generate(sb, level);
                     break;
-                //case 17:
-                //    MetaData.StartSubModel(sb, "pentagonTest");
-                //    double s = 2; //sidelength
-                //    double a = 0.5 * s / Math.Tan(Math.PI / 5);
-                //    Plate plate = new Plate(1, 2);
-                //    double d = (a + 1) / Math.Cos(Math.PI / 5);
-                //    d *= 2 * Math.Cos(3 * Math.PI / 5);
-                //    for (int i = 0; i < 5; i++)
-                //    {
-                //        double angle = 2 * i * Math.PI / 5;
-                //        double angledegrees = i * 72;
-                //        sb.AppendLine(plate.Rotate(angledegrees).Print(Math.Cos(angle) * (a + 0.5), Math.Sin(angle) * (a + 0.5), 0, ColorMap.Get("White").id));
-                //        sb.AppendLine(plate.Rotate(180 - angledegrees).Print(Math.Cos(Math.PI - angle) * (a + 0.5) + d, Math.Sin(Math.PI - angle) * (a + 0.5), -5, ColorMap.Get("Red").id));
-                //    }
-                //    break;
                 default:
                     tileGens[modelChoice - 20].Generate(sb, level);
                     break;

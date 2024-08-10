@@ -81,7 +81,7 @@ namespace BrunnianLink
 
         public override bool Level0IsComposite => true;
 
-        private static readonly (double x, double y, double rotation, int state)[] m_startStates = new[] { (0.0, 0.0, 0.0, 3) };
+        private static readonly (double x, double y, double rotation, int state)[] m_startStates = new[] { (0.0, 0.0, 0.0, 2) };
 
         public override (double x, double y, double rotation, int state)[] StartStates => m_startStates;
         public override void DefineCompositeBasePart(StringBuilder sb, int state, int color)
