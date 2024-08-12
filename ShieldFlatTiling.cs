@@ -66,14 +66,13 @@ namespace BrunnianLink
 
         public static void GenerateShield(StringBuilder sb, Rot30Coords c, int rotation, bool flip, int level)
         {
-            Rot30Coords dc = new Rot30Coords();
-            int drot = 0;
             if (level == 0)
             {
                 Rot30Coords dc = new Rot30Coords();
                 int drot = 0;
                 switch (rotation % 90)
                 {
+                    case 0: //square in top left corner
                         break;
                     case 30:
                         dc = X - Y;
@@ -128,7 +127,7 @@ namespace BrunnianLink
                 int drot = 0;
                 switch (rotation % 90)
                 {
-                    case 0: //square in top left corner
+                    case 0: 
                         break;
                     case 30:
                         dc = U - Y;
