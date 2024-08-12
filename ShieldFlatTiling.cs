@@ -66,13 +66,14 @@ namespace BrunnianLink
 
         public static void GenerateShield(StringBuilder sb, Rot30Coords c, int rotation, bool flip, int level)
         {
+            Rot30Coords dc = new Rot30Coords();
+            int drot = 0;
             if (level == 0)
             {
                 Rot30Coords dc = new Rot30Coords();
                 int drot = 0;
                 switch (rotation % 90)
                 {
-                    case 0: //square in top left corner
                         break;
                     case 30:
                         dc = X - Y;
@@ -111,8 +112,6 @@ namespace BrunnianLink
             GenerateTriangle1(sb, c - Yr, rotation, !flip, level); //center triangle
             GenerateSquare(sb, c - Yr, addR(30), flip, level); //right sqUrare
 
-            GenerateTriangle1(sb, c - Ur - Vr, addR(30), flip, level); //left center
-            GenerateTriangle1(sb, c + Xr + Ur - Vr - Yr, addR(330), !flip, level); //right center
 
             GenerateTriangle2(sb, c - Vr - 2 * Yr, addR(210), !flip, level); //bottom left
             GenerateSquare(sb, c - Yr - Vr, addR(90), !flip, level); //bottom sqUrare
@@ -194,19 +193,6 @@ namespace BrunnianLink
                     c -= X.Rotate(rotation);
                 int cutrot = (rotation / 90) * 90;
 
-                switch (rotation%90)
-                { 
-                    case 0:
-                        sb.AppendLine(new Plate(4, 4).Rotate(cutrot).Print(c.cx + 2, c.cy -2, 0, whiteId));
-                        break;
-                    case 30:
-                        sb.AppendLine(new Shape() { PartID = "Square30", SubModel = true }.Rotate(cutrot).Print(c.cx, c.cy, 0, 16));
-                        break;
-                    case 60:
-                        sb.AppendLine(new Shape() { PartID = "Square60", SubModel = true }.Rotate(cutrot).Print(c.cx, c.cy, 0, 16));
-                        break;
-                }
-            }
         }
 
         public struct Rot30Coords
