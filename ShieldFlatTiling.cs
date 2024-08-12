@@ -189,9 +189,23 @@ namespace BrunnianLink
             if (level == 0)
             {
                 if (flip)
-                    c -= X.Rotate(rotation);
+                    c -= 4*X.Rotate(rotation);
                 int cutrot = (rotation / 90) * 90;
-
+                switch (rotation % 90)
+                {
+                    case 0:
+                        c += (2 * (X - Y)).Rotate(rotation);
+                        sb.AppendLine(new Plate(4,4).Print(c.cx,c.cy,0,whiteId));
+                        break;
+                    case 30:
+                        sb.AppendLine(new Shape() { PartID="Square30",SubModel=true}.Rotate(cutrot).Print(c.cx, c.cy, 0, 16));
+                        break;
+                    case 60:
+                        sb.AppendLine(new Shape() { PartID = "Square60", SubModel = true }.Rotate(cutrot).Print(c.cx, c.cy, 0, 16));
+                        break;
+                }
+                return;
+            }
         }
 
         public struct Rot30Coords
