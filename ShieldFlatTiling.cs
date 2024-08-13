@@ -17,7 +17,7 @@ namespace BrunnianLink
             MetaData.StartSubModel(sb, $"ShieldTiling{level}");
 
             //replace by other call (GenerateSquare, GenerateTriangle1,GenerateTriangle2) for dfferent results
-            GenerateShield(sb, new Rot30Coords(), 0, false, level);
+            GenerateSquare(sb, new Rot30Coords(), 0, false, level);
 
             //shield subpart
             MetaData.StartSubModel(sb, $"Shield");
