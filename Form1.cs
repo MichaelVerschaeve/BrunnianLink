@@ -177,8 +177,11 @@ namespace BrunnianLink
                 case 19:
                     BoerdijkCoxeter.Generate(sb, level);
                     break;
+                case 20:
+                    ShieldFlatTiling.Generate(sb, level);
+                    break;
                 default:
-                    tileGens[modelChoice - 20].Generate(sb, level);
+                    tileGens[modelChoice - 21].Generate(sb, level);
                     break;
             }
             var utf8WithoutBom = new System.Text.UTF8Encoding(false);
