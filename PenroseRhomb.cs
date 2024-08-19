@@ -20,7 +20,7 @@ namespace BrunnianLink
         public int rotation;
         public bool thin;
 
-        public int CompareTo(RhombData other)
+        public readonly int CompareTo(RhombData other)
         {
             int res = (rotation,thin).CompareTo((other.rotation,other.thin));
             if (res != 0) return res;

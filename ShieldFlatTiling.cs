@@ -9,9 +9,9 @@ namespace BrunnianLink
 {
     public static class ShieldFlatTiling
     {
-        static int azureId = ColorMap.Get("Medium_Azure").id;
-        static int whiteId = ColorMap.Get("White").id;
-        static int limeId = ColorMap.Get("Lime").id;
+        static readonly int azureId = ColorMap.Get("Medium_Azure").id;
+        static readonly int whiteId = ColorMap.Get("White").id;
+        static readonly int limeId = ColorMap.Get("Lime").id;
         public static void Generate(StringBuilder sb, int level)
         {
             MetaData.StartSubModel(sb, $"ShieldTiling{level}");
@@ -21,13 +21,13 @@ namespace BrunnianLink
             sb.AppendLine(new Tile(2, 2).Print(0, 0, -1, 4));
             //shield subpart
             MetaData.StartSubModel(sb, $"Shield");
-            Plate p = new Plate(2, 2);
+            Plate p = new (2, 2);
             sb.AppendLine(p.Print(1, -3, 0, azureId));
             sb.AppendLine(p.Print(1, -5, 0, azureId));
             sb.AppendLine(p.Print(-1, -5, 0, azureId));
-            p = new Plate(4, 4);
+            p = new (4, 4);
             sb.AppendLine(p.Print(-2, -2, 0, azureId));
-            Shape w = new Shape() { PartID = "65426" };
+            Shape w = new() { PartID = "65426" };
             sb.AppendLine(w.Print(-3,-6, 0, azureId));
             sb.AppendLine(w.Rotate(90).Print(0,-7, 0, azureId));
             w = new Shape() { PartID = "65429" };
@@ -58,17 +58,17 @@ namespace BrunnianLink
             sb.AppendLine(w.Rotate(180).Print(-1, -2, 0, limeId));
         }
 
-        private static Rot30Coords X = new Rot30Coords() { x = 1 };
-        private static Rot30Coords U = new Rot30Coords() { u = 1 };
-        private static Rot30Coords V = new Rot30Coords() { v = 1 };
-        private static Rot30Coords Y = new Rot30Coords() { y = 1 };
+        private static Rot30Coords X = new() { x = 1 };
+        private static Rot30Coords U = new() { u = 1 };
+        private static Rot30Coords V = new() { v = 1 };
+        private static Rot30Coords Y = new() { y = 1 };
 
 
         public static void GenerateShield(StringBuilder sb, Rot30Coords c, int rotation, bool flip, int level)
         {
             if (level == 0)
             {
-                Rot30Coords dc = new Rot30Coords();
+                Rot30Coords dc = new ();
                 int drot = 0;
                 switch (rotation % 90)
                 {
@@ -87,7 +87,7 @@ namespace BrunnianLink
                 c += dc.Rotate(cutrot);
                 rotation = drot + cutrot;
                 if (rotation >= 360) rotation -= 360;
-                sb.AppendLine(new Shape() { PartID = "Shield", SubModel = true }.Rotate(rotation).Print(c.cx, c.cy, 0, 16));
+                sb.AppendLine(new Shape() { PartID = "Shield", SubModel = true }.Rotate(rotation).Print(c.Cx, c.Cy, 0, 16));
                 return;
             }
             //enlarge, rotate by 15 degrees...f
@@ -100,7 +100,7 @@ namespace BrunnianLink
             if (flip)
                 (Xr, Ur, Vr) = (-Xr, -Ur + Yr, Vr - Xr);
 
-            var addR = (int r) => ((flip ? (360 - r) : r) + rotation) % 360;
+            int addR(int r) => ((flip ? (360 - r) : r) + rotation) % 360;
 
             GenerateTriangle1(sb, c - Ur, addR(300), flip, level); //leftmost
             GenerateTriangle1(sb, c + Ur - Yr, addR(60), !flip, level); //rightmost
@@ -125,7 +125,7 @@ namespace BrunnianLink
         {
             if (level == 0)
             {
-                Rot30Coords dc = new Rot30Coords();
+                Rot30Coords dc = new();
                 int drot = 0;
                 switch (rotation % 90)
                 {
@@ -144,7 +144,7 @@ namespace BrunnianLink
                 c += dc.Rotate(cutrot);
                 rotation = drot + cutrot;
                 if (rotation >= 360) rotation -= 360;
-                sb.AppendLine(new Shape() { PartID = "Triangle", SubModel = true }.Rotate(rotation).Print(c.cx, c.cy, 0, 16));
+                sb.AppendLine(new Shape() { PartID = "Triangle", SubModel = true }.Rotate(rotation).Print(c.Cx, c.Cy, 0, 16));
                 return;
             }
             //enlarge, rotate by 15 degrees...
@@ -156,9 +156,9 @@ namespace BrunnianLink
             Rot30Coords Yr = Y.Rotate(rotation);
             if (flip)
             {
-                (Xr, Ur, Vr, Yr) = (-Ur, -Xr, -Ur + Yr, Vr - Xr); //symmetry axis has tilted also
+                (_, Ur, _, Yr) = (-Ur, -Xr, -Ur + Yr, Vr - Xr); //symmetry axis has tilted also
             }
-            var addR = (int r) => (r + rotation) % 360;
+            int addR(int r) => (r + rotation) % 360;
             GenerateShield(sb, c + Ur-Yr, flip?addR(90):addR(330), flip, level);
         }
 
@@ -178,9 +178,9 @@ namespace BrunnianLink
             Rot30Coords Yr = Y.Rotate(rotation);
             if (flip)
             {
-                (Xr, Ur, Vr, Yr) = (-Ur, -Xr, -Ur + Yr, Vr - Xr); //symmetry axis has tilted also
+                (_, Ur, Vr, Yr) = (-Ur, -Xr, -Ur + Yr, Vr - Xr); //symmetry axis has tilted also
             }
-            var addR = (int r) => ((flip ? (390 - r) : r) + rotation) % 360;
+            int addR(int r) => ((flip ? (390 - r) : r) + rotation) % 360;
             GenerateSquare(sb, c + Ur - Yr, addR(240), flip, level);
             GenerateTriangle2(sb, c + Ur - Vr -Yr, addR(120), flip, level);
             GenerateTriangle2(sb, c + Ur - Vr - Yr, addR(270), !flip, level);
@@ -198,13 +198,13 @@ namespace BrunnianLink
                     case 0:
                         int dx = (rotation <= 90) ? 2 : -2;
                         int dy = (rotation == 180 || rotation == 90) ? 2 : -2;
-                        sb.AppendLine(new Plate(4,4).Print(c.cx+dx,c.cy+dy,0,whiteId));
+                        sb.AppendLine(new Plate(4,4).Print(c.Cx+dx,c.Cy+dy,0,whiteId));
                         break;
                     case 30:
-                        sb.AppendLine(new Shape() { PartID="Square30",SubModel=true}.Rotate(cutrot).Print(c.cx, c.cy, 0, 16));
+                        sb.AppendLine(new Shape() { PartID="Square30",SubModel=true}.Rotate(cutrot).Print(c.Cx, c.Cy, 0, 16));
                         break;
                     case 60:
-                        sb.AppendLine(new Shape() { PartID = "Square60", SubModel = true }.Rotate(cutrot).Print(c.cx, c.cy, 0, 16));
+                        sb.AppendLine(new Shape() { PartID = "Square60", SubModel = true }.Rotate(cutrot).Print(c.Cx, c.Cy, 0, 16));
                         break;
                 }
                 return;
@@ -220,7 +220,7 @@ namespace BrunnianLink
             {
                 (Xr, Ur, Vr, Yr) = (-Ur, -Xr, -Ur + Yr, Vr - Xr); //symmetry axis has tilted also
             }
-            var addR = (int r) => ((flip ? (390 - r) : r) + rotation) % 360;
+            int addR(int r) => ((flip ? (390 - r) : r) + rotation) % 360;
 
             GenerateSquare(sb, c + Xr, addR(60), !flip, level);
             GenerateTriangle1(sb, c - Vr + Xr, addR(30), flip, level);
@@ -235,10 +235,10 @@ namespace BrunnianLink
             public int u;
             public int v;
             public int y;
-            public readonly int cx => 4 * x + 4 * u + 2 * v;
-            public readonly int cy => 2 * u + 4 * v + 4 * y;
+            public readonly int Cx => 4 * x + 4 * u + 2 * v;
+            public readonly int Cy => 2 * u + 4 * v + 4 * y;
 
-            public Rot30Coords Rotate(int rot)
+            public readonly Rot30Coords Rotate(int rot)
             {
                 Rot30Coords res = this;
                 for (int r = 0; r < rot; r += 30)
@@ -247,13 +247,13 @@ namespace BrunnianLink
                 return res;
             }
             public static Rot30Coords operator +(Rot30Coords a, Rot30Coords b)
-            => new Rot30Coords() { x = a.x + b.x, u = a.u + b.u, v = a.v + b.v, y = a.y + b.y };
+            => new() { x = a.x + b.x, u = a.u + b.u, v = a.v + b.v, y = a.y + b.y };
             public static Rot30Coords operator -(Rot30Coords a, Rot30Coords b)
-            => new Rot30Coords() { x = a.x - b.x, u = a.u - b.u, v = a.v - b.v, y = a.y - b.y };
+            => new() { x = a.x - b.x, u = a.u - b.u, v = a.v - b.v, y = a.y - b.y };
             public static Rot30Coords operator -(Rot30Coords a)
-            => new Rot30Coords() { x = -a.x, u = -a.u, v = -a.v, y = -a.y };
+            => new() { x = -a.x, u = -a.u, v = -a.v, y = -a.y };
             public static Rot30Coords operator *(int s,Rot30Coords a)
-            => new Rot30Coords() { x = s*a.x, u = s*a.u, v = s*a.v, y = s*a.y };
+            => new() { x = s*a.x, u = s*a.u, v = s*a.v, y = s*a.y };
 
             public Rot30Coords(int x, int u, int v, int y)
             {
