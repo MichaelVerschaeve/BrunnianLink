@@ -17,8 +17,8 @@ namespace BrunnianLink
             MetaData.StartSubModel(sb, $"ShieldTiling{level}");
 
             //replace by other call (GenerateSquare, GenerateTriangle1,GenerateTriangle2) for dfferent results
-            GenerateSquare(sb, new Rot30Coords(), 0, false, level);
-
+            GenerateShield(sb, new Rot30Coords(), 0, false, level);
+            sb.AppendLine(new Tile(2, 2).Print(0, 0, -1, 4));
             //shield subpart
             MetaData.StartSubModel(sb, $"Shield");
             Plate p = new Plate(2, 2);
@@ -90,7 +90,7 @@ namespace BrunnianLink
                 sb.AppendLine(new Shape() { PartID = "Shield", SubModel = true }.Rotate(rotation).Print(c.cx, c.cy, 0, 16));
                 return;
             }
-            //enlarge, rotate by 15 degrees...
+            //enlarge, rotate by 15 degrees...f
             c += c.Rotate(30);
             level--;
             Rot30Coords Xr = X.Rotate(rotation);
@@ -98,9 +98,9 @@ namespace BrunnianLink
             Rot30Coords Vr = V.Rotate(rotation);
             Rot30Coords Yr = Y.Rotate(rotation);
             if (flip)
-                (Xr, Ur, Yr) = (-Xr - Vr, -Ur, Yr + Ur);
+                (Xr, Ur, Vr) = (-Xr, -Ur + Yr, Vr - Xr);
 
-            var addR = (int r) => ((flip?(540-r):r) + rotation) % 360;
+            var addR = (int r) => ((flip ? (360 - r) : r) + rotation) % 360;
 
             GenerateTriangle1(sb, c - Ur, addR(300), flip, level); //leftmost
             GenerateTriangle1(sb, c + Ur - Yr, addR(60), !flip, level); //rightmost
@@ -111,6 +111,8 @@ namespace BrunnianLink
             GenerateTriangle1(sb, c - Yr, rotation, !flip, level); //center triangle
             GenerateSquare(sb, c - Yr, addR(30), flip, level); //right sqUrare
 
+            GenerateTriangle1(sb, c - Ur - Vr, addR(30), flip, level); //mid left
+            GenerateTriangle1(sb, c + Xr + Ur - Vr - Yr, addR(330), !flip, level); //mid right
 
             GenerateTriangle2(sb, c - Vr - 2 * Yr, addR(210), !flip, level); //bottom left
             GenerateSquare(sb, c - Yr - Vr, addR(90), !flip, level); //bottom sqUrare
@@ -154,11 +156,10 @@ namespace BrunnianLink
             Rot30Coords Yr = Y.Rotate(rotation);
             if (flip)
             {
-                (Xr, Ur, Yr) = (-Xr - Vr, -Ur, Yr + Ur);
-                (Xr, Ur, Vr, Yr) = (Xr.Rotate(30),Ur.Rotate(30),Vr.Rotate(30),Yr.Rotate(30)); //symmetry axis has tilted also
+                (Xr, Ur, Vr, Yr) = (-Ur, -Xr, -Ur + Yr, Vr - Xr); //symmetry axis has tilted also
             }
-            var addR = (int r) => ((flip ? (570 - r) : r) + rotation) % 360;
-            GenerateShield(sb, c + Ur-Yr, addR(330), flip, level);
+            var addR = (int r) => (r + rotation) % 360;
+            GenerateShield(sb, c + Ur-Yr, flip?addR(90):addR(330), flip, level);
         }
 
         public static void GenerateTriangle2(StringBuilder sb, Rot30Coords c, int rotation, bool flip, int level)
@@ -177,13 +178,12 @@ namespace BrunnianLink
             Rot30Coords Yr = Y.Rotate(rotation);
             if (flip)
             {
-                (Xr, Ur, Yr) = (-Xr - Vr, -Ur, Yr + Ur);
-                (Xr, Ur, Vr, Yr) = (Xr.Rotate(30), Ur.Rotate(30), Vr.Rotate(30), Yr.Rotate(30)); //symmetry axis has tilted also
+                (Xr, Ur, Vr, Yr) = (-Ur, -Xr, -Ur + Yr, Vr - Xr); //symmetry axis has tilted also
             }
-            var addR = (int r) => ((flip ? (570 - r) : r) + rotation) % 360;
+            var addR = (int r) => ((flip ? (390 - r) : r) + rotation) % 360;
             GenerateSquare(sb, c + Ur - Yr, addR(240), flip, level);
             GenerateTriangle2(sb, c + Ur - Vr -Yr, addR(120), flip, level);
-            GenerateTriangle2(sb, c + Ur - Vr - Yr, addR(270), flip, level);
+            GenerateTriangle2(sb, c + Ur - Vr - Yr, addR(270), !flip, level);
         }
 
         public static void GenerateSquare(StringBuilder sb, Rot30Coords c, int rotation, bool flip, int level)
@@ -218,10 +218,9 @@ namespace BrunnianLink
             Rot30Coords Yr = Y.Rotate(rotation);
             if (flip)
             {
-                (Xr, Ur, Yr) = (-Xr - Vr, -Ur, Yr + Ur);
-                (Xr, Ur, Vr, Yr) = (Xr.Rotate(30), Ur.Rotate(30), Vr.Rotate(30), Yr.Rotate(30)); //symmetry axis has tilted also
+                (Xr, Ur, Vr, Yr) = (-Ur, -Xr, -Ur + Yr, Vr - Xr); //symmetry axis has tilted also
             }
-            var addR = (int r) => ((flip ? (570 - r) : r) + rotation) % 360;
+            var addR = (int r) => ((flip ? (390 - r) : r) + rotation) % 360;
 
             GenerateSquare(sb, c + Xr, addR(60), !flip, level);
             GenerateTriangle1(sb, c - Vr + Xr, addR(30), flip, level);
