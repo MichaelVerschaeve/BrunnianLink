@@ -180,8 +180,11 @@ namespace BrunnianLink
                 case 20:
                     ShieldFlatTiling.Generate(sb, level);
                     break;
+                case 21:
+                    MillarTiling.Generate(sb, level);
+                    break;
                 default:
-                    tileGens[modelChoice - 21].Generate(sb, level);
+                    tileGens[modelChoice - 22].Generate(sb, level);
                     break;
             }
             var utf8WithoutBom = new System.Text.UTF8Encoding(false);

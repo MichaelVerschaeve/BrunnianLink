@@ -11,7 +11,7 @@ namespace BrunnianLink
     {
         static readonly int starId = ColorMap.Get("Dark_Blue").id;
         static readonly int rhombId = ColorMap.Get("Bright_Light_Orange").id;
-        static readonly int squareId = ColorMap.Get("White").id;
+        static readonly int squareId = ColorMap.Get("Green").id;
 
 
 
@@ -38,7 +38,7 @@ namespace BrunnianLink
             sb.AppendLine(w.Rotate(180).Print(0.5, -2.5, 0, starId));
             sb.AppendLine(w.Rotate(270).Print(2.5, 0.5, 0, starId));
             MetaData.StartSubModel(sb, $"Rhomb");
-            Plate rect  = new(1, 2);
+            Tile rect  = new(1, 2);
             sb.AppendLine(rect.Print(0, 0, 0, rhombId));
             sb.AppendLine(w.Print(1.5, 0, 0, rhombId));
             sb.AppendLine(w.Rotate(180).Print(-1.5, 0, 0, rhombId));
@@ -69,7 +69,7 @@ namespace BrunnianLink
 
             if (level == 0)
             {
-                if (rotation % 45 == 0)
+                if (rotation % 90 == 0)
                     sb.AppendLine(new Plate(3, 3).Print(midx, midy, 0, squareId));
                 else
                 {
@@ -89,7 +89,7 @@ namespace BrunnianLink
             Rot45Coords Yr = Y.Rotate(rotation);
             GenerateStar(sb, c, rotation, level);
             GenerateRhomb(sb, c, (rotation + 45) % 360, level);
-            GenerateRhomb(sb, c - Yr - Ur, (rotation + 45) % 360, level);
+            GenerateRhomb(sb, c - Yr + Ur, (rotation + 45) % 360, level);
             GenerateRhomb(sb, c, (rotation + 360 - 45) % 360, level);
             GenerateRhomb(sb, c + Xr + Vr, (rotation + 360 - 45) % 360, level);
         }
@@ -106,10 +106,10 @@ namespace BrunnianLink
             visitedMids.Add((midx, midy, level));
             if (level == 0)
             {
-                if (rotation % 45 == 0)
-                    sb.AppendLine(new Shape() { PartID = "Star", SubModel = true }.Print(midx, midy, rotation, 16));
+                if (rotation % 90 == 0)
+                    sb.AppendLine(new Shape() { PartID = "Star", SubModel = true }.Rotate(rotation).Print(midx, midy, 0, 16));
                 else
-                    sb.AppendLine(new Shape() { PartID = "Star_Tilt45", SubModel = true }.Print(midx, midy, rotation - 45, 16));
+                    sb.AppendLine(new Shape() { PartID = "Star_Tilt45", SubModel = true }.Rotate(rotation - 45).Print(midx, midy, 0, 16));
                 return;
             }
             c += c.Rotate(45); //rotate 22.5 degrees...
@@ -144,10 +144,10 @@ namespace BrunnianLink
             visitedMids.Add((midx, midy, level));
             if (level == 0)
             {
-                if (rotation % 45 == 0)
-                    sb.AppendLine(new Shape() { PartID = "Rhomb", SubModel = true }.Print(midx, midy, rotation, 16));
+                if (rotation % 90 == 0)
+                    sb.AppendLine(new Shape() { PartID = "Rhomb", SubModel = true }.Rotate(rotation).Print(midx, midy, 0, 16));
                 else
-                    sb.AppendLine(new Shape() { PartID = "Rhomb_Tilt45", SubModel = true }.Print(midx, midy, rotation - 45, 16));
+                    sb.AppendLine(new Shape() { PartID = "Rhomb_Tilt45", SubModel = true }.Rotate(rotation-45).Print(midx, midy,0, 16));
                 return;
             }
             c += c.Rotate(45); //rotate 22.5 degrees...
