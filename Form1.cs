@@ -186,8 +186,11 @@ namespace BrunnianLink
                 case 22:
                     LabyrinthTiling.Generate(sb, level);
                     break;
+                case 23:
+                    TerDragonII.Generate(sb, level);
+                    break;
                 default:
-                    tileGens[modelChoice - 23].Generate(sb, level);
+                    tileGens[modelChoice - 24].Generate(sb, level);
                     break;
             }
             var utf8WithoutBom = new System.Text.UTF8Encoding(false);

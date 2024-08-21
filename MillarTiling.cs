@@ -13,8 +13,6 @@ namespace BrunnianLink
         static readonly int rhombId = ColorMap.Get("Bright_Light_Orange").id;
         static readonly int squareId = ColorMap.Get("Sand_Green").id;
 
-
-
         public static void Generate(StringBuilder sb, int level)
         {
             visitedMids.Clear();
