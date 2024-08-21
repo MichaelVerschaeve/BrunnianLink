@@ -11,7 +11,7 @@ namespace BrunnianLink
     {
         static readonly int starId = ColorMap.Get("Dark_Blue").id;
         static readonly int rhombId = ColorMap.Get("Bright_Light_Orange").id;
-        static readonly int squareId = ColorMap.Get("Green").id;
+        static readonly int squareId = ColorMap.Get("Sand_Green").id;
 
 
 
@@ -57,7 +57,7 @@ namespace BrunnianLink
         private static readonly HashSet<(double x, double y, int level)> visitedMids = new();
 
 
-        //square is at zero degrees parallel to x and y axises and origin is in top corner
+        //square is at zero degrees parallel to x and y axises and origin is in top left corner
         public static void GenerateSquare(StringBuilder sb, Rot45Coords c, int rotation, int level)
         {
             Rot45Coords otherPoint = c + (X - Y).Rotate(rotation);
