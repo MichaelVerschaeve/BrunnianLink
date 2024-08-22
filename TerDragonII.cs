@@ -55,14 +55,6 @@ namespace BrunnianLink
                     rotations.RemoveAt(0);
                 }
             }
-
-            
-
-            /*
-            Shape wedgeLeft = new() { PartID = "65426" };  //   \|
-            Shape wedgeRight = new() { PartID = "65429" }; //   |/
-            Shape triangle = new() { PartID = "35787" }; // |\
-            */
         }
 
         private static void DrawTriangle(StringBuilder sb, Rot30Coords c, int rotation, int cornerflags, int colorOutId, int colorInId)
@@ -130,8 +122,6 @@ namespace BrunnianLink
             sb.AppendLine(swLeft.Print(x - 1, y - 1, 1, colorInId));
             sb.AppendLine(swRight.Print(x + 1, y - 1, 1, colorInId));
         }
-
-
 
         private static Rot30Coords X = new() { x = 1 };
         private static Rot30Coords U = new() { u = 1 };
