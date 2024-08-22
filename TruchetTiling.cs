@@ -147,8 +147,6 @@ namespace BrunnianLink
             int yfrom = board.Keys.Select(t => t.y).Min();
             int yto = board.Keys.Select(t => t.y).Max();
 
-            bool doOrig = false;
-
             for (int ix = xfrom; ix <= xto; ix++)
             {
                 double x = ix * 2.0;
@@ -189,17 +187,8 @@ namespace BrunnianLink
                             bottomId = inID;
                     }
                   
-                    if (!doOrig && topId != bottomId) 
-                    {
-                        if (topId == centerId)
-                            topId = bottomId;
-                        else
-                            bottomId = topId;
-                    }
 
-
-                    int wop = (doOrig)?0:(((ix+iy) & 1)==0?-1:1);
-                    int rot = (4+(doRot ? 1 : 0)+(wop))%4;
+                    int rot = (4+(doRot ? 1 : 0))%4;
 
                     switch (rot)
                     {

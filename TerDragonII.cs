@@ -12,77 +12,53 @@ namespace BrunnianLink
         public static void Generate(StringBuilder sb, int level)
         {
             MetaData.StartSubModel(sb, $"TerDragonII_{level}");
-            neededSubPart.Clear();
             List<string> someColorNames = new() { "Red", "Blue", "Green", "Orange", "Purple", "Black" };
             var colorIds = someColorNames.Select(x => ColorMap.Get(x).id).ToList();
 
-            for (int i = 0; i < 6; i++)
-                GenerateRec(sb, new Rot30Coords(), i * 60, i, (i + 1) % 6, level);
+            //rotations as Rot30Coords vectors...
+            List<Rot30Coords> rotations = new() { ((level&1)==0)?X:U }; //only up down triangles
+
+            for (int i = 0; i < level; i++)
+            {
+                List<Rot30Coords> newrotations = new();
+                foreach(var rot in rotations)
+                {
+                    newrotations.Add(rot.Rotate(30));
+                    newrotations.Add(rot.Rotate(270));
+                    newrotations.Add(rot.Rotate(30));
+                }
+                rotations = newrotations;
+            }
+
+            Rot30Coords currentPos = new();
+
+            while (rotations.Count>1)
+            {
+                if (rotations.Count > 2 && rotations[0] + rotations[1] == -rotations[2])
+                {
+
+                    rotations.RemoveRange(0, 2);
+                }
+                else
+                {
+
+                    currentPos += rotations[0];
+                    rotations.RemoveAt(0);
+                }
+            }
+
+            /*
             Shape wedgeLeft = new() { PartID = "65426" };  //   \|
             Shape wedgeRight = new() { PartID = "65429" }; //   |/
             Shape triangle = new() { PartID = "35787" }; // |\
-            foreach (var p in neededSubPart)
-            {
-                MetaData.StartSubModel(sb, $"Rhomb_{p.r}_{p.id1}_{p.id2}");
-                int id1 = colorIds[p.id1];
-                int id2 = colorIds[p.id2];
-                switch (p.r)
-                {
-                    case 0:
-                        sb.AppendLine(wedgeRight.Rotate(90).Print(2, -1, 1, id1));
-                        sb.AppendLine(wedgeLeft.Rotate(270).Print(2, 1, 1, id2));
-                        sb.AppendLine(wedgeRight.Rotate(270).Print(6, 1, 1, id2));
-                        sb.AppendLine(wedgeLeft.Rotate(90).Print(6, -1, 1, id1));
-                        break;
-                    case 30:
-                        sb.AppendLine(wedgeRight.Rotate(180).Print(1, 2, 0, id2));
-                        sb.AppendLine(wedgeRight.Print(5, 2, 0, id1));
-
-                        sb.AppendLine(triangle.Rotate(90).Print(3, 2, 0, id1));
-                        sb.AppendLine(triangle.Rotate(270).Print(5, 2, 0, id2));
-
-                        sb.AppendLine(wedgeLeft.Rotate(90).Print(4, 3, 1, id2));
-                        sb.AppendLine(wedgeLeft.Rotate(270).Print(2, 1, 1, id1));
-                        break;
-                    case 60:
-                        sb.AppendLine(wedgeLeft.Rotate(90).Print(2,1, 0, id1));
-                        sb.AppendLine(wedgeLeft.Rotate(270).Print(2,5, 0, id2));
-                        sb.AppendLine(triangle.Rotate(90).Print(2, 3, 0, id1));
-                        sb.AppendLine(triangle.Rotate(270).Print(2, 3, 0, id2));
-                        sb.AppendLine(wedgeRight.Print(0, 2, 1, id2));
-                        sb.AppendLine(wedgeRight.Rotate(180).Print(3, 4, 1, id1));
-                        break;
-                }
-            }
+            */
         }
 
-        public static void GenerateRec(StringBuilder sb, Rot30Coords c, int rotation, int id1, int id2, int level)
-        {
-            if (level == 0)
-            {
-                int rotMod = rotation % 90;
-                int cutrot = (rotation / 90) * 90;
-                sb.AppendLine(new Shape() { PartID = $"Rhomb_{rotMod}_{id1}_{id2}", SubModel = true }.Rotate(cutrot).Print(c.Cx, c.Cy, 0, 16));
-                neededSubPart.Add((rotMod, id1, id2));
-                return;
-            }
-            c *= 3;
-            level--;
-            Rot30Coords Xr = X.Rotate(rotation);
-            Rot30Coords Vr = V.Rotate(rotation);
-            GenerateRec(sb,c, (rotation+30)%360, id1, id2, level);
-            GenerateRec(sb, c + Xr + Vr, (rotation + 270) % 360, id1, id2, level);
-            GenerateRec(sb, c + 2*Xr - Vr, (rotation + 90) % 360, id1, id2, level);
-
-        }
-
-        static readonly HashSet<(int r, int id1, int id2)> neededSubPart = new();
 
         private static Rot30Coords X = new() { x = 1 };
-        //private static Rot30Coords U = new() { u = 1 };
+        private static Rot30Coords U = new() { u = 1 };
         private static Rot30Coords V = new() { v = 1 };
-        //private static Rot30Coords Y = new() { y = 1 };
-
+        private static Rot30Coords Y = new() { y = 1 };
 
 
         public struct Rot30Coords
@@ -112,6 +88,12 @@ namespace BrunnianLink
             => new() { x = s * a.x, u = s * a.u, v = s * a.v, y = s * a.y };
             public static Rot30Coords operator *(Rot30Coords a, int s)
             => new() { x = s * a.x, u = s * a.u, v = s * a.v, y = s * a.y };
+
+            public static bool operator==(Rot30Coords a, Rot30Coords b)
+            => (a.x, a.u, a.v, a.y) == (b.x, b.u, b.v, b.y);
+            public static bool operator!=(Rot30Coords a, Rot30Coords b)
+            => (a.x, a.u, a.v, a.y)!=(b.x, b.u, b.v, b.y);
+
             public Rot30Coords(int x, int u, int v, int y)
             {
                 this.x = x; this.u = u; this.v = v; this.y = y;
