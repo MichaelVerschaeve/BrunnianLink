@@ -189,8 +189,11 @@ namespace BrunnianLink
                 case 23:
                     TerDragonII.Generate(sb, level);
                     break;
+                case 24:
+                    HeighwayTruchetNested.Generate(sb, level);
+                    break;
                 default:
-                    tileGens[modelChoice - 24].Generate(sb, level);
+                    tileGens[modelChoice - 25].Generate(sb, level);
                     break;
             }
             var utf8WithoutBom = new System.Text.UTF8Encoding(false);
