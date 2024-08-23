@@ -12,7 +12,11 @@ namespace BrunnianLink
         public static void Generate(StringBuilder sb, int level)
         {
             MetaData.StartSubModel(sb, $"TerDragonII_{level}");
-            List<string> someColorNames = new() { "Red", "Blue", "Green", "Orange", "Purple", "Black" };
+            //List<string> someColorNames = new() { "Red", "Blue", "Green", "Orange", "Purple", "Black" };
+
+            List<string> someColorNames = new() { "Bright_Light_Orange", "White", "Medium_Azure", "Tan", "Red", "Lime"};
+
+
             var colorIds = someColorNames.Select(x => ColorMap.Get(x).id).ToList();
 
             //rotations as Rot30Coords vectors...
@@ -37,7 +41,7 @@ namespace BrunnianLink
                 bool closed = rotations.Count > 2 && rotations[0] + rotations[1] == -rotations[2]; //closed triangle
                 bool counterclockwise = rotations[0].Rotate(120) == rotations[1];
                 int rotation = Enumerable.Range(0, 6).Select(t => 60 * t).First(a=>X.Rotate(a)==rotations[0]);
-                for (int i = 0; i < level; i++)
+                for (int i = 0; i < 6; i++)
                 {
                     if (counterclockwise)
                         DrawTriangle(sb, currentPos.Rotate(i * 60), (rotation + i * 60) % 360, closed ? 3 : 1, colorIds[i], colorIds[(i + 1) % 6]);
@@ -47,6 +51,7 @@ namespace BrunnianLink
 
                 if (closed)
                 {
+                    currentPos += rotations[0] + rotations[1];
                     rotations.RemoveRange(0, 2);
                 }
                 else
@@ -77,7 +82,7 @@ namespace BrunnianLink
                     DrawUp(sb, c.Cx, c.Cy, false, (cornerflags & 1) == 1, (cornerflags & 2) == 2, colorOutId, colorInId);
                     break;
                 case 300:
-                    DrawDown(sb, c.Cx + 3, c.Cy - 6, false, (cornerflags & 1) == 1, (cornerflags & 2) == 2,  colorOutId, colorInId);
+                    DrawDown(sb, c.Cx + 3, c.Cy - 6, false, (cornerflags & 2) == 2, (cornerflags & 1) == 1,  colorOutId, colorInId);
                     break;
 
             }
@@ -110,7 +115,7 @@ namespace BrunnianLink
             sb.AppendLine(p.Print(x, y + 5, 0, colorInId));
             sb.AppendLine(swLeft.Print(x - 2, y + 5, 0, left ? colorOutId : colorInId));
             sb.AppendLine(swRight.Print(x + 2, y + 5, 0, right ? colorOutId : colorInId));
-            DrawHex(sb, x, y - 4, colorInId);
+            DrawHex(sb, x, y + 4, colorInId);
         }
 
         private static void DrawHex(StringBuilder sb, int x, int y, int colorInId)

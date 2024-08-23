@@ -31,7 +31,7 @@ namespace BrunnianLink
             MetaData.StartSubModel(sb, $"Chiral_Spectre_tiling_{level}");
 
             List<string> someColorNames = new() { "White", "Bright_Pink", "Dark_Blue", "Red", "Lime", "Medium_Azure", "Medium_Orange", "Tan", "Light_Aqua" };
-            
+
 
             Dictionary<Color, int> mappedColors = new();
 
