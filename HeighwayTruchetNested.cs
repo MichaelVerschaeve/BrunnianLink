@@ -12,7 +12,7 @@ namespace BrunnianLink
         {
             MetaData.StartSubModel(sb, $"HeighwayDragonII{level}");
             // List<string> someColorNames = new() { "Bright_Light_Orange", "Light_Bluish_Grey", "Coral", "Dark_Turquoise" };
-            List<string> someColorNames = new() { "Coral", "Lime", "Dark_Tan", "Dark_Turquoise" };
+            List<string> someColorNames = new() { "Coral", "Lime", "Dark_Turquoise", "Bright_Light_Orange" };
             var colorIds = someColorNames.Select(x => ColorMap.Get(x).id).ToList();
             Tile t = new Tile(1, 1);
             sb.AppendLine(t.Print(0.5, -0.5, 0, colorIds[0]));
