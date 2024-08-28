@@ -1,15 +1,5 @@
-using System;
 using System.Diagnostics;
-using System.Drawing;
-using System.IO;
-using System.Reflection.Metadata.Ecma335;
 using System.Text;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement.TaskbarClock;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement;
-using System.Windows.Forms;
-using System.Linq;
-using System.Drawing.Imaging;
-using Microsoft.VisualBasic.Devices;
 
 namespace BrunnianLink
 {
