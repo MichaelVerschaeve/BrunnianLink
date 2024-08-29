@@ -19,8 +19,8 @@ namespace BrunnianLink
             MetaData.StartSubModel(sb, $"Miller12_{level}");
             sb.AppendLine(new Tile(2, 2).Print(0, 0, -1, 4));
 
-            //GenerateTriangle(sb, new Rot30Coords(), 0, level);
-            GenerateRhomb(sb, new Rot30Coords(), (level-1)*30, 1);
+            GenerateTriangle(sb, new Rot30Coords(), 0, level);
+            //GenerateStar(sb, new Rot30Coords(), (level-1)*30, 1);
             Shape wRight = new() { PartID = "65429" };
             Shape wLeft = new() { PartID = "65426" };
             //triangle subpart
@@ -57,12 +57,13 @@ namespace BrunnianLink
         //rotation = 0 -> uppointing, top is origin
         public static void GenerateTriangle(StringBuilder sb, Rot30Coords c, int rotation, int level)
         {
-            Rot30Coords otherPoint1 = c + X.Rotate(rotation);
-            Rot30Coords otherPoint2 = c + V.Rotate(rotation);
+            Rot30Coords otherPoint1 = c - V.Rotate(rotation);
+            Rot30Coords otherPoint2 = otherPoint1 + X.Rotate(rotation);
             double midx = (c.Cx + otherPoint1.Cx + otherPoint2.Cx) / 3.0;
             double midy = (c.Cy + otherPoint1.Cy + otherPoint2.Cy) / 3.0;
             if (visitedMids.Contains((midx, midy, level)))
                 return;
+            visitedMids.Add((midx, midy, level));
             if (level == 0)
             {
                 Rot30Coords dc = new();
@@ -104,11 +105,12 @@ namespace BrunnianLink
 
         public static void GenerateRhomb(StringBuilder sb, Rot30Coords c, int rotation, int level)
         {
-            Rot30Coords otherPoint = c + X.Rotate(rotation)+V.Rotate(rotation);
+            Rot30Coords otherPoint = c + X.Rotate(rotation)+U.Rotate(rotation);
             double midx = (c.Cx + otherPoint.Cx)  * 0.5;
             double midy = (c.Cy + otherPoint.Cy)  * 0.5;
             if (visitedMids.Contains((midx, midy, level)))
                 return;
+            visitedMids.Add((midx, midy, level));
             if (level == 0)
             {
                 sb.AppendLine(new Shape() { PartID = $"Rhomb_{rotation%90}", SubModel = true }.Rotate((rotation/90)*90).Print(c.Cx, c.Cy, 0, 16));
@@ -138,6 +140,7 @@ namespace BrunnianLink
             double midy = (c.Cy + otherPoint1.Cy + otherPoint2.Cy) / 3.0;
             if (visitedMids.Contains((midx, midy, level)))
                 return;
+            visitedMids.Add((midx, midy, level));
             if (level == 0)
             {
                 Rot30Coords dc = new();
@@ -172,14 +175,15 @@ namespace BrunnianLink
 
             for (int i = 0; i < 3; i++)
             {
-                Xr = X.Rotate(rotation+i*120);
-                Ur = U.Rotate(rotation+i*120);
-                Vr = V.Rotate(rotation+i*120);
-                Yr = Y.Rotate(rotation+i*120);
+                int subrotation = (rotation + i * 120) % 360;
+                Xr = X.Rotate(subrotation);
+                Ur = U.Rotate(subrotation);
+                Vr = V.Rotate(subrotation);
+                Yr = Y.Rotate(subrotation);
 
-                GenerateRhomb(sb, c, (rotation+270), level);
-                GenerateRhomb(sb, c + Ur- Yr - Vr+Xr, (rotation + 120) % 360, level);
-                GenerateTriangle(sb, -Vr + Xr, (rotation + 30) % 360, level);
+                GenerateRhomb(sb, c, (subrotation+270), level);
+                GenerateRhomb(sb, c + Ur- Yr - Vr+Xr, (subrotation + 120) % 360, level);
+                GenerateTriangle(sb, c -Vr + Xr, (subrotation + 30) % 360, level);
                 c += Xr - 2 * (Vr + Yr);
             }
         }
