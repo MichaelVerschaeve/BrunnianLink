@@ -64,9 +64,9 @@ namespace BrunnianLink
             n += 3;
             double r = scale * 3 * Math.Sqrt(3.0) / 10.0;
             double h = scale / Math.Sqrt(10.0);
-            List<double> px = new List<double>();
-            List<double> py = new List<double>();
-            List<double> pz = new List<double>();
+            List<double> px = new();
+            List<double> py = new();
+            List<double> pz = new();
             double alpha = Math.Acos(-2.0 / 3.0);
             for (int i = 0; i < n; i++)
             {

@@ -303,7 +303,7 @@ namespace BrunnianLink
                 {
                     Cell ur = maze[x, y];
                     Cell dl = maze[x - 1, y - 1];
-                    HashSet<Direction> links = new HashSet<Direction>();
+                    HashSet<Direction> links = new();
                     if (ur.Walls[(int)Direction.Left].Open)
                         links.Add(Direction.Up);
                     if (ur.Walls[(int)Direction.Down].Open)

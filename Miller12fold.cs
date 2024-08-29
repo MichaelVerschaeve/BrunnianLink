@@ -17,9 +17,12 @@ namespace BrunnianLink
         {
             visitedMids.Clear();
             MetaData.StartSubModel(sb, $"Miller12_{level}");
+            sb.AppendLine(new Tile(2, 2).Print(0, 0, -1, 4));
 
-            Shape wRight = new Shape() { PartID = "65429" };
-            Shape wLeft = new Shape() { PartID = "65426" };
+            //GenerateTriangle(sb, new Rot30Coords(), 0, level);
+            GenerateRhomb(sb, new Rot30Coords(), (level-1)*30, 1);
+            Shape wRight = new() { PartID = "65429" };
+            Shape wLeft = new() { PartID = "65426" };
             //triangle subpart
             MetaData.StartSubModel(sb, "Triangle");
             sb.AppendLine(wLeft.Rotate(180).Print(1, -2, 1, triangleId));
@@ -31,15 +34,15 @@ namespace BrunnianLink
             sb.AppendLine(new Plate(4, 4).Print(0, -6, 0, starId)); //sunken;
 
             MetaData.StartSubModel(sb, "Rhomb_0");
-            sb.AppendLine(wLeft.Rotate(270).Print(2, 1, 1, starId));
-            sb.AppendLine(wRight.Rotate(270).Print(6, 1, 1, starId));
+            sb.AppendLine(wLeft.Rotate(270).Print(2, 1, 1, rhombId));
+            sb.AppendLine(wLeft.Rotate(90).Print(6, 1, 1, rhombId));
             MetaData.StartSubModel(sb, "Rhomb_30");
-            sb.AppendLine(wRight.Print(5, 4, 1, starId));
-            sb.AppendLine(wLeft.Rotate(270).Print(2, 1, 1, starId));
-            sb.AppendLine(new Shape() {PartID="2639" }.Rotate(90).Print(3, 3, 0, starId)); //sunken, try to orient bottom outwards
+            sb.AppendLine(wRight.Print(5, 4, 0, rhombId));
+            sb.AppendLine(wLeft.Rotate(90).Print(2, 1, 0, rhombId));
+            sb.AppendLine(new Shape() {PartID="2639" }.Rotate(90).Print(3, 3, 0, rhombId)); //sunken, try to orient bottom outwards
             MetaData.StartSubModel(sb, "Rhomb_60");
-            sb.AppendLine(wRight.Print(1, 2, 1, starId));
-            sb.AppendLine(wLeft.Rotate(180).Print(1, 6, 1, starId));
+            sb.AppendLine(wRight.Print(1, 2, 1, rhombId));
+            sb.AppendLine(wRight.Rotate(180).Print(1, 6, 1, rhombId));
         }
 
         private static Rot30Coords X = new() { x = 1 };
@@ -81,7 +84,7 @@ namespace BrunnianLink
                 c += dc.Rotate(cutrot);
                 rotation = drot + cutrot;
                 if (rotation >= 360) rotation -= 360;
-                sb.AppendLine(new Shape() { PartID = "Star", SubModel = true }.Rotate(rotation).Print(c.Cx, c.Cy, 0, 16));
+                sb.AppendLine(new Shape() { PartID = "Triangle", SubModel = true }.Rotate(rotation).Print(c.Cx, c.Cy, 0, 16));
                 return;
 
             }
@@ -108,11 +111,22 @@ namespace BrunnianLink
                 return;
             if (level == 0)
             {
-                sb.AppendLine(new Shape() { PartID = "Rhomb_{rotation%90}", SubModel = true }.Rotate((rotation/90)*90).Print(c.Cx, c.Cy, 0, 16));
+                sb.AppendLine(new Shape() { PartID = $"Rhomb_{rotation%90}", SubModel = true }.Rotate((rotation/90)*90).Print(c.Cx, c.Cy, 0, 16));
                 return;
             }
             c += c.Rotate(30);
             level--;
+            Rot30Coords Xr = X.Rotate(rotation);
+            Rot30Coords Ur = U.Rotate(rotation);
+            Rot30Coords Vr = V.Rotate(rotation);
+            Rot30Coords Yr = Y.Rotate(rotation);
+            GenerateRhomb(sb, c, rotation, level);
+            GenerateRhomb(sb, c+Ur+Vr, (rotation+210)%360, level);
+            GenerateTriangle(sb, c + Ur,(rotation + 120) % 360, level);
+            c += Xr + 2 * Ur + Vr;
+            GenerateRhomb(sb, c, (rotation+180)%360, level);
+            GenerateRhomb(sb, c - Ur - Vr, (rotation + 30) % 360, level);
+            GenerateTriangle(sb, c - Ur, (rotation + 300) % 360, level);
         }
 
         //rotation = 0 -> top is origin left of uppointing star arm is vertical
@@ -133,11 +147,11 @@ namespace BrunnianLink
                     case 0:
                         break;
                     case 30:
-                        dc = U - Y;
+                        dc = X - Y + U;
                         drot = 270;
                         break;
                     case 60:
-                        dc = X - V;
+                        dc = U - Y - V + X;
                         drot = 180;
                         break;
                 }
@@ -145,11 +159,29 @@ namespace BrunnianLink
                 c += dc.Rotate(cutrot);
                 rotation = drot + cutrot;
                 if (rotation >= 360) rotation -= 360;
-                sb.AppendLine(new Shape() { PartID = "Triangle", SubModel = true }.Rotate(rotation).Print(c.Cx, c.Cy, 0, 16));
+                sb.AppendLine(new Shape() { PartID = "Star", SubModel = true }.Rotate(rotation).Print(c.Cx, c.Cy, 0, 16));
                 return;
             }
             c += c.Rotate(30);
             level--;
+            Rot30Coords Xr = X.Rotate(rotation);
+            Rot30Coords Ur = U.Rotate(rotation);
+            Rot30Coords Vr = V.Rotate(rotation);
+            Rot30Coords Yr = Y.Rotate(rotation);
+            GenerateTriangle(sb, c -(Yr+Vr)+Xr, (rotation + 90) % 360, level); //center triangle
+
+            for (int i = 0; i < 3; i++)
+            {
+                Xr = X.Rotate(rotation+i*120);
+                Ur = U.Rotate(rotation+i*120);
+                Vr = V.Rotate(rotation+i*120);
+                Yr = Y.Rotate(rotation+i*120);
+
+                GenerateRhomb(sb, c, (rotation+270), level);
+                GenerateRhomb(sb, c + Ur- Yr - Vr+Xr, (rotation + 120) % 360, level);
+                GenerateTriangle(sb, -Vr + Xr, (rotation + 30) % 360, level);
+                c += Xr - 2 * (Vr + Yr);
+            }
         }
 
         //rotation = 0 -> to the right 

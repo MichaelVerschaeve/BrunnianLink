@@ -30,7 +30,7 @@ namespace BrunnianLink
             int whiteId = ColorMap.Get("White").id;
             if (level==1)
             {
-                Plate p = new Plate(1,2);
+                Plate p = new(1,2);
                 int s = state == 0 ? 1 : -1;
                 sb.AppendLine(p.Print(-0.5*s, 1, 2, whiteId));
                 sb.AppendLine(p.Print(0.5*s, 0, 2, whiteId));

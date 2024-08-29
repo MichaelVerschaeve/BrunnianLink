@@ -182,8 +182,11 @@ namespace BrunnianLink
                 case 24:
                     HeighwayTruchetNested.Generate(sb, level);
                     break;
+                case 25:
+                    Miller12fold.Generate(sb, level);
+                    break;
                 default:
-                    tileGens[modelChoice - 25].Generate(sb, level);
+                    tileGens[modelChoice - 26].Generate(sb, level);
                     break;
             }
             var utf8WithoutBom = new System.Text.UTF8Encoding(false);
