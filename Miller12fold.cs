@@ -8,9 +8,9 @@ namespace BrunnianLink
 {
     public static class Miller12fold
     {
-        static readonly int starId = ColorMap.Get("Medium_Azure").id;
-        static readonly int triangleId = ColorMap.Get("White").id;
-        static readonly int rhombId = ColorMap.Get("Lime").id;
+        static readonly int starId = ColorMap.Get("White").id;
+        static readonly int triangleId = ColorMap.Get("Red").id;
+        static readonly int rhombId = ColorMap.Get("Dark_Blue").id;
 
 
         public static void Generate(StringBuilder sb, int level)
@@ -72,11 +72,11 @@ namespace BrunnianLink
                     case 0:
                         break;
                     case 30:
-                        dc = X + V - Y;
-                        drot = 90;
+                        dc = U - Y;
+                        drot = 270;
                         break;
                     case 60:
-                        dc = -Y - V;
+                        dc = X - V;
                         drot = 180;
                         break;
                 }
