@@ -121,7 +121,7 @@ namespace BrunnianLink
             Rot30Coords Xr = X.Rotate(rotation);
             Rot30Coords Ur = U.Rotate(rotation);
             Rot30Coords Vr = V.Rotate(rotation);
-            Rot30Coords Yr = Y.Rotate(rotation);
+           // Rot30Coords Yr = Y.Rotate(rotation);
             GenerateRhomb(sb, c, rotation, level);
             GenerateRhomb(sb, c+Ur+Vr, (rotation+210)%360, level);
             GenerateTriangle(sb, c + Ur,(rotation + 120) % 360, level);
@@ -168,7 +168,7 @@ namespace BrunnianLink
             c += c.Rotate(30);
             level--;
             Rot30Coords Xr = X.Rotate(rotation);
-            Rot30Coords Ur = U.Rotate(rotation);
+            Rot30Coords Ur;// = U.Rotate(rotation);
             Rot30Coords Vr = V.Rotate(rotation);
             Rot30Coords Yr = Y.Rotate(rotation);
             GenerateTriangle(sb, c -(Yr+Vr)+Xr, (rotation + 90) % 360, level); //center triangle

@@ -185,8 +185,11 @@ namespace BrunnianLink
                 case 25:
                     Miller12fold.Generate(sb, level);
                     break;
+                case 26:
+                    AmmanBeenkerFlat.Generate(sb, level);
+                    break;
                 default:
-                    tileGens[modelChoice - 26].Generate(sb, level);
+                    tileGens[modelChoice - 27].Generate(sb, level);
                     break;
             }
             var utf8WithoutBom = new System.Text.UTF8Encoding(false);
