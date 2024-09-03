@@ -10,40 +10,41 @@ namespace BrunnianLink
     {
 
         static readonly int triangleId = ColorMap.Get("Orange").id;
-        static readonly int triangleMirror2Id = ColorMap.Get("Tan").id;
-        static readonly int rhombId = ColorMap.Get("Sand_Blue").id;
+        static readonly int triangleMirror2Id = ColorMap.Get("Yellow").id;
+        static readonly int rhombId = ColorMap.Get("Dark_Blue").id;
 
 
         public static void Generate(StringBuilder sb, int level)
         {
             MetaData.StartSubModel(sb, $"AmmanBeenker_{level}");
-            for (int rot = 0; rot < 360; rot+=45)
-                GenerateRhomb(sb, new Rot45Coords(), rot, false,level);
-            Shape w = new() { PartID = "35787" };
+            //for (int rot = 0; rot < 360; rot+=45)
+            //GenerateRhomb(sb, new Rot45Coords(), rot, false,level);
+            GenerateTriangle(sb, new Rot45Coords(), 0, false, level);
+            GenerateTriangle(sb, U-V, 0, true, level);
+            Shape wCorner = new() { PartID = "35787" };// |\
             MetaData.StartSubModel(sb, "Triangle_0");
-            sb.AppendLine(w.Rotate(90).Print(1, -1, 0, triangleId));
-            sb.AppendLine(w.Rotate(180).Print(-1, -1, 0, triangleId));
+            sb.AppendLine(wCorner.Print(1, -1, 0, triangleId));
+            sb.AppendLine(wCorner.Rotate(90).Print(-1, -1, 0, triangleId));
             MetaData.StartSubModel(sb, "Triangle_0_M");
-            sb.AppendLine(w.Print(1, 1, 0, triangleId));
-            sb.AppendLine(w.Rotate(270).Print(-1, 1, 0, triangleMirror2Id));
+            sb.AppendLine(wCorner.Rotate(270).Print(1, 1, 0, triangleMirror2Id));
+            sb.AppendLine(wCorner.Rotate(180).Print(-1, 1, 0, triangleMirror2Id));
             //Shape wLeft = new() { PartID = "5091" }; //[ \
             Shape wRight = new() { PartID = "5092" }; //[ /
-            Shape wCorner = new() { PartID = "35787" };// |/
             MetaData.StartSubModel(sb, "Triangle_45");
-            sb.AppendLine(wRight.Print(2,-0.5,0, triangleId));
+            sb.AppendLine(wRight.Rotate(90).Print(2,-0.5,0, triangleId));
             sb.AppendLine(new Plate(1,1).Print(0.5, -0.5, 0, triangleId));
-            sb.AppendLine(wCorner.Print(1, -2, 0, triangleId));
+            sb.AppendLine(wCorner.Rotate(270).Print(1, -2, 0, triangleId));
             MetaData.StartSubModel(sb, "Triangle_45_M");
-            sb.AppendLine(wRight.Rotate(180).Print(-2, 0.5, 0, triangleMirror2Id));
+            sb.AppendLine(wRight.Rotate(270).Print(-2, 0.5, 0, triangleMirror2Id));
             sb.AppendLine(new Plate(1, 1).Print(-0.5, 0.5, 0, triangleMirror2Id));
-            sb.AppendLine(wCorner.Print(-1, 2, 0, triangleMirror2Id));
+            sb.AppendLine(wCorner.Rotate(90).Print(-1, 2, 0, triangleMirror2Id));
             MetaData.StartSubModel(sb, "Rhomb_0");
-            sb.AppendLine(wCorner.Rotate(270).Print(1, -1, 0, rhombId));
-            sb.AppendLine(wCorner.Rotate(90).Print(4, -1, 0, rhombId));
+            sb.AppendLine(wCorner.Rotate(180).Print(1, -1, 0, rhombId));
+            sb.AppendLine(wCorner.Print(4, -1, 0, rhombId));
             sb.AppendLine(new Plate(1,2).Print(2.5, -1, 0, rhombId));
             MetaData.StartSubModel(sb, "Rhomb_45");
-            sb.AppendLine(wCorner.Rotate(180).Print(1, 1, 0, rhombId));
-            sb.AppendLine(wCorner.Print(4, 1, 0, rhombId));
+            sb.AppendLine(wCorner.Rotate(90).Print(1, 1, 0, rhombId));
+            sb.AppendLine(wCorner.Rotate(270).Print(4, 1, 0, rhombId));
             sb.AppendLine(new Plate(1, 2).Print(2.5, 1, 0, rhombId));
         }
 
@@ -66,7 +67,7 @@ namespace BrunnianLink
                 (_, Vr, Yr) = (Vr, Ur, -Yr);
             int addR(int r) => ((mirror ? (360 - r) : r) + rotation) % 360;
             GenerateRhomb(sb,c, addR(270),mirror,level);
-            GenerateRhomb(sb, c-Yr+Xr, rotation, mirror, level);
+            GenerateRhomb(sb, c-Yr, rotation, mirror, level);
             GenerateTriangle(sb, c - Yr, addR(180), !mirror, level);
             GenerateTriangle(sb, c - Yr, addR(135), mirror, level);
             GenerateTriangle(sb, c - Yr-Vr, addR(225), mirror, level);
