@@ -188,8 +188,11 @@ namespace BrunnianLink
                 case 26:
                     AmmanBeenkerFlat.Generate(sb, level);
                     break;
+                case 27:
+                    PenroseFlat.Generate(sb, level);
+                    break;
                 default:
-                    tileGens[modelChoice - 27].Generate(sb, level);
+                    tileGens[modelChoice - 28].Generate(sb, level);
                     break;
             }
             var utf8WithoutBom = new System.Text.UTF8Encoding(false);
