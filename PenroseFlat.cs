@@ -9,46 +9,73 @@ namespace BrunnianLink
     public static class PenroseFlat
     {
 
-        static readonly int[] colorIds = new[] 
-        { ColorMap.Get("Blue").id, 
-            ColorMap.Get("Lime").id, 
-            ColorMap.Get("Red").id, 
-            ColorMap.Get("Orange").id, 
-            ColorMap.Get("Tan").id };
+        //static readonly int[] colorIds = new[]
+        //{   ColorMap.Get("Dark_Blue").id,
+        //    ColorMap.Get("Medium_Azure").id,
+        //    ColorMap.Get("Red").id,
+        //    ColorMap.Get("Bright_Light_Orange").id,
+        //    ColorMap.Get("Tan").id,
+        //    ColorMap.Get("Dark_Blue").id,
+        //    ColorMap.Get("Medium_Azure").id,
+        //    ColorMap.Get("Red").id,
+        //    ColorMap.Get("Bright_Light_Orange").id,
+        //    ColorMap.Get("Tan").id
+        //};
 
+        static readonly int[] colorIds = Enumerable.Repeat(ColorMap.Get("Yellow").id,5).Concat(Enumerable.Repeat(ColorMap.Get("Red").id, 5)).ToArray();
         public static void Generate(StringBuilder sb, int level)
         {
             visitedMids.Clear();
             MetaData.StartSubModel(sb, $"PenroseWedges_{level}");
-            GenerateThick( sb, new Rot36Coords(), 0, level );
-            
+            for (int rot = 0; rot < 360; rot+=72)
+                GenerateThick(sb, new Rot36Coords(), rot, level);
+
             Shape wedgeLeft = new() { PartID = "65426" };  //   \|
             Shape wedgeRight = new() { PartID = "65429" }; //   |/
-            MetaData.StartSubModel(sb, $"ThickRomb_0");
+            MetaData.StartSubModel(sb, $"ThickRhomb_0");
             sb.AppendLine(wedgeRight.Print(1, 2, 0, colorIds[0]));
             sb.AppendLine(wedgeLeft.Print(-1, 2, 0, colorIds[0]));
             sb.AppendLine(wedgeRight.Rotate(180).Print(-1, 6, 0, colorIds[0]));
             sb.AppendLine(wedgeLeft.Rotate(180).Print(1, 6, 0, colorIds[0]));
-            MetaData.StartSubModel(sb, $"ThickRomb_72");
+            MetaData.StartSubModel(sb, $"ThickRhomb_72");
             sb.AppendLine(wedgeLeft.Print(-5, 0, 0, colorIds[1]));
             sb.AppendLine(wedgeLeft.Rotate(90).Print(-2, -1, 0, colorIds[1]));
             sb.AppendLine(wedgeLeft.Rotate(180).Print(-1, 2, 0, colorIds[1]));
             sb.AppendLine(wedgeLeft.Rotate(270).Print(-4, 3, 0, colorIds[1]));
             sb.AppendLine(new Plate(2, 2).Print(-3, 1, 0, colorIds[1]));
-            MetaData.StartSubModel(sb, $"ThickRomb_144");
+            MetaData.StartSubModel(sb, $"ThickRhomb_144");
             sb.AppendLine(wedgeLeft.Rotate(270).Print(-2, -1, 0, colorIds[2]));
             sb.AppendLine(new Plate(4, 2).Print(-2, -3, 0, colorIds[2]));
             sb.AppendLine(wedgeLeft.Rotate(90).Print(-2, -5, 0, colorIds[2]));
-            MetaData.StartSubModel(sb, $"ThickRomb_216");
+            MetaData.StartSubModel(sb, $"ThickRhomb_216");
             sb.AppendLine(wedgeRight.Rotate(90).Print(2, -1, 0, colorIds[3]));
             sb.AppendLine(new Plate(4, 2).Print(2, -3, 0, colorIds[3]));
             sb.AppendLine(wedgeRight.Rotate(270).Print(2, -5, 0, colorIds[3]));
-            MetaData.StartSubModel(sb, $"ThickRomb_288");
+            MetaData.StartSubModel(sb, $"ThickRhomb_288");
             sb.AppendLine(wedgeRight.Print(5, 0, 0, colorIds[4]));
-            sb.AppendLine(wedgeRight.Rotate(90).Print(3, 3, 0, colorIds[4]));
+            sb.AppendLine(wedgeRight.Rotate(90).Print(4, 3, 0, colorIds[4]));
             sb.AppendLine(wedgeRight.Rotate(180).Print(1, 2, 0, colorIds[4]));
             sb.AppendLine(wedgeRight.Rotate(270).Print(2, -1, 0, colorIds[4]));
             sb.AppendLine(new Plate(2, 2).Print(3, 1, 0, colorIds[4]));
+            MetaData.StartSubModel(sb, $"ThinRhomb_0");
+            sb.AppendLine(wedgeRight.Rotate(90).Print(2, 3, 0, colorIds[5]));
+            sb.AppendLine(wedgeLeft.Rotate(270).Print(-2, 3, 0, colorIds[5]));
+            sb.AppendLine(wedgeRight.Rotate(270).Print(-2, 1, 0, colorIds[5]));
+            sb.AppendLine(wedgeLeft.Rotate(90).Print(2, 1, 0, colorIds[5]));
+            MetaData.StartSubModel(sb, $"ThinRhomb_72");
+            sb.AppendLine(wedgeRight.Print(-1, -2, 0, colorIds[6]));
+            sb.AppendLine(wedgeRight.Rotate(180).Print(-1, 2, 0, colorIds[6]));
+            MetaData.StartSubModel(sb, $"ThinRhomb_144");
+            sb.AppendLine(wedgeRight.Rotate(90).Print(-2, 1, -1, colorIds[7]));
+            sb.AppendLine(wedgeLeft.Rotate(180).Print(1, -2, -1, colorIds[7]));
+            sb.AppendLine(new Plate(3, 3).Print(-1.5, -1.5, -1, colorIds[7]));
+            MetaData.StartSubModel(sb, $"ThinRhomb_216");
+            sb.AppendLine(wedgeLeft.Rotate(270).Print(2, 1, -1, colorIds[8]));
+            sb.AppendLine(wedgeRight.Rotate(180).Print(-1, -2, -1, colorIds[8]));
+            sb.AppendLine(new Plate(3, 3).Print(1.5, -1.5, -1, colorIds[8]));
+            MetaData.StartSubModel(sb, $"ThinRhomb_288");
+            sb.AppendLine(wedgeLeft.Print(1, -2, 0, colorIds[9]));
+            sb.AppendLine(wedgeLeft.Rotate(180).Print(1, 2, 0, colorIds[9]));
         }
 
         //long side vertical aligned, bottom is origin
@@ -70,7 +97,7 @@ namespace BrunnianLink
                 return;
             }
             level--;
-            c = c.Rotate(36)+c.Rotate(-36);
+            c = c.Rotate(36)+c.Rotate(360-36);
             Rot36Coords[] Tr = T.Select(t=>t.Rotate(rotation)).ToArray();
             GenerateThick(sb,c + Tr[0] + Tr[1],(rotation+180+36)%360,level); //left point
             GenerateThin(sb, c + Tr[0] + Tr[1], (rotation +360- 36) % 360, level); //left point
@@ -99,7 +126,7 @@ namespace BrunnianLink
                 return;
             }
             level--;
-            c = c.Rotate(36) + c.Rotate(-36);
+            c = c.Rotate(36) + c.Rotate(360-36);
             Rot36Coords[] Tr = T.Select(t => t.Rotate(rotation)).ToArray();
             GenerateThin(sb, c + Tr[0], (rotation + 90 + 18) % 360, level);
             GenerateThin(sb, c + Tr[0], (rotation + 270 - 18) % 360, level);
@@ -116,9 +143,15 @@ namespace BrunnianLink
         //rotation = 0 -> positive Y-axis
         public struct Rot36Coords
         {
-            public readonly int[] t = new int[] { 0, 0, 0, 0, 0 };
-            public readonly int Cx => 4 * (t[1] - t[4]) + 2 * (t[1] - t[2]);
+            public readonly int[] t;
+            public readonly int Cx => 4 * (t[4] - t[1]) + 2 * (t[3] - t[2]);
             public readonly int Cy => 4 * (t[0] - t[2] - t[3]) + 2 * (t[1] + t[4]);
+
+            public Rot36Coords()
+            {
+                t =  new int[] { 0, 0, 0, 0, 0 };
+            }
+
 
             public readonly Rot36Coords Rotate(int rot)
             {
@@ -157,6 +190,15 @@ namespace BrunnianLink
                 return res;
             }
             public static Rot36Coords operator *(int s, Rot36Coords a)
+            {
+                Rot36Coords res = new Rot36Coords();
+                if (res.t != null)
+                    for (int i = 0; i < 5; i++)
+                        res.t[i] = s * a.t[i];
+                return res;
+            }
+
+            public static Rot36Coords operator *( Rot36Coords a, int s)
             {
                 Rot36Coords res = new Rot36Coords();
                 if (res.t != null)
