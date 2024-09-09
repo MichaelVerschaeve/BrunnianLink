@@ -191,8 +191,11 @@ namespace BrunnianLink
                 case 27:
                     PenroseFlat.Generate(sb, level);
                     break;
+                case 28:
+                    RhombSquareOcta.Generate(sb, level);
+                    break;
                 default:
-                    tileGens[modelChoice - 28].Generate(sb, level);
+                    tileGens[modelChoice - 29].Generate(sb, level);
                     break;
             }
             var utf8WithoutBom = new System.Text.UTF8Encoding(false);
