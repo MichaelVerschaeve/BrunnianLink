@@ -28,7 +28,7 @@ namespace BrunnianLink
             sb.AppendLine(swRight.Rotate(180).Print(-1, 1, -1, colorIds[1]));
             sb.AppendLine(swLeft.Print(-1, -1, -1, colorIds[1]));
             MetaData.StartSubModel(sb, "Trap_120");
-            sb.AppendLine(wedgeLeft.Rotate(180).Print(0, 1, 0, colorIds[2]));
+            sb.AppendLine(wedgeLeft.Rotate(180).Print(0, 0, 0, colorIds[2]));
             sb.AppendLine(swRight.Rotate(180).Print(-1, 1, -1, colorIds[2]));
             sb.AppendLine(swLeft.Print(-1, -1, -1, colorIds[2]));
             MetaData.StartSubModel(sb, "Trap_180");
@@ -54,6 +54,7 @@ namespace BrunnianLink
                 return;
             }
             c *= 2;
+            level--;
             GenerateRec(sb, c, rotation, level);
             GenerateRec(sb, c + 2 * Vr - Xr, (rotation + 180) % 360, level);
             GenerateRec(sb, c + Xr + Vr, (rotation + 120) % 360, level);

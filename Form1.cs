@@ -194,8 +194,11 @@ namespace BrunnianLink
                 case 28:
                     RhombSquareOcta.Generate(sb, level);
                     break;
+                case 29:
+                    HalfHexWedges.Generate(sb, level);
+                    break;
                 default:
-                    tileGens[modelChoice - 29].Generate(sb, level);
+                    tileGens[modelChoice - 30].Generate(sb, level);
                     break;
             }
             var utf8WithoutBom = new System.Text.UTF8Encoding(false);
