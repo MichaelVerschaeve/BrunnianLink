@@ -21,7 +21,7 @@ namespace BrunnianLink
         {
             visitedMids.Clear();
             MetaData.StartSubModel(sb, $"RhombSquareOctagon_{level}");
-            GenerateOctagon(sb, new Rot45Coords(), 0, level);
+            GenerateSquare(sb, new Rot45Coords(), 0, level);
             MetaData.StartSubModel(sb, "Octagon"); //centered one
             Shape wTile = new() { PartID = "35787" };// |\
             Shape wedge3x3 = new() { PartID = "2450" };// |/
@@ -82,7 +82,7 @@ namespace BrunnianLink
                 GenerateRhomb(sb, center, subrotation, level);
                 GenerateSquare(sb, center + Vr, subrotation, level);
                 GenerateOctagon(sb, center + Vr + Yr, subrotation, level);
-                GenerateSquare(sb, center + 2*V+Xr+Yr, subrotation, level);
+                GenerateSquare(sb, center + 2*Vr+Xr+Yr, subrotation, level);
             }
         }
         
@@ -141,7 +141,7 @@ namespace BrunnianLink
             GenerateSquare(sb, c + Vr, rotation, level);
             GenerateSquare(sb, otherPoint - Vr, (rotation + 180) % 360, level);
             GenerateSquare(sb, c + Yr, (rotation + 45) % 360, level);
-            GenerateSquare(sb, c - Yr, (rotation + 180 + 45) % 360, level);
+            GenerateSquare(sb, otherPoint - Yr, (rotation + 180 + 45) % 360, level);
         }
 
         private static Rot45Coords X = new() { x = 1 };

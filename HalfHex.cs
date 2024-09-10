@@ -57,7 +57,7 @@ namespace BrunnianLink
             {
                 List<string> colors = new() { "Red", "Medium_Azure", "Dark_Blue", "Lime", "Tan" };
                 colors.Sort((string c1, string c2) => ColorMap.Get(c1).c.GetHue().CompareTo(ColorMap.Get(c2).c.GetHue()));
-                MessageBox.Show(string.Concat(colors.Select((string c) => c + ":" + ColorMap.Get(c).c.GetHue() + " ")));
+               // MessageBox.Show(string.Concat(colors.Select((string c) => c + ":" + ColorMap.Get(c).c.GetHue() + " ")));
             }
             int colorId = ColorMap.Get(m_colors[color]).id;
             foreach (string line in fileLines.SkipWhile(line => line.StartsWith('0')))
