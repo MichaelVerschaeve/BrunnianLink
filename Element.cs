@@ -298,4 +298,33 @@ namespace BrunnianLink
             partID = XYPartID(sizeY, sizeX);
         }
     }
+
+
+    public class Brick : Shape
+    {
+        static readonly Dictionary<(int, int), string> brickIDs = new()
+        {
+            {(1,1), "3005" },
+            {(1,2), "3004" },
+            {(2,2), "3003" },
+        };
+
+        public static string XYPartID(int sizeY, int sizeX) => brickIDs[(sizeY, sizeX)];
+        public static bool BrickExists(int sizeY, int sizeX) => brickIDs.ContainsKey((sizeY, sizeX)) || brickIDs.ContainsKey((sizeX, sizeY));
+
+        public Brick(int sizeX, int sizeY = 1)
+        {
+            if (sizeX < sizeY)
+            {
+                (sizeX, sizeY) = (sizeY, sizeX);
+                rotationAngleDegrees = 90;
+            }
+
+            sz = 20 * sizeY;
+            sx = 20 * sizeX;
+            sy = 8;
+            ax = az = 0;
+            partID = XYPartID(sizeY, sizeX);
+        }
+    }
 }

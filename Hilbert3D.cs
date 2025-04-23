@@ -4,6 +4,7 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static BrunnianLink.LabyrinthTiling;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace BrunnianLink
@@ -21,7 +22,6 @@ namespace BrunnianLink
 
             List<int[]> points = new() { new int[] { 0, 0, 0 } };
             bool? currentTube = null;
-            bool? prevTube = null;
             List<Rotation> rotations = new() { new Rotation() };
 
 
@@ -52,7 +52,7 @@ namespace BrunnianLink
                 }
                 if (points.Count == 3)
                 {
-                    prevTube = currentTube;
+                    bool? prevTube = currentTube;
                     currentTube = AddCilindersAndElbows(sb, points, rotations);
                    /* if (prevTube.HasValue)
                     {
@@ -73,6 +73,119 @@ namespace BrunnianLink
                     }*/
                     points.RemoveAt(0);
                     rotations.RemoveAt(0);
+                }
+            }
+        }
+
+        static bool[,,] holes = new bool[0,0,0];
+
+        static public void GenerateTrans(StringBuilder sb, int level)
+        {
+            level = Math.Max(level, 1);
+            MetaData.StartSubModel(sb, $"Hilbert3D_hollow_{level}");
+
+            string commands = "X";
+            for (int i = 0; i < level; i++)
+                commands = commands.Replace("X", "^<XF^<XFX-F^>>XFX&F+>>XFX-F>X->");
+
+            int[] lastPoint = new int[] { 0, 0, 0 };
+            Rotation rotation = new();
+
+            int size = (1 << (level + 1)) + 1;
+
+            holes = new bool[size, size, size + 1];
+            holes[0, 1, 1] = true;
+            holes[1, 1, 1] = true;
+            holes[size - 1, 1, 1] = true;
+            for (int x = 0; x < size; x++)
+                for (int y = 0; y < size; y++)
+                    holes[x, y, size] = true;
+
+            foreach (char command in commands)
+            {
+                switch (command)
+                {
+                    case 'F':
+                        int[] newPoint = rotation.Forward(lastPoint);
+                        System.Diagnostics.Debug.WriteLine(string.Join(' ', newPoint));
+                        holes[newPoint[0] * 2 + 1, newPoint[1] * 2 + 1, newPoint[2] * 2 + 1] = true;
+                        holes[newPoint[0] + lastPoint[0] + 1, newPoint[1] + lastPoint[1] + 1, newPoint[2] + lastPoint[2] + 1] = true;
+                        lastPoint = newPoint;
+                        break;
+                    case '+':
+                        rotation.Yaw(false); break;
+                    case '-':
+                        rotation.Yaw(true); break;
+                    case '^':
+                        rotation.Pitch(true); break;
+                    case '&':
+                        rotation.Pitch(false); break;
+                    case '<':
+                        rotation.Roll(true); break;
+                    case '>':
+                        rotation.Roll(false); break;
+                }
+            }
+            bool regular = true;
+            int colorId = ColorMap.Get("Bright_Pink").id; //trans clear//
+            Shape[] square2x2Shapes = { new Plate(2, 2), new Brick(2, 2), new Plate(2, 2) };
+            Tile SquareTile = new(2, 2);
+            Shape SquareInvertedTile = new() { PartID = "11203" };
+            Shape[] square1x1Shapes = { new Plate(1, 1), new Brick(1, 1), new Plate(1, 1) };
+            Shape[] rect1x2Shapes = { new Plate(1, 2), new Brick(1, 2), new Plate(1, 2) };
+            Shape[] rect2x1Shapes = { new Plate(2, 1), new Brick(2, 1), new Plate(2, 1) };
+            for (int i = 0; i < size; i++)
+            {
+                int[] z = { 5 * i + 1, 5 * i + 4, 5 * i + 5 };
+                for (int j = 0; j < 3; j++)
+                {
+                    if (regular)
+                    {
+                        for (int x = 0; x < size; x++)
+                            for (int y = 0; y < size; y++)
+                                if (!holes[x, y, i])
+                                {
+                                    Shape s = square2x2Shapes[j];
+                                    if (j == 2 && (i == size-1 || holes[x, y, i + 1]))
+                                        s = SquareTile;
+                                    if (j == 0 && (i == 0 || holes[x, y, i - 1]))
+                                        s = SquareInvertedTile;
+                                    sb.AppendLine(s.Print(2 * x + 1, 2 * y + 1, z[j], colorId));
+                                }
+                    }
+                    else //offsetted layer
+                    {
+                        for (int x = 0; x <= size; x++)
+                            for (int y = 0; y <= size; y++)
+                            {
+                                bool holeBottomLeft = x == 0 || y == 0 || holes[x - 1, y - 1, i];
+                                bool holeTopLeft = x == 0 || y == size || holes[x - 1, y, i];
+                                bool holeBottomRight = x == size || y == 0 || holes[x, y - 1, i];
+                                bool holeTopRight = x == size || y == size || holes[x, y, i];
+                                if (!holeBottomLeft && !holeTopLeft && !holeBottomRight && !holeTopRight)
+                                    sb.AppendLine(square2x2Shapes[j].Print(2 * x, 2 * y, z[j], colorId));
+                                else if (!holeBottomLeft && !holeTopLeft && holeBottomRight && holeTopRight)
+                                    sb.AppendLine(rect1x2Shapes[j].Print(2 * x - 0.5, 2 * y, z[j], colorId));
+                                else if (holeBottomLeft && holeTopLeft && !holeBottomRight && !holeTopRight)
+                                    sb.AppendLine(rect1x2Shapes[j].Print(2 * x + 0.5, 2 * y, z[j], colorId));
+                                else if (!holeBottomLeft && holeTopLeft && !holeBottomRight && holeTopRight)
+                                    sb.AppendLine(rect2x1Shapes[j].Print(2 * x, 2 * y - 0.5, z[j], colorId));
+                                else if (holeBottomLeft && !holeTopLeft && holeBottomRight && !holeTopRight)
+                                    sb.AppendLine(rect2x1Shapes[j].Print(2 * x, 2 * y + 0.5, z[j], colorId));
+                                else
+                                {
+                                    Shape s = square1x1Shapes[j];
+                                    double[] xoffset = { -0.5, -0.5, 0.5, 0.5 };
+                                    double[] yoffset = { -0.5, 0.5, -0.5, 0.5 };
+                                    bool[] skipcondition = { holeBottomLeft, holeTopLeft, holeBottomRight, holeTopRight };
+                                    for (int k = 0; k < 4; k++)
+                                        if (!skipcondition[k])
+                                            sb.AppendLine(s.Print(2 * x + xoffset[k], 2 * y + yoffset[k], z[j], colorId));
+                                }
+                            }
+                    }
+                    regular = !regular;
+                    MetaData.BuildStepFinished(sb);
                 }
             }
         }
