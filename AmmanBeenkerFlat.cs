@@ -19,8 +19,8 @@ namespace BrunnianLink
             MetaData.StartSubModel(sb, $"AmmanBeenker_{level}");
             //for (int rot = 0; rot < 360; rot+=45)
             //GenerateRhomb(sb, new Rot45Coords(), rot, false,level);
-            GenerateTriangle(sb, new Rot45Coords(), 0, false, level);
-            GenerateTriangle(sb, U-V, 0, true, level);
+            GenerateTriangle(sb, new Rot45Coords(), 45, false, level);
+            GenerateTriangle(sb, (U-V).Rotate(45), 45, true, level);
             Shape wCorner = new() { PartID = "35787" };// |\
             MetaData.StartSubModel(sb, "Triangle_0");
             sb.AppendLine(wCorner.Print(1, -1, 0, triangleId));

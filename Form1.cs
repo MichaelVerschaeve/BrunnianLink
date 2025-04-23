@@ -109,7 +109,7 @@ namespace BrunnianLink
                     ChiralSpectre.Generate(sb, level);
                     break;
                 case 5:
-                    Hilbert3D.Generate(sb, level);
+                    Hilbert3D.GenerateTrans(sb, level);
                     break;
                 case 6:
                     for (int p1 = -5; p1 <= 5; p1++)
