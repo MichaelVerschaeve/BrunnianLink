@@ -12,34 +12,20 @@ namespace BrunnianLink
 
     static public class Hilbert3D
     {
+        static IEnumerable<int> FormVector(List<int[]> source, int i)
+        {
+            for (int j = 0; j < 3; j++)
+                yield return source[(source.Count + i + 1) % source.Count][j] - source[(source.Count + i) % source.Count][j];
+        }
+
         static bool ShapeCondition(List<int[]> source)
         {
-            int dxm2 = source[~1][0] - source[~2][0];
-            int dym2 = source[~1][1] - source[~2][1];
-            int dzm2 = source[~1][2] - source[~2][2];
-            int dxm1 = source[0][0] - source[~1][0];
-            int dym1 = source[0][1] - source[~1][1];
-            int dzm1 = source[0][2] - source[~1][2];
-            int dx0 = source[1][0]- source[0][0];
-            int dy0 = source[1][1] - source[0][1];
-            int dz0 = source[1][2] - source[0][2];
-            int dx1 = source[2][0] - source[1][0];
-            int dy1 = source[2][1] - source[1][1];
-            int dz1 = source[2][2] - source[1][2];
-
-            //last segment perpendicular to first
-            if (dxm1 * dx0 + dym1 * dy0 + dzm1 * dz0 != 0)
-                return false;
-            //2nd segment perpendicular to first
-            if (dx1 * dx0 + dy1 * dy0 + dz1 * dz0 != 0)
-                return false;
-            //2nd segment perpendicual to last
-            if (dx1 * dxm1 + dy1 * dym1 + dz1 * dzm1 != 0)
+            var ortho = (int i, int j) => FormVector(source,i).Zip(FormVector(source, j)).Select(p=>p.First*p.Second).Sum()==0;
+            //last segment and first two pairwise perpendicular
+            if (!ortho(-1,0) || !ortho(0,1) || !ortho(-1,1))
                 return false;
             //second to last segment = - first segment
-            if (dxm2 != dx0 || dym2 != dy0 || dzm2 != dz0)
-                return false;
-            return true;
+            return FormVector(source,-2).SequenceEqual(FormVector(source,0).Select(t => -t));
         }
 
         static int[] MatMul(int[][] columnOrderFirst, int[] v)
@@ -51,6 +37,8 @@ namespace BrunnianLink
             return res;
         }
 
+        static int[][] Transpose(int[][] columnOrderFirst) => Enumerable.Range(0, 3).Select(r => Enumerable.Range(0, 3).Select(c => columnOrderFirst[c][r]).ToArray()).ToArray();
+
         static List<int[]> Transform(List<int[]> source, int[] targetOrigin, int[] targetX, int[] targetY, int[] targetZ)
         {
             if (!ShapeCondition(source))
@@ -60,14 +48,16 @@ namespace BrunnianLink
             }
             if (!ShapeCondition(source))
                 throw new NotImplementedException(); //not expected
-            int[][] transpose = 
+            int[][] transpose = Transpose([FormVector(source,0).ToArray(), FormVector(source, 1).ToArray(), FormVector(source, -1).Select(t=>-t).ToArray()]);
+            int[][] targetMat = [targetX,targetY, targetZ];
+            return source.Select(point => MatMul(targetMat, MatMul(transpose, point)).Select((v, index) => v - source[0][index] + targetOrigin[index]).ToArray()).ToList();
         }
 
 
         static List<int[]> PointCollection(int level)
         {
             if (level == 1) return [[0, 0, 0], [1, 0, 0], [1, 1, 0], [0, 1, 0], [0, 1, 1], [1, 1, 1], [1, 0, 1], [0, 0, 1]];
-
+            int[] X = [1,0,0], Y = [0,1,0], Z = [0,0,1], minX = [-1, 0, 0], minY = [0, -1, 0], minZ = [0, 0, -1];
             List<int[]> points = PointCollection(level-1);
 
         }
