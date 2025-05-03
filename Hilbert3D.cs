@@ -9,6 +9,21 @@ using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace BrunnianLink
 {
+    public class PointComparer : IComparer<int[]>
+    {
+        public int Compare(int[]? x, int[]? y)
+        {
+            if (ReferenceEquals(x, y)) return 0;
+            if (x == null) return 1;
+            if (y == null) return -1;
+            foreach ((int c1,int c2) in x.Zip(y))
+            {
+                int t= c1.CompareTo(c2);
+                if (t != 0) return t;
+            }
+            return 0;   
+        }
+    }
 
     static public class Hilbert3D
     {
@@ -45,23 +60,59 @@ namespace BrunnianLink
             {
                 source = new(source);
                 source.Reverse();
+                if (!ShapeCondition(source))
+                    throw new NotImplementedException(); //not expected
             }
-            if (!ShapeCondition(source))
-                throw new NotImplementedException(); //not expected
             int[][] transpose = Transpose([FormVector(source,0).ToArray(), FormVector(source, 1).ToArray(), FormVector(source, -1).Select(t=>-t).ToArray()]);
             int[][] targetMat = [targetX,targetY, targetZ];
-            return source.Select(point => MatMul(targetMat, MatMul(transpose, point)).Select((v, index) => v - source[0][index] + targetOrigin[index]).ToArray()).ToList();
+            return source.Select(point => MatMul(targetMat, MatMul(transpose, point.Select((v, index) => v - source[0][index]).ToArray())).Select((v, index) => v  + targetOrigin[index]).ToArray()).ToList();
         }
 
 
         static List<int[]> PointCollection(int level)
         {
             if (level == 1) return [[0, 0, 0], [1, 0, 0], [1, 1, 0], [0, 1, 0], [0, 1, 1], [1, 1, 1], [1, 0, 1], [0, 0, 1]];
-            int[] X = [1,0,0], Y = [0,1,0], Z = [0,0,1], minX = [-1, 0, 0], minY = [0, -1, 0], minZ = [0, 0, -1];
-            List<int[]> points = PointCollection(level-1);
-
+            int[] X = [1, 0, 0], Y = [0, 1, 0], Z = [0, 0, 1], minX = [-1, 0, 0], minY = [0, -1, 0], minZ = [0, 0, -1];
+            List<int[]> points = PointCollection(level - 1);
+            List<int[]> t1 = Transform(points, [0, 0, 1], minY, Z, minX);
+            List<int[]> t2 = Transform(points, [0, 0, 0], minY, minZ, minX); t2.Reverse();
+            List<int[]> t3 = Transform(points, [1, 0, 0], minZ, minY, X);
+            List<int[]> t4 = Transform(points, [1, 1, 0], minZ, Y, X); t4.Reverse();
+            List<int[]> t5 = Transform(points, [0, 1, 0], Y, minZ, minX);
+            List<int[]> t6 = Transform(points, [0, 1, 1], Y, Z, minX); t6.Reverse();
+            List<int[]> t7 = Transform(points, [1, 1, 1], Z, Y, X);
+            List<int[]> t8 = Transform(points, [1, 0, 1], Z, minY, X); t8.Reverse();
+            List<int[]> result = new();
+            List<int[]>[] subs = [t1, t2, t3, t4, t5, t6, t7, t8];
+            foreach (var range in subs)
+                result.AddRange(range);
+            //return result;
+            
+            int[]? minPoint = result.Min(new PointComparer());
+            int index = minPoint == null ? 0 : result.IndexOf(minPoint);
+            result = result.Skip(index).Concat(result.Take(index)).ToList();
+            return Transform(result, [0, 0, 0], X, Y, Z);
         }
 
+        static public void GenerateCyclic(StringBuilder sb, int level)
+        {
+            level = Math.Max(level, 1);
+            MetaData.StartSubModel(sb, $"Hilbert3D_{level}");
+            var points = PointCollection(level);
+            var connects = points.Zip(points.Skip(1).Append(points[0])).Select(t => new double[] { 2.0*(t.First[0] + t.Second[0]), 2.0*(t.First[1] + t.Second[1]), 5*(t.First[2] + t.Second[2]) } ).ToList();
+            var all = connects.Concat(points.Select<int[],double[]>(a => [4.0 * a[0], 4.0 * a[1],10.0*a[2]]));
+
+            int colorId = ColorMap.Get("Red").id; //trans clear//
+            Brick brick = new (2, 2);
+            Tile squareTile = new(2, 2);
+            Shape squareInvertedTile = new() { PartID = "11203" };
+            foreach ( var point in all)
+            {
+                sb.AppendLine(squareInvertedTile.Print(point[0], point[1], point[2], colorId));
+                sb.AppendLine(brick.Print(point[0], point[1], point[2]+3, colorId));
+                sb.AppendLine(squareTile.Print(point[0], point[1], point[2] + 4, colorId));
+            }
+        }
 
 
         static public void Generate(StringBuilder sb, int level)
@@ -136,49 +187,20 @@ namespace BrunnianLink
         {
             level = Math.Max(level, 1);
             MetaData.StartSubModel(sb, $"Hilbert3D_hollow_{level}");
-
-            string commands = "X";
-            for (int i = 0; i < level; i++)
-                commands = commands.Replace("X", "^<XF^<XFX-F^>>XFX&F+>>XFX-F>X->");
-
-            int[] lastPoint = new int[] { 0, 0, 0 };
-            Rotation rotation = new();
-
             int size = (1 << (level + 1)) + 1;
-
             holes = new bool[size, size, size + 1];
-            holes[0, 1, 1] = true;
-            holes[1, 1, 1] = true;
-            holes[size - 1, 1, 1] = true;
             for (int x = 0; x < size; x++)
                 for (int y = 0; y < size; y++)
                     holes[x, y, size] = true;
-
-            foreach (char command in commands)
-            {
-                switch (command)
-                {
-                    case 'F':
-                        int[] newPoint = rotation.Forward(lastPoint);
-                        System.Diagnostics.Debug.WriteLine(string.Join(' ', newPoint));
-                        holes[newPoint[0] * 2 + 1, newPoint[1] * 2 + 1, newPoint[2] * 2 + 1] = true;
-                        holes[newPoint[0] + lastPoint[0] + 1, newPoint[1] + lastPoint[1] + 1, newPoint[2] + lastPoint[2] + 1] = true;
-                        lastPoint = newPoint;
-                        break;
-                    case '+':
-                        rotation.Yaw(false); break;
-                    case '-':
-                        rotation.Yaw(true); break;
-                    case '^':
-                        rotation.Pitch(true); break;
-                    case '&':
-                        rotation.Pitch(false); break;
-                    case '<':
-                        rotation.Roll(true); break;
-                    case '>':
-                        rotation.Roll(false); break;
-                }
+            var pointCollection = PointCollection(level);
+            int[] prevPoint = pointCollection[pointCollection.Count-1];
+            foreach (var point in pointCollection)
+            { 
+                holes[point[0] * 2 + 1, point[1] * 2 + 1, point[2] * 2 + 1] = true;
+                holes[point[0] + prevPoint[0] + 1, point[1] + prevPoint[1] + 1, point[2] + prevPoint[2] + 1] = true;
+                prevPoint = point;
             }
+            holes[1, 0, 1] = true; //the peeper;
             bool regular = true;
             int colorId = ColorMap.Get("Bright_Pink").id; //trans clear//
             Shape[] square2x2Shapes = { new Plate(2, 2), new Brick(2, 2), new Plate(2, 2) };
