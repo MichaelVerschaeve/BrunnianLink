@@ -203,7 +203,9 @@ namespace BrunnianLink
             holes[1, 0, 1] = true; //the peeper;
             bool regular = true;
             int colorId = ColorMap.Get("Bright_Pink").id; //trans clear//
+            int colorId2 = ColorMap.Get("Medium_Lavender").id; //trans clear//
             Shape[] square2x2Shapes = { new Plate(2, 2), new Brick(2, 2), new Plate(2, 2) };
+            Shape[] L2x2Shapes = { new() { PartID = "2420" }, new() { PartID = "2357" }, new() { PartID = "2420" } };
             Tile SquareTile = new(2, 2);
             Shape SquareInvertedTile = new() { PartID = "11203" };
             Shape[] square1x1Shapes = { new Plate(1, 1), new Brick(1, 1), new Plate(1, 1) };
@@ -247,6 +249,14 @@ namespace BrunnianLink
                                     sb.AppendLine(rect2x1Shapes[j].Print(2 * x, 2 * y - 0.5, z[j], colorId));
                                 else if (holeBottomLeft && !holeTopLeft && holeBottomRight && !holeTopRight)
                                     sb.AppendLine(rect2x1Shapes[j].Print(2 * x, 2 * y + 0.5, z[j], colorId));
+                                else if (!holeBottomLeft && !holeTopLeft && !holeBottomRight && holeTopRight)
+                                    sb.AppendLine(L2x2Shapes[j].Print(2 * x-0.5, 2 * y-0.5 , z[j], colorId2));
+                                else if (!holeBottomLeft && holeTopLeft && !holeBottomRight && !holeTopRight)
+                                    sb.AppendLine(L2x2Shapes[j].Rotate(90).Print(2 * x + 0.5, 2 * y -  0.5, z[j], colorId2));
+                                else if (holeBottomLeft && !holeTopLeft && !holeBottomRight && !holeTopRight)
+                                    sb.AppendLine(L2x2Shapes[j].Rotate(180).Print(2 * x + 0.5, 2 * y + 0.5, z[j], colorId2));
+                                else if (!holeBottomLeft && !holeTopLeft && holeBottomRight && !holeTopRight)
+                                    sb.AppendLine(L2x2Shapes[j].Rotate(270).Print(2 * x - 0.5, 2 * y + 0.5, z[j], colorId2));
                                 else
                                 {
                                     Shape s = square1x1Shapes[j];

@@ -77,7 +77,7 @@ namespace BrunnianLink
             sb.AppendLine(wedgePlate2.Print(0, 0, 3, ColorMap.Get("Black").id));
             */
             int level = (int)nudLevel.Value;
-            int modelChoice = TextToIndex[cbModelChoice.SelectedItem.ToString()!];
+            int modelChoice = TextToIndex[cbModelChoice.SelectedItem?.ToString()!];
             string file = tbPath.Text;
             string parentDir = Directory.GetParent(file)?.FullName!;
             if (!Directory.Exists(parentDir))
