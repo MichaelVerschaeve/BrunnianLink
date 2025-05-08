@@ -35,7 +35,7 @@ namespace BrunnianLink
 
         static bool ShapeCondition(List<int[]> source)
         {
-            var ortho = (int i, int j) => FormVector(source,i).Zip(FormVector(source, j)).Select(p=>p.First*p.Second).Sum()==0;
+            bool ortho(int i, int j) => FormVector(source, i).Zip(FormVector(source, j)).Select(p => p.First * p.Second).Sum() == 0;
             //last segment and first two pairwise perpendicular
             if (!ortho(-1,0) || !ortho(0,1) || !ortho(-1,1))
                 return false;
@@ -82,7 +82,7 @@ namespace BrunnianLink
             List<int[]> t6 = Transform(points, [0, 1, 1], Y, Z, minX); t6.Reverse();
             List<int[]> t7 = Transform(points, [1, 1, 1], Z, Y, X);
             List<int[]> t8 = Transform(points, [1, 0, 1], Z, minY, X); t8.Reverse();
-            List<int[]> result = new();
+            List<int[]> result = [];
             List<int[]>[] subs = [t1, t2, t3, t4, t5, t6, t7, t8];
             foreach (var range in subs)
                 result.AddRange(range);
@@ -124,9 +124,9 @@ namespace BrunnianLink
             for (int i = 0; i < level; i++)
                 commands = commands.Replace("X", "^<XF^<XFX-F^>>XFX&F+>>XFX-F>X->");
 
-            List<int[]> points = new() { new int[] { 0, 0, 0 } };
+            List<int[]> points = [[0, 0, 0]];
             bool? currentTube = null;
-            List<Rotation> rotations = new() { new Rotation() };
+            List<Rotation> rotations = [new Rotation()];
 
 
             Rotation rotation = new();
@@ -193,7 +193,7 @@ namespace BrunnianLink
                 for (int y = 0; y < size; y++)
                     holes[x, y, size] = true;
             var pointCollection = PointCollection(level);
-            int[] prevPoint = pointCollection[pointCollection.Count-1];
+            int[] prevPoint = pointCollection[^1];
             foreach (var point in pointCollection)
             { 
                 holes[point[0] * 2 + 1, point[1] * 2 + 1, point[2] * 2 + 1] = true;
@@ -208,12 +208,12 @@ namespace BrunnianLink
             Shape[] L2x2Shapes = { new() { PartID = "2420" }, new() { PartID = "2357" }, new() { PartID = "2420" } };
             Tile SquareTile = new(2, 2);
             Shape SquareInvertedTile = new() { PartID = "11203" };
-            Shape[] square1x1Shapes = { new Plate(1, 1), new Brick(1, 1), new Plate(1, 1) };
-            Shape[] rect1x2Shapes = { new Plate(1, 2), new Brick(1, 2), new Plate(1, 2) };
-            Shape[] rect2x1Shapes = { new Plate(2, 1), new Brick(2, 1), new Plate(2, 1) };
+            Shape[] square1x1Shapes = [new Plate(1, 1), new Brick(1, 1), new Plate(1, 1)];
+            Shape[] rect1x2Shapes = [new Plate(1, 2), new Brick(1, 2), new Plate(1, 2)];
+            Shape[] rect2x1Shapes = [new Plate(2, 1), new Brick(2, 1), new Plate(2, 1)];
             for (int i = 0; i < size; i++)
             {
-                int[] z = { 5 * i + 1, 5 * i + 4, 5 * i + 5 };
+                int[] z = [5 * i + 1, 5 * i + 4, 5 * i + 5];
                 for (int j = 0; j < 3; j++)
                 {
                     if (regular)
@@ -260,9 +260,9 @@ namespace BrunnianLink
                                 else
                                 {
                                     Shape s = square1x1Shapes[j];
-                                    double[] xoffset = { -0.5, -0.5, 0.5, 0.5 };
-                                    double[] yoffset = { -0.5, 0.5, -0.5, 0.5 };
-                                    bool[] skipcondition = { holeBottomLeft, holeTopLeft, holeBottomRight, holeTopRight };
+                                    double[] xoffset = [-0.5, -0.5, 0.5, 0.5];
+                                    double[] yoffset = [-0.5, 0.5, -0.5, 0.5];
+                                    bool[] skipcondition = [holeBottomLeft, holeTopLeft, holeBottomRight, holeTopRight];
                                     for (int k = 0; k < 4; k++)
                                         if (!skipcondition[k])
                                             sb.AppendLine(s.Print(2 * x + xoffset[k], 2 * y + yoffset[k], z[j], colorId));
@@ -307,19 +307,19 @@ namespace BrunnianLink
             {
                 sb.Append($"{60 * points[1][i]} ");
             }
-            sb.Append( new Rotation(new int[][] { vX_In, CrossProduct(vX_Out, vX_In), vX_Out }));
+            sb.Append( new Rotation([vX_In, CrossProduct(vX_Out, vX_In), vX_Out]));
             sb.AppendLine(" 25214.dat"); //elbow
             return true;
         }
 
         private static int[] CrossProduct(int[] a, int[] b)
         {
-            return new int[] {
+            return [
 
                 a[1] * b[2] - a[2] * b[1],
                 a[2] * b[0] - a[0] * b[2],
                 a[0] * b[1] - a[1] * b[0]
-            };
+            ];
 
         }
     }
@@ -328,7 +328,7 @@ namespace BrunnianLink
     {
 
 
-        int[] mat = new int[] { 1, 0, 0, 0, 1, 0, 0, 0, 1 }; //row storage
+        int[] mat = [1, 0, 0, 0, 1, 0, 0, 0, 1]; //row storage
 
         public Rotation(int[][] columns)
         {
